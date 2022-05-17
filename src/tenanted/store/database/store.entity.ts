@@ -1,0 +1,42 @@
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { StorePhone } from './store-phone.entity'
+import { StoreWorker } from './store-worker.entity'
+
+@Entity({ name: 'stores' })
+export class Store {
+  @PrimaryGeneratedColumn('increment')
+  id: number
+
+  @Column({ nullable: false })
+  store: string
+
+  @Column()
+  description?: string
+
+  @Column({ nullable: false })
+  address: string
+
+  @Column({ nullable: false, default: false })
+  isMain?: boolean
+
+  @Column({ type: 'decimal', nullable: true })
+  latitude?: number
+
+  @Column({ type: 'decimal', nullable: true })
+  longitude?: number
+
+  @Column({ nullable: true })
+  cityId?: number
+
+  @Column()
+  isOpenAlways: boolean
+
+  @OneToMany(() => StorePhone, (phone) => phone.store, { eager: true })
+  phones?: StorePhone[]
+
+  @OneToMany(() => StoreWorker, (worker) => worker.store, { eager: true })
+  workers?: StoreWorker[]
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: number
+}
