@@ -1,4 +1,3 @@
-import { PHONE_TYPES } from 'src/tenanted/common/classTypes'
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Store } from './store.entity'
 
@@ -13,7 +12,7 @@ export class StorePhone {
   @Column()
   countryCode: number
 
-  @Column({ enum: PHONE_TYPES })
+  @Column()
   type: string
 
   @ManyToOne(() => Store, (store) => store.phones)
