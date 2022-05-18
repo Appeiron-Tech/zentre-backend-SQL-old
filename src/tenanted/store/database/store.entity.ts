@@ -19,10 +19,10 @@ export class Store {
   @Column({ nullable: false, default: false })
   isMain?: boolean
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'decimal', precision: 6, scale: 3, nullable: true })
   latitude?: number
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'decimal', precision: 6, scale: 3, nullable: true })
   longitude?: number
 
   @Column({ nullable: true })

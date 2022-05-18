@@ -27,6 +27,14 @@ export class StoreService {
     return stores
   }
 
+  async findAllWorkers(): Promise<StoreWorker[]> {
+    const workers = await this.storeWorkerRepository
+      .createQueryBuilder()
+      .groupBy('store')
+      .getMany()
+    return workers
+  }
+
   async create(store: CreateStoreDto): Promise<Store> {
     const createdStore = await this.storeRepository.save(store)
     return createdStore

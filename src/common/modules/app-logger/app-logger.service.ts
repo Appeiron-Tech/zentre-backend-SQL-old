@@ -13,31 +13,31 @@ export class AppLoggerService extends Logger {
     // this.cloudLogger.setContext(context)
   }
 
-  log(logName: string, message: string) {
+  log(message: string) {
     // if (this.sendToCloudLogging) this.cloudLogger.log(logName, message)
     super.log(message)
   }
 
-  info(logName: string, message: string, payLoad?: any) {
+  info(message: string, payLoad?: any) {
     // if (this.sendToCloudLogging)
     //   this.cloudLogger.info(logName, message, payLoad)
     message = payLoad ? message + '\n' + payLoad : message
     super.log(message)
   }
 
-  notice(logName: string, message: string, payLoad?: any) {
+  notice(message: string, payLoad?: any) {
     // if (this.sendToCloudLogging)
     //   this.cloudLogger.notice(logName, message, payLoad)
     message = payLoad ? message + '\n' + payLoad : message
     super.log(message)
   }
 
-  warn(message: string, logName: string) {
+  warn(message: string) {
     // if (this.sendToCloudLogging) this.cloudLogger.warn(logName, message)
     super.warn(message)
   }
 
-  error(message: string, trace: string, logName: string) {
+  error(message: string, trace: string) {
     // if (this.sendToCloudLogging) this.cloudLogger.error(logName, message, trace)
     super.error(message, trace)
   }
