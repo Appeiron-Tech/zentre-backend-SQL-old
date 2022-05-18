@@ -6,8 +6,10 @@ import {
   Param,
   Patch,
   Post,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common'
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { StoreWorker } from './database/store-worker.entity'
 import { Store } from './database/store.entity'
 import { CreateStoreWorkerDto } from './dto/create-store-worker.dto'
@@ -15,6 +17,7 @@ import { CreateStoreDto } from './dto/create-store.dto'
 import { UpdateStoreDto } from './dto/update-store.dto'
 import { StoreService } from './store.service'
 
+@UseInterceptors(LoggingInterceptor)
 @Controller('api/store')
 export class StoreController {
   constructor(private storeService: StoreService) {}
