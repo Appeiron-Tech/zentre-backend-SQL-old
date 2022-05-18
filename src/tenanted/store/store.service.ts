@@ -8,6 +8,7 @@ import { Store } from './database/store.entity'
 import { CreateStorePhoneDto } from './dto/create-store-phone.dto'
 import { CreateStoreWorkerDto } from './dto/create-store-worker.dto'
 import { CreateStoreDto } from './dto/create-store.dto'
+import { ResStoreWorkerDto } from './dto/res-store-worker.dto'
 import { UpdateStoreDto } from './dto/update-store.dto'
 
 @Injectable({ scope: Scope.REQUEST })
@@ -30,8 +31,10 @@ export class StoreService {
   async findAllWorkers(): Promise<StoreWorker[]> {
     const workers = await this.storeWorkerRepository
       .createQueryBuilder()
-      .groupBy('storeId')
+      .orderBy('storeId')
+      .addOrderBy('id')
       .getMany()
+    console.log(JSON.stringify(workers))
     return workers
   }
 
@@ -47,8 +50,6 @@ export class StoreService {
       { id: storeId },
       { ...store },
     )
-    console.log('****************')
-    console.log(updatedStore)
     return updatedStore
   }
 

@@ -14,6 +14,7 @@ import { StoreWorker } from './database/store-worker.entity'
 import { Store } from './database/store.entity'
 import { CreateStoreWorkerDto } from './dto/create-store-worker.dto'
 import { CreateStoreDto } from './dto/create-store.dto'
+import { ResStoreWorkerDto } from './dto/res-store-worker.dto'
 import { UpdateStoreDto } from './dto/update-store.dto'
 import { StoreService } from './store.service'
 

@@ -6,6 +6,9 @@ export class StoreWorker {
   @PrimaryGeneratedColumn('increment')
   id: number
 
+  @Column('int', { nullable: true })
+  storeId: number
+
   @ManyToOne(() => Store, (store) => store.workers)
   store: number
 
