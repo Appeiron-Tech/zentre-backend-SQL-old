@@ -3,7 +3,7 @@ import { CreateStorePhoneDto } from './create-store-phone.dto'
 
 export class CreateStoreDto {
   store: string
-  description: string
+  description?: string
   address: string
 
   isMain: boolean

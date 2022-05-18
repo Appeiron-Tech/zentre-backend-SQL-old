@@ -8,6 +8,7 @@ import { Store } from './database/store.entity'
 import { CreateStorePhoneDto } from './dto/create-store-phone.dto'
 import { CreateStoreWorkerDto } from './dto/create-store-worker.dto'
 import { CreateStoreDto } from './dto/create-store.dto'
+import { UpdateStoreDto } from './dto/update-store.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class StoreService {
@@ -29,6 +30,18 @@ export class StoreService {
   async create(store: CreateStoreDto): Promise<Store> {
     const createdStore = await this.storeRepository.save(store)
     return createdStore
+  }
+
+  async update(storeId: number, store: UpdateStoreDto): Promise<any> {
+    console.log('update store: ' + storeId)
+    console.log('with data: ' + JSON.stringify(store))
+    const updatedStore = await this.storeRepository.update(
+      { id: storeId },
+      { ...store },
+    )
+    console.log('****************')
+    console.log(updatedStore)
+    return updatedStore
   }
 
   async createPhones(

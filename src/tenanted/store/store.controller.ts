@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   ValidationPipe,
 } from '@nestjs/common'
@@ -11,6 +12,7 @@ import { StoreWorker } from './database/store-worker.entity'
 import { Store } from './database/store.entity'
 import { CreateStoreWorkerDto } from './dto/create-store-worker.dto'
 import { CreateStoreDto } from './dto/create-store.dto'
+import { UpdateStoreDto } from './dto/update-store.dto'
 import { StoreService } from './store.service'
 
 @Controller('api/store')
@@ -31,10 +33,18 @@ export class StoreController {
     if (store.phones) {
       await this.storeService.createPhones(createdStore.id, store.phones)
     }
-    // if (store.workers) {
-    //   await this.storeService.createWorkers(createdStore.id, store.workers)
-    // }
     return createdStore
+  }
+
+  @Patch('/:id')
+  async update(
+    @Param('id') storeId: number,
+    @Body(new ValidationPipe()) store: UpdateStoreDto,
+  ): Promise<void> {
+    await this.storeService.update(storeId, store)
+    // if (store.phones) {
+    //   await this.storeService.createPhones(createdStore.id, store.phones)
+    // }
   }
 
   @Delete('/:id')
