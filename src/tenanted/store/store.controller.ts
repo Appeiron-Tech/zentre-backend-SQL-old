@@ -28,6 +28,12 @@ export class StoreController {
     return stores
   }
 
+  @Get('/allWorkers')
+  async findAllWorkers(): Promise<StoreWorker[]> {
+    const workers = await this.storeService.findAllWorkers()
+    return workers
+  }
+
   @Post()
   async create(
     @Body(new ValidationPipe()) store: CreateStoreDto,

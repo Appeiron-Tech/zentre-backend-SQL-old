@@ -30,7 +30,7 @@ export class StoreService {
   async findAllWorkers(): Promise<StoreWorker[]> {
     const workers = await this.storeWorkerRepository
       .createQueryBuilder()
-      .groupBy('store')
+      .groupBy('storeId')
       .getMany()
     return workers
   }
