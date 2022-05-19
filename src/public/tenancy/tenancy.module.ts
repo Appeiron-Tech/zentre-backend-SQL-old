@@ -19,6 +19,7 @@ import { TenancyService as DBTenancyService } from 'src/database/public/tenancy/
 import { StorePhone } from 'src/tenanted/store/database/store-phone.entity'
 import { Store } from 'src/tenanted/store/database/store.entity'
 import { StoreWorker } from 'src/tenanted/store/database/store-worker.entity'
+import { StoreOpeningHour } from 'src/tenanted/store/database/store-opening-hour.entity'
 
 @Module({
   imports: [DBTenancyModule],
@@ -80,6 +81,7 @@ export class TenancyModule {
                 Store,
                 StorePhone,
                 StoreWorker,
+                StoreOpeningHour,
               ],
               // entities: [__dirname + '/**/*.entity{.ts,.js}'],
               synchronize: true,

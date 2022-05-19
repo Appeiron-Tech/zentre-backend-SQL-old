@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { StoreOpeningHour } from './store-opening-hour.entity'
 import { StorePhone } from './store-phone.entity'
 import { StoreWorker } from './store-worker.entity'
 
@@ -48,6 +49,11 @@ export class Store {
 
   @OneToMany(() => StoreWorker, (worker) => worker.store, { eager: true })
   workers?: StoreWorker[]
+
+  @OneToMany(() => StoreOpeningHour, (openingHour) => openingHour.store, {
+    eager: true,
+  })
+  openingHours?: StoreOpeningHour[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number

@@ -15,6 +15,9 @@ export class StoreWorker {
   @Column({ nullable: false })
   name: string
 
+  @Column({ nullable: true })
+  email: string
+
   @Column()
   jobTitle?: string
 
