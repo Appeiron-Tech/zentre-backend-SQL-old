@@ -4,3 +4,7 @@ export async function asyncForEach(array, callback) {
     await callback(array[index], index, array)
   }
 }
+
+export function isEmpty(obj: any): boolean {
+  return Object.keys(obj).length === 0
+}

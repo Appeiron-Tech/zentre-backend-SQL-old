@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  MiddlewareConsumer,
-  Module,
-  RequestMethod,
-} from '@nestjs/common'
+import { BadRequestException, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NextFunction, Request } from 'express'
 import { User } from 'src/tenanted/user/user.entity'
@@ -20,6 +15,7 @@ import { StorePhone } from 'src/tenanted/store/database/store-phone.entity'
 import { Store } from 'src/tenanted/store/database/store.entity'
 import { StoreWorker } from 'src/tenanted/store/database/store-worker.entity'
 import { StoreOpeningHour } from 'src/tenanted/store/database/store-opening-hour.entity'
+import { Announcement } from 'src/tenanted/announcement/database/announcement.entity'
 
 @Module({
   imports: [DBTenancyModule],
@@ -40,15 +36,11 @@ export class TenancyModule {
         const tenancyHost: string = this.getTenancyHost(req.hostname)
         console.log('tenancyHost: ' + tenancyHost)
         if (tenancyHost === null) {
-          throw new BadRequestException(
-            'Invalid Hostname, more than one subdomain',
-          )
+          throw new BadRequestException('Invalid Hostname, more than one subdomain')
         }
 
         if (tenancyHost) {
-          const tenancy: ITenancy = await this.tenancyService.findOne(
-            tenancyHost,
-          )
+          const tenancy: ITenancy = await this.tenancyService.findOne(tenancyHost)
 
           if (!tenancy) {
             throw new BadRequestException(
@@ -62,9 +54,7 @@ export class TenancyModule {
             console.log('connection exists')
             next()
           } catch (e) {
-            await this.connection.query(
-              `CREATE DATABASE IF NOT EXISTS ${tenancy.name}`,
-            )
+            await this.connection.query(`CREATE DATABASE IF NOT EXISTS ${tenancy.name}`)
 
             const createdConnection: Connection = await createConnection({
               name: tenancy.name,
@@ -82,6 +72,7 @@ export class TenancyModule {
                 StorePhone,
                 StoreWorker,
                 StoreOpeningHour,
+                Announcement,
               ],
               // entities: [__dirname + '/**/*.entity{.ts,.js}'],
               synchronize: true,

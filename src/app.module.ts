@@ -6,6 +6,7 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { TenancyModule } from './public/tenancy/tenancy.module'
 import { ThemesModule } from './public/themes/themes.module'
+import { AnnouncementModule } from './tenanted/announcement/announcement.module'
 import { ClientModule } from './tenanted/client/client.module'
 import { StoreModule } from './tenanted/store/store.module'
 import { UserModule } from './tenanted/user/user.module'
@@ -34,6 +35,7 @@ import { UserModule } from './tenanted/user/user.module'
     ThemesModule,
     ClientModule,
     StoreModule,
+    AnnouncementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

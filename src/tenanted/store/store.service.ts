@@ -7,10 +7,11 @@ import { StorePhone } from './database/store-phone.entity'
 import { StoreWorker } from './database/store-worker.entity'
 import { Store } from './database/store.entity'
 import { CreateStorePhoneDto } from './dto/create-store-phone.dto'
-import { CreateStoreWorkerDto } from './dto/create-store-worker.dto'
+import { CreateStoreWorkerDto } from './dto/worker/create-store-worker.dto'
 import { CreateStoreDto } from './dto/create-store.dto'
-import { UpdStoreWorkerDto } from './dto/upd-store-worker.dto'
+import { UpdStoreWorkerDto } from './dto/worker/upd-store-worker.dto'
 import { UpdateStoreDto } from './dto/upd-store.dto'
+import { UpdStoreOpeningHourDto } from './dto/upd-store-opening-hour.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class StoreService {
@@ -37,8 +38,6 @@ export class StoreService {
   }
 
   async update(storeId: number, store: UpdateStoreDto): Promise<any> {
-    console.log('update store: ' + storeId)
-    console.log('with data: ' + JSON.stringify(store))
     const updatedStore = await this.storeRepository.update({ id: storeId }, { ...store })
     return updatedStore
   }
@@ -48,12 +47,6 @@ export class StoreService {
       phone.store = storeId
       await this.storePhoneRepository.save(phone)
     })
-  }
-
-  async createWorker(storeId: number, worker: CreateStoreWorkerDto): Promise<StoreWorker> {
-    worker.store = storeId
-    const createdWorker = await this.storeWorkerRepository.save(worker)
-    return createdWorker
   }
 
   async dropStorePhones(storeId: number): Promise<void> {
@@ -67,6 +60,12 @@ export class StoreService {
   }
 
   // ********************** Store Worker ********************** //
+  async createWorker(storeId: number, worker: CreateStoreWorkerDto): Promise<StoreWorker> {
+    worker.store = storeId
+    const createdWorker = await this.storeWorkerRepository.save(worker)
+    return createdWorker
+  }
+
   async findAllWorkers(): Promise<StoreWorker[]> {
     const workers = await this.storeWorkerRepository
       .createQueryBuilder()
@@ -77,10 +76,13 @@ export class StoreService {
   }
 
   async updateWorker(workerId: number, worker: UpdStoreWorkerDto): Promise<any> {
-    console.log('update store: ' + workerId)
-    console.log('with data: ' + JSON.stringify(worker))
     const updatedStore = await this.storeWorkerRepository.update({ id: workerId }, { ...worker })
     return updatedStore
+  }
+
+  async dropWorker(workerId: number): Promise<void> {
+    console.log('dropping worker')
+    await this.storeWorkerRepository.delete({ id: workerId })
   }
 
   // ********************** Opening Hours ********************** //
@@ -98,5 +100,21 @@ export class StoreService {
     openingHour.storeId = storeId
     const createdOpeningHour = await this.storeOpeningHourRepository.save(openingHour)
     return createdOpeningHour
+  }
+
+  // async updateOpeningHour(
+  //   openingHourId: number,
+  //   openingHour: UpdStoreOpeningHourDto,
+  // ): Promise<any> {
+  //   const updatedOpeningHour = await this.storeOpeningHourRepository.update(
+  //     { id: openingHourId },
+  //     { ...openingHour },
+  //   )
+  //   return updatedOpeningHour
+  // }
+
+  async dropStoreOpeningHours(storeId: number, weekDay: number): Promise<void> {
+    console.log('dropping opening hours for week day', weekDay)
+    await this.storeOpeningHourRepository.delete({ storeId: storeId, weekDay: weekDay })
   }
 }
