@@ -1,4 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common'
+import { ScreenService } from './screen.service'
 
-@Controller('screen')
-export class ScreenController {}
+@Controller('public/screen')
+export class ScreenController {
+  constructor(private screenService: ScreenService) {}
+
+  @Get()
+  async findAll(): Promise<any> {
+    return this.screenService.findAll()
+  }
+}

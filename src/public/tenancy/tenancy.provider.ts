@@ -12,10 +12,7 @@ export const TenancyProvider: Provider = {
   scope: Scope.REQUEST,
   useFactory: async (req: Request, connection: Connection) => {
     const name: string = req.hostname.split('.')[0]
-    const tenant: Tenancy = await connection
-      .getRepository(Tenancy)
-      .findOne({ where: { name } })
-
+    const tenant: Tenancy = await connection.getRepository(Tenancy).findOne({ where: { name } })
     return getConnection(tenant.name)
   },
 }

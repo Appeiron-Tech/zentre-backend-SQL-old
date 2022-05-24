@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConnectionOptions } from 'typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { ScreenModule } from './public/screen/screen.module'
 import { TenancyModule } from './public/tenancy/tenancy.module'
 import { ThemesModule } from './public/themes/themes.module'
 import { AnnouncementModule } from './tenanted/announcement/announcement.module'
@@ -30,9 +31,13 @@ import { UserModule } from './tenanted/user/user.module'
         } as ConnectionOptions
       },
     }),
+    //PUBLIC
     TenancyModule,
     UserModule,
     ThemesModule,
+    ScreenModule,
+
+    //TENANTED
     ClientModule,
     StoreModule,
     AnnouncementModule,

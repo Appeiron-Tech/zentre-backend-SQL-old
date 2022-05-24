@@ -11,7 +11,6 @@ import { CreateStoreWorkerDto } from './dto/worker/create-store-worker.dto'
 import { CreateStoreDto } from './dto/create-store.dto'
 import { UpdStoreWorkerDto } from './dto/worker/upd-store-worker.dto'
 import { UpdateStoreDto } from './dto/upd-store.dto'
-import { UpdStoreOpeningHourDto } from './dto/upd-store-opening-hour.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class StoreService {

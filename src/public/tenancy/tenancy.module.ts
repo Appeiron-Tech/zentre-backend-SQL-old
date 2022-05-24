@@ -30,69 +30,63 @@ export class TenancyModule {
     private readonly tenancyService: TenancyService,
   ) {}
   configure(consumer: MiddlewareConsumer): void {
-    consumer
-      .apply(async (req: Request, res: Response, next: NextFunction) => {
-        // const tenancyHost: string = req.params['0'].split('/')[0]
-        const tenancyHost: string = this.getTenancyHost(req.hostname)
-        console.log('tenancyHost: ' + tenancyHost)
-        if (tenancyHost === null) {
-          throw new BadRequestException('Invalid Hostname, more than one subdomain')
+    consumer.apply(async (req: Request, res: Response, next: NextFunction) => {
+      // const tenancyHost: string = req.params['0'].split('/')[0]
+      const tenancyHost: string = this.getTenancyHost(req.hostname)
+      console.log('tenancyHost: ' + tenancyHost)
+      if (tenancyHost === null) {
+        throw new BadRequestException('Invalid Hostname, more than one subdomain')
+      }
+
+      if (tenancyHost) {
+        const tenancy: ITenancy = await this.tenancyService.findOne(tenancyHost)
+
+        if (!tenancy) {
+          throw new BadRequestException('Database Connection Error', 'This tenancy does not exists')
         }
 
-        if (tenancyHost) {
-          const tenancy: ITenancy = await this.tenancyService.findOne(tenancyHost)
+        try {
+          getConnection(tenancy.name)
+          console.log('connection exists')
+          next()
+        } catch (e) {
+          await this.connection.query(`CREATE DATABASE IF NOT EXISTS ${tenancy.name}`)
 
-          if (!tenancy) {
+          const createdConnection: Connection = await createConnection({
+            name: tenancy.name,
+            type: 'mysql',
+            host: this.configService.get('DB_HOST'),
+            port: +this.configService.get('DB_PORT'),
+            username: this.configService.get('DB_USER'),
+            password: this.configService.get('DB_PASSWORD'),
+            database: tenancy.name,
+            entities: [
+              User,
+              Client,
+              ClientPhone,
+              Store,
+              StorePhone,
+              StoreWorker,
+              StoreOpeningHour,
+              Announcement,
+            ],
+            // entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: true,
+          })
+
+          if (createdConnection) {
+            next()
+          } else {
             throw new BadRequestException(
               'Database Connection Error',
-              'This tenancy does not exists',
+              'There is a Error with the Database!',
             )
           }
-
-          try {
-            getConnection(tenancy.name)
-            console.log('connection exists')
-            next()
-          } catch (e) {
-            await this.connection.query(`CREATE DATABASE IF NOT EXISTS ${tenancy.name}`)
-
-            const createdConnection: Connection = await createConnection({
-              name: tenancy.name,
-              type: 'mysql',
-              host: this.configService.get('DB_HOST'),
-              port: +this.configService.get('DB_PORT'),
-              username: this.configService.get('DB_USER'),
-              password: this.configService.get('DB_PASSWORD'),
-              database: tenancy.name,
-              entities: [
-                User,
-                Client,
-                ClientPhone,
-                Store,
-                StorePhone,
-                StoreWorker,
-                StoreOpeningHour,
-                Announcement,
-              ],
-              // entities: [__dirname + '/**/*.entity{.ts,.js}'],
-              synchronize: true,
-            })
-
-            if (createdConnection) {
-              next()
-            } else {
-              throw new BadRequestException(
-                'Database Connection Error',
-                'There is a Error with the Database!',
-              )
-            }
-          }
-        } else {
-          next()
         }
-      })
-      .exclude({ path: '/public/tenants', method: RequestMethod.ALL })
-      .forRoutes('*')
+      } else {
+        next()
+      }
+    })
   }
 
   private getTenancyHost(fullHostname: string): string {
