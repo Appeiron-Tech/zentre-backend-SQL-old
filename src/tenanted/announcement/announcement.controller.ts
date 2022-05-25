@@ -6,9 +6,11 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { isEmpty } from 'src/utils/utils'
 import { AnnouncementService } from './announcement.service'
 import { Announcement } from './database/announcement.entity'
@@ -16,6 +18,7 @@ import { CreateAnnouncementDto } from './dto/create-announcement.dto'
 import { ReqAnnouncementDto } from './dto/req-announcement.dto'
 import { UpdAnnouncementDto } from './dto/upd-announcement.dto'
 
+@UseInterceptors(LoggingInterceptor)
 @UsePipes(
   new ValidationPipe({
     always: true,

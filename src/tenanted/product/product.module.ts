@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
-import { AnnouncementService } from './announcement.service'
-import { AnnouncementController } from './announcement.controller'
+import { ProductService } from './product.service'
+import { ProductController } from './product.controller'
 import { TenancyModule } from 'src/public/tenancy/tenancy.module'
 import { AppLoggerModule } from 'src/common/modules/app-logger/app-logger.module'
 
 @Module({
   imports: [TenancyModule, AppLoggerModule],
-  providers: [AnnouncementService],
-  controllers: [AnnouncementController],
+  providers: [ProductService],
+  controllers: [ProductController],
 })
-export class AnnouncementModule {}
+export class ProductModule {}

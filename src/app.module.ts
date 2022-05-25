@@ -9,6 +9,7 @@ import { TenancyModule } from './public/tenancy/tenancy.module'
 import { ThemesModule } from './public/themes/themes.module'
 import { AnnouncementModule } from './tenanted/announcement/announcement.module'
 import { ClientModule } from './tenanted/client/client.module'
+import { ProductModule } from './tenanted/product/product.module'
 import { StoreModule } from './tenanted/store/store.module'
 import { UserModule } from './tenanted/user/user.module'
 
@@ -41,6 +42,7 @@ import { UserModule } from './tenanted/user/user.module'
     ClientModule,
     StoreModule,
     AnnouncementModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
