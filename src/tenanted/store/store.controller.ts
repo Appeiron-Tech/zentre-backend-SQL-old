@@ -19,9 +19,11 @@ import { CreateStoreOpeningHourDto } from './dto/create-store-opening-hour.dto'
 import { CreateStoreWorkerDto } from './dto/worker/create-store-worker.dto'
 import { CreateStoreDto } from './dto/create-store.dto'
 import { UpdStoreWorkerDto } from './dto/worker/upd-store-worker.dto'
-import { UpdateStoreDto } from './dto/upd-store.dto'
 import { StoreService } from './store.service'
 import { UpdStoreOpeningHourDto } from './dto/upd-store-opening-hour.dto'
+import { plainToClass } from 'class-transformer'
+import { ReqUpdateStoreDto } from './dto/req-upd-store.dto'
+import { UpdateStoreDto } from './dto/upd-store.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -51,17 +53,20 @@ export class StoreController {
   @Patch('/:id')
   async update(
     @Param('id') storeId: number,
-    @Body(new ValidationPipe()) store: UpdateStoreDto,
+    @Body(new ValidationPipe()) store: ReqUpdateStoreDto,
   ): Promise<void> {
-    await this.storeService.update(storeId, store)
-    // if (store.phones) {
-    //   await this.storeService.createPhones(createdStore.id, store.phones)
-    // }
+    const storeToUpdate = plainToClass(UpdateStoreDto, store)
+    await this.storeService.update(storeId, storeToUpdate)
+    if (store.phones) {
+      await this.storeService.dropStorePhones(storeId)
+      await this.storeService.createPhones(storeId, store.phones)
+    }
   }
 
   @Delete('/:id')
   async drop(@Param('id') id: number): Promise<void> {
     await this.storeService.dropStorePhones(id)
+    await this.storeService.dropAllStoreOpeningHours(id)
     await this.storeService.dropStore(id)
   }
 

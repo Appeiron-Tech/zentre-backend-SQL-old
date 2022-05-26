@@ -44,6 +44,7 @@ export class StoreService {
   async createPhones(storeId: number, phones: CreateStorePhoneDto[]): Promise<void> {
     await asyncForEach(phones, async (phone: StorePhone) => {
       phone.store = storeId
+      if (!phone.isWspMain) phone.isWspMain = false
       await this.storePhoneRepository.save(phone)
     })
   }
@@ -115,5 +116,10 @@ export class StoreService {
   async dropStoreOpeningHours(storeId: number, weekDay: number): Promise<void> {
     console.log('dropping opening hours for week day', weekDay)
     await this.storeOpeningHourRepository.delete({ storeId: storeId, weekDay: weekDay })
+  }
+
+  async dropAllStoreOpeningHours(storeId: number): Promise<void> {
+    console.log('dropping all opening for a store')
+    await this.storeOpeningHourRepository.delete({ storeId: storeId })
   }
 }

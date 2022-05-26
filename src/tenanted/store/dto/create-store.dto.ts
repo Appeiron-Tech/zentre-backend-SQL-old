@@ -1,4 +1,11 @@
-import { IsArray, IsLatitude, IsLongitude, IsOptional } from 'class-validator'
+import {
+  IsArray,
+  IsBoolean,
+  IsLatitude,
+  IsLongitude,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator'
 import { CreateStorePhoneDto } from './create-store-phone.dto'
 
 export class CreateStoreDto {
@@ -6,6 +13,8 @@ export class CreateStoreDto {
   description?: string
   address: string
 
+  @IsNotEmpty()
+  @IsBoolean()
   isMain: boolean
 
   @IsOptional()

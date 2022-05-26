@@ -17,7 +17,7 @@ export class Store {
   @Column({ nullable: false })
   address: string
 
-  @Column({ nullable: false, default: false })
+  @Column({ nullable: true, default: false })
   isMain?: boolean
 
   @Column({
