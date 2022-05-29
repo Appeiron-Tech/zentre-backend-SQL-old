@@ -20,7 +20,6 @@ export class AnnouncementService {
   }
 
   async findBy(reqAnnouncementDto: ReqAnnouncementDto): Promise<Announcement[]> {
-    console.log(JSON.stringify(reqAnnouncementDto))
     const announcements = this.announcementRepository.createQueryBuilder('announcements')
     if (reqAnnouncementDto.screenCode) {
       announcements.where('screenCode = :screenCode')
@@ -39,7 +38,6 @@ export class AnnouncementService {
       screenType: reqAnnouncementDto.screenType,
       isActive: reqAnnouncementDto.isActive,
     })
-    console.log(announcements.getQueryAndParameters())
 
     const foundAnnouncements = await announcements.getMany()
     return foundAnnouncements

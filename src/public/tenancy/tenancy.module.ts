@@ -1,7 +1,6 @@
 import { BadRequestException, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NextFunction, Request } from 'express'
-import { User } from 'src/tenanted/user/user.entity'
 import { Client } from 'src/tenanted/client/entities/client.entity'
 import { ClientPhone } from 'src/tenanted/client/entities/client-phone.entity'
 import { Connection, createConnection, getConnection } from 'typeorm'
@@ -69,7 +68,6 @@ export class TenancyModule {
               password: this.configService.get('DB_PASSWORD'),
               database: tenancy.name,
               entities: [
-                User,
                 Client,
                 ClientPhone,
                 Store,
