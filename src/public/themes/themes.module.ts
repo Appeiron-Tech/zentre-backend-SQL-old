@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common'
-import { ThemesService as DBThemesService } from 'src/database/public/themes/themes.service'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Theme } from './database/theme.entity'
 import { ThemesController } from './themes.controller'
 import { ThemesService } from './themes.service'
-import { ThemesModule as DBThemesModule } from 'src/database/public/themes/themes.module'
 
 @Module({
-  imports: [DBThemesModule],
-  providers: [ThemesService, DBThemesService],
+  imports: [TypeOrmModule.forFeature([Theme])],
+  providers: [ThemesService],
   controllers: [ThemesController],
-  exports: [ThemesService],
+  exports: [TypeOrmModule, ThemesService],
 })
 export class ThemesModule {}

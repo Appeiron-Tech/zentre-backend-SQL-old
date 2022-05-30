@@ -1,8 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import { ITenancy } from './tenancy.interface'
 
 @Entity({ name: 'tenancies' })
-export class Tenancy implements ITenancy {
+export class Tenancy {
   @PrimaryGeneratedColumn('increment')
   id: number
 

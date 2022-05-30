@@ -1,24 +1,20 @@
 import { Injectable } from '@nestjs/common'
-import { ITheme } from 'src/database/public/themes/theme.interface'
-import { ThemesService as DBThemesService } from 'src/database/public/themes/themes.service'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { Theme } from './database/theme.entity'
 
 @Injectable()
 export class ThemesService {
-  constructor(private readonly dbThemesService: DBThemesService) {}
+  constructor(
+    @InjectRepository(Theme)
+    private readonly themeRepository: Repository<Theme>,
+  ) {}
 
-  async findAll(): Promise<ITheme[]> {
+  async findAll(): Promise<Theme[]> {
     try {
-      return await this.dbThemesService.findAll()
+      return await this.themeRepository.find()
     } catch (err) {
-      throw err
-    }
-  }
-
-  async findOne(theme: string): Promise<ITheme> {
-    try {
-      return await this.dbThemesService.findOne(theme)
-    } catch (err) {
-      throw err
+      throw new Error(err)
     }
   }
 }

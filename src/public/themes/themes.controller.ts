@@ -1,13 +1,13 @@
 import { Controller, Get } from '@nestjs/common'
-import { ITheme } from 'src/database/public/themes/theme.interface'
+import { Theme } from './database/theme.entity'
 import { ThemesService } from './themes.service'
 
-@Controller('api/public')
+@Controller('public')
 export class ThemesController {
-  constructor(private readonly tenantService: ThemesService) {}
+  constructor(private readonly themeService: ThemesService) {}
 
-  @Get('/themes')
-  findAll(): Promise<ITheme[]> {
-    return this.tenantService.findAll()
+  @Get('themes')
+  findAll(): Promise<Theme[]> {
+    return this.themeService.findAll()
   }
 }

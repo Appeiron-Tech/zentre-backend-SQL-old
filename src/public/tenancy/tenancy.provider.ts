@@ -2,7 +2,7 @@ import { Provider, Scope } from '@nestjs/common'
 import { REQUEST } from '@nestjs/core'
 import { Connection, getConnection } from 'typeorm'
 import { Request } from 'express'
-import { Tenancy } from '../../database/public/tenancy/tenancy.entity'
+import { Tenancy } from './database/tenancy.entity'
 
 export const TENANCY_CONNECTION = 'TENANCY_CONNECTION'
 

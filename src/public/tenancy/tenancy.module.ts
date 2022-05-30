@@ -6,10 +6,6 @@ import { ClientPhone } from 'src/tenanted/client/entities/client-phone.entity'
 import { Connection, createConnection, getConnection } from 'typeorm'
 import { TenancyController } from './tenancy.controller'
 import { TenancyProvider } from './tenancy.provider'
-import { TenancyService } from '../../database/public/tenancy/tenancy.service'
-import { ITenancy } from 'src/database/public/tenancy/tenancy.interface'
-import { TenancyModule as DBTenancyModule } from 'src/database/public/tenancy/tenancy.module'
-import { TenancyService as DBTenancyService } from 'src/database/public/tenancy/tenancy.service'
 import { StorePhone } from 'src/tenanted/store/database/store-phone.entity'
 import { Store } from 'src/tenanted/store/database/store.entity'
 import { StoreWorker } from 'src/tenanted/store/database/store-worker.entity'
@@ -19,11 +15,14 @@ import { Product } from 'src/tenanted/product/database/product.entity'
 import { Category } from 'src/tenanted/product/database/category.entity'
 import { Variant } from 'src/tenanted/product/database/variant.entity'
 import { VariantOption } from 'src/tenanted/product/database/variantOption.entity'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Tenancy } from './database/tenancy.entity'
+import { TenancyService } from './tenancy.service'
 
 @Module({
-  imports: [DBTenancyModule],
+  imports: [TypeOrmModule.forFeature([Tenancy])],
   controllers: [TenancyController],
-  providers: [TenancyService, TenancyProvider, DBTenancyService],
+  providers: [TenancyService, TenancyProvider],
   exports: [TenancyProvider],
 })
 export class TenancyModule {
@@ -43,7 +42,7 @@ export class TenancyModule {
         }
 
         if (tenancyHost) {
-          const tenancy: ITenancy = await this.tenancyService.findOne(tenancyHost)
+          const tenancy: Tenancy = await this.tenancyService.findOne(tenancyHost)
 
           if (!tenancy) {
             throw new BadRequestException(

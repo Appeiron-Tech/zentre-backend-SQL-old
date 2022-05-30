@@ -1,44 +1,43 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import { ITheme } from './theme.interface'
 
 @Entity({ name: 'themes' })
-export class Theme implements ITheme {
+export class Theme {
   @PrimaryGeneratedColumn('increment')
   id: number
 
-  @Column({ unique: true })
+  @Column({ unique: true, length: 32 })
   theme: string
 
-  @Column()
+  @Column({ length: 32 })
   brightness: string
 
-  @Column()
+  @Column({ length: 6 })
   primary: string
 
-  @Column()
+  @Column({ length: 6 })
   onPrimary: string
 
-  @Column()
+  @Column({ length: 6 })
   secondary: string
 
-  @Column()
+  @Column({ length: 6 })
   onSecondary: string
 
-  @Column()
+  @Column({ length: 6 })
   error: string
 
-  @Column()
+  @Column({ length: 6 })
   onError: string
 
-  @Column()
+  @Column({ length: 6 })
   background: string
 
-  @Column()
+  @Column({ length: 6 })
   onBackground: string
 
-  @Column()
+  @Column({ length: 6 })
   surface: string
 
-  @Column()
+  @Column({ length: 6 })
   onSurface: string
 }
