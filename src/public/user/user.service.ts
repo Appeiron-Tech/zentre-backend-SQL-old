@@ -21,7 +21,7 @@ export class UserService {
 
   async find(reqUser: ReqUserDto): Promise<User> {
     console.log(JSON.stringify(reqUser))
-    const user = await this.userRepository.findOne({ userName: reqUser.userName })
+    const user = await this.userRepository.findOne({ email: reqUser.email })
     // const users = await this.userRepository.find()
     // return users.map((user) => plainToClass(ReadUserDto, user))
     return user
