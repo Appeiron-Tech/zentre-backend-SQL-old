@@ -13,6 +13,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(UserTenancy)
     private readonly userTenancyRepository: Repository<UserTenancy>,
   ) {}
 
