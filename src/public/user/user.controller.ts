@@ -18,6 +18,7 @@ import * as bcryptjs from 'bcryptjs'
 import { plainToClass } from 'class-transformer'
 import { ReadTenancyDto } from './dto/read-tenancy.dto'
 import { ReadUserDto } from './dto/read-user.dto'
+import { CreateUserTenancyDto } from './dto/create-user-tenancy.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -41,7 +42,6 @@ export class UserController {
     const user = await this.userService.find({ email: email })
     user?.userTenancies.forEach((userTenancy) => {
       const readTenancy = plainToClass(ReadTenancyDto, userTenancy.tenancy)
-      console.log('readTenancy: ', readTenancy)
       readTenancies.push(readTenancy)
     })
     const readUser: ReadUserDto = plainToClass(ReadUserDto, user)
@@ -65,5 +65,18 @@ export class UserController {
       user.password = await bcryptjs.hash(user.password, this.SALT_ROUNDS)
     }
     await this.userService.update(email, user)
+  }
+
+  //* ***************************** USER TENANCY **************************** */
+  @Post(':email/tenancy')
+  async createUserTenancy(
+    @Param('email') email: string,
+    @Body() userTenancy: CreateUserTenancyDto,
+  ): Promise<void> {
+    const user = await this.userService.find({ email: email })
+    if (user) {
+      userTenancy.userId = user.id
+      await this.userService.createUserTenancy(userTenancy)
+    }
   }
 }

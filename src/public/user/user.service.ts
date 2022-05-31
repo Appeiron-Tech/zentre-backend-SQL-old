@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { UserTenancy } from './database/user-tenancy.entity'
 import { User } from './database/user.entity'
+import { CreateUserTenancyDto } from './dto/create-user-tenancy.dto'
 import { CreateUserDto } from './dto/create-user.dto'
 import { ReqUserDto } from './dto/req-user.dto'
 import { UpdUserDto } from './dto/upd-user.dto'
@@ -11,6 +13,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly userTenancyRepository: Repository<UserTenancy>,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -36,6 +39,11 @@ export class UserService {
     await this.userRepository.update({ email: email }, { ...user })
   }
 
+  //* ***************************** USER TENANCY **************************** */
+  async createUserTenancy(userTenancy: CreateUserTenancyDto): Promise<UserTenancy> {
+    const createdUserTenancy = await this.userTenancyRepository.save(userTenancy)
+    return createdUserTenancy
+  }
   // async updateProfilePhoto(file: Express.Multer.File, email: string): Promise<User> {
   //   try {
   //     await this.cloudStorageService.uploadFile(file)

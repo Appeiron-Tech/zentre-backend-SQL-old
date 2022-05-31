@@ -1,14 +1,12 @@
 import { Exclude, Expose } from 'class-transformer'
 import { IsEmail, IsOptional } from 'class-validator'
+import { ReadTenancyDto } from './read-tenancy.dto'
 
 @Exclude()
 export class ReadUserDto {
   @IsEmail()
   @Expose()
   email: string
-
-  @Expose()
-  rol: string
 
   @Expose()
   language: string
@@ -30,9 +28,9 @@ export class ReadUserDto {
 
   @IsOptional()
   @Expose()
-  photo?: string
+  tenancies?: ReadTenancyDto[]
 
   @IsOptional()
   @Expose()
-  createdAt: string
+  photoUrl?: string
 }

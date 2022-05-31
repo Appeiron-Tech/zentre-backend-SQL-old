@@ -43,7 +43,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Req() request: Request) {
-    console.log('request.user: ' + JSON.stringify(request.user))
     return request.user
   }
 
