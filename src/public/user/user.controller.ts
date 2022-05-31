@@ -15,6 +15,9 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdUserDto } from './dto/upd-user.dto'
 import { UserService } from './user.service'
 import * as bcryptjs from 'bcryptjs'
+import { plainToClass } from 'class-transformer'
+import { ReadTenancyDto } from './dto/read-tenancy.dto'
+import { ReadUserDto } from './dto/read-user.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -33,8 +36,20 @@ export class UserController {
   }
 
   @Get(':email')
-  async find(@Param('email') email: string): Promise<User> {
-    return this.userService.find({ email: email })
+  async find(@Param('email') email: string): Promise<ReadUserDto> {
+    const readTenancies: ReadTenancyDto[] = []
+    const user = await this.userService.find({ email: email })
+    user?.userTenancies.forEach((userTenancy) => {
+      const readTenancy = plainToClass(ReadTenancyDto, userTenancy.tenancy)
+      console.log('readTenancy: ', readTenancy)
+      readTenancies.push(readTenancy)
+    })
+    const readUser: ReadUserDto = plainToClass(ReadUserDto, user)
+    if (user) {
+      readUser.tenancies = readTenancies
+      return readUser
+    }
+    return null
   }
 
   @Post()

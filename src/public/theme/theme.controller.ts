@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common'
 import { Theme } from './database/theme.entity'
-import { ThemesService } from './themes.service'
+import { ThemesService } from './theme.service'
 
 @Controller('public')
 export class ThemesController {

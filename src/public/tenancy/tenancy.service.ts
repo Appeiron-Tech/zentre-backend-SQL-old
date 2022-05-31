@@ -5,6 +5,7 @@ import { ReadTenancyDto } from 'src/public/tenancy/dto/read-tenancy.dto'
 import { Tenancy } from './database/tenancy.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { UpdTenancyDto } from './dto/upd-tenancy.dto'
 
 @Injectable()
 export class TenancyService {
@@ -25,5 +26,9 @@ export class TenancyService {
   async create(tenant: CreateTenancyDto): Promise<ReadTenancyDto> {
     const createdTenant = await this.tenancyRepository.save(tenant)
     return plainToClass(ReadTenancyDto, createdTenant)
+  }
+
+  async update(id: number, tenancy: UpdTenancyDto): Promise<void> {
+    await this.tenancyRepository.update({ id: id }, { ...tenancy })
   }
 }

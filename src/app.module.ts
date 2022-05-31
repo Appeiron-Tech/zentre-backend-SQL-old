@@ -7,7 +7,8 @@ import { AppService } from './app.service'
 import { AuthModule } from './common/modules/auth/auth.module'
 import { ScreenModule } from './public/screen/screen.module'
 import { TenancyModule } from './public/tenancy/tenancy.module'
-import { ThemesModule } from './public/themes/themes.module'
+import { ThemesModule } from './public/theme/theme.module'
+import { AppModule as MyAppModule } from './public/app/app.module'
 import { UserModule } from './public/user/user.module'
 import { AnnouncementModule } from './tenanted/announcement/announcement.module'
 import { ClientModule } from './tenanted/client/client.module'
@@ -38,6 +39,7 @@ import { StoreModule } from './tenanted/store/store.module'
     TenancyModule,
     UserModule,
     ThemesModule,
+    MyAppModule,
     ScreenModule,
 
     //TENANTED

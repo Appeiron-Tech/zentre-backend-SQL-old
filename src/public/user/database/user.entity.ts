@@ -1,4 +1,5 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
+import { UserTenancy } from './user-tenancy.entity'
 
 @Entity({ name: 'users' })
 export class User {
@@ -32,6 +33,11 @@ export class User {
 
   @Column({ nullable: true, length: 256 })
   photo?: string
+
+  @OneToMany(() => UserTenancy, (userTenancy) => userTenancy.user, {
+    eager: true,
+  })
+  userTenancies?: UserTenancy[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Timestamp
