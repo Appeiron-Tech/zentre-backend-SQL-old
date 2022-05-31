@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer'
-import { IsArray, IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator'
 
 @Exclude()
 export class ReadTenancyDto {
@@ -25,13 +25,13 @@ export class ReadTenancyDto {
   @Expose()
   readonly logo?: string
 
-  @IsString()
+  @IsNumber()
   @Expose()
-  readonly planACOM: string
+  readonly planACOM: number
 
-  @IsString()
+  @IsNumber()
   @Expose()
-  readonly planWCOM: string
+  readonly planWCOM: number
 
   @IsNumber()
   @Expose()
