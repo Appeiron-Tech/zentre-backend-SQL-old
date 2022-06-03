@@ -114,10 +114,17 @@ export class StoreController {
   }
 
   @Post('/:id/openingHour')
-  async createOpeningHour(
+  async createOpeningHours(
     @Param('id') storeId: number,
-    @Body(new ValidationPipe()) openingHour: CreateStoreOpeningHourDto,
+    @Body(new ValidationPipe()) openingHours: CreateStoreOpeningHourDto[],
   ): Promise<void> {
+    await this.storeService.dropAllStoreOpeningHours(storeId)
+    await asyncForEach(openingHours, async (openingHour: CreateStoreOpeningHourDto) => {
+      await this.createOpeningHour(storeId, openingHour)
+    })
+  }
+
+  async createOpeningHour(storeId: number, openingHour: CreateStoreOpeningHourDto): Promise<void> {
     await asyncForEach(openingHour.ranges, async (range: StoreOpeningHour) => {
       const createOpeningHour = {
         storeId: storeId,
@@ -130,21 +137,21 @@ export class StoreController {
   }
 
   // @UseGuards(JwtAuthGuard)
-  @Patch('/:storeId/openingHour/:weekDay')
-  async updateOpeningHour(
-    @Param('storeId') storeId: number,
-    @Param('weekDay') weekDay: number,
-    @Body() openingHour: UpdStoreOpeningHourDto,
-  ): Promise<void> {
-    await this.storeService.dropStoreOpeningHours(storeId, weekDay)
-    await asyncForEach(openingHour.ranges, async (range: StoreOpeningHour) => {
-      const createOpeningHour = {
-        storeId: storeId,
-        weekDay: weekDay,
-        from: range.from,
-        to: range.to,
-      }
-      await this.storeService.createOpeningHour(storeId, createOpeningHour)
-    })
-  }
+  // @Patch('/:storeId/openingHour/:weekDay')
+  // async updateOpeningHour(
+  //   @Param('storeId') storeId: number,
+  //   @Param('weekDay') weekDay: number,
+  //   @Body() openingHour: UpdStoreOpeningHourDto,
+  // ): Promise<void> {
+  //   await this.storeService.dropStoreOpeningHours(storeId, weekDay)
+  //   await asyncForEach(openingHour.ranges, async (range: StoreOpeningHour) => {
+  //     const createOpeningHour = {
+  //       storeId: storeId,
+  //       weekDay: weekDay,
+  //       from: range.from,
+  //       to: range.to,
+  //     }
+  //     await this.storeService.createOpeningHour(storeId, createOpeningHour)
+  //   })
+  // }
 }
