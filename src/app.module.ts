@@ -14,6 +14,7 @@ import { AnnouncementModule } from './tenanted/announcement/announcement.module'
 import { ClientModule } from './tenanted/client/client.module'
 import { StoreModule } from './tenanted/store/store.module'
 import { ProductModule } from './tenanted/product/product.module'
+import { CloudStorageModule } from './third-party-apis/Google/cloud-storage/cloud-storage.module'
 
 @Module({
   imports: [
@@ -47,6 +48,9 @@ import { ProductModule } from './tenanted/product/product.module'
     StoreModule,
     AnnouncementModule,
     ProductModule,
+
+    //THIRD PARTY APIS
+    CloudStorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

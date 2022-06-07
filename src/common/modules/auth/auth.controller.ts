@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Req,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
@@ -21,6 +22,10 @@ import { LocalAuthGuard } from './guards/local-auth.guard'
 import * as bcryptjs from 'bcryptjs'
 import { UpdUserDto } from './dto/upd-user.dto'
 import { ValidateUserDTO } from './dto/validate-user.dto'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import { editFileName, getExtension } from 'src/utils/utils'
+import { ReadUserDto } from './dto/read-user.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @Controller('auth')
@@ -63,20 +68,20 @@ export class AuthController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Patch('upload/:email')
-  // @UseInterceptors(
-  //   FileInterceptor('image', {
-  //     storage: diskStorage({
-  //       filename: editFileName,
-  //     }),
-  //   }),
-  // )
-  // async updateProfilePhoto(
-  //   @UploadedFile() file: Express.Multer.File,
-  //   @Param('email') email: string,
-  // ): Promise<ReadUserDto> {
-  //   file.filename = 'users_photos/' + email.split('@')[0] + '.' + getExtension(file.originalName)
-  //   return this.userService.updateProfilePhoto(file, email)
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Patch('upload/:email')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        filename: editFileName,
+      }),
+    }),
+  )
+  async updateProfilePhoto(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('email') email: string,
+  ): Promise<void> {
+    file.filename = 'users_photos/' + email.split('@')[0] + '.' + getExtension(file.originalname)
+    await this.userService.updateProfilePhoto(file, email)
+  }
 }

@@ -21,6 +21,10 @@ import { PTag } from 'src/tenanted/product/database/entities/p-tag.entity'
 import { Variation } from 'src/tenanted/product/database/entities/variation.entity'
 import { ProductCategory } from 'src/tenanted/product/database/category/product-category.entity'
 import { CrossProduct } from 'src/tenanted/product/database/crossProduct/cross-product.entity'
+import { Order } from 'src/tenanted/order/database/order.entity'
+import { OrderState } from 'src/tenanted/order/database/order-state.entity'
+import { OrderStateLog } from 'src/tenanted/order/database/order-state-log.entity'
+import { OrderPaymentState } from 'src/tenanted/order/database/order-payment-state'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -77,6 +81,10 @@ export class TenancyModule {
                 StoreWorker,
                 StoreOpeningHour,
                 Announcement,
+                Order,
+                OrderState,
+                OrderStateLog,
+                OrderPaymentState,
                 Product,
                 CrossProduct,
                 Category,
