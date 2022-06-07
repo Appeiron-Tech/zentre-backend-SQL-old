@@ -1,17 +1,17 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator'
+import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator'
 
 export class UpdUserPrivacyDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @IsEmail()
   newEmail?: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(8)
   currentPassword?: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(8)
   newPassword?: string

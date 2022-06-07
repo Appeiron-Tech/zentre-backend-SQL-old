@@ -75,8 +75,6 @@ export class UserController {
     @Body() user: UpdUserPrivacyDto,
   ): Promise<void> {
     const userToUpdate: UpdateUserDto = {}
-    console.log('user to update')
-    console.log(user)
     if (user?.currentPassword) {
       const isValidPassword = await this.userService.isValidPassword(email, user.currentPassword)
       if (isValidPassword) {
@@ -93,9 +91,7 @@ export class UserController {
         throw new Error('Email already exists')
       }
     }
-    // await this.userService.update(email, userToUpdate)
-    console.log('user to update')
-    console.log(userToUpdate)
+    await this.userService.update(email, userToUpdate)
   }
 
   //* ***************************** USER TENANCY **************************** */
