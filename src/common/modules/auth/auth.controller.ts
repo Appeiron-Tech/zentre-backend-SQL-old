@@ -25,7 +25,6 @@ import { ValidateUserDTO } from './dto/validate-user.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { editFileName, getExtension } from 'src/utils/utils'
-import { ReadUserDto } from './dto/read-user.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @Controller('auth')

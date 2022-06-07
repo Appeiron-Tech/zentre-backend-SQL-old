@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import path from 'path'
+import { join } from 'path'
 import { Storage } from '@google-cloud/storage'
 import { ConfigService } from '@nestjs/config'
 
@@ -9,7 +9,7 @@ export class CloudStorageService {
 
   async uploadFile(file: Express.Multer.File) {
     const gc = new Storage({
-      keyFilename: path.join(__dirname, this.configService.get<string>('GCS_PATH_KEY')),
+      keyFilename: join(__dirname, this.configService.get<string>('GCS_PATH_KEY')),
       projectId: this.configService.get<string>('GCS_PROJECT_ID'),
     })
     const bucket = gc.bucket(this.configService.get<string>('GCS_STORAGE_MEDIA_BUCKET'))
