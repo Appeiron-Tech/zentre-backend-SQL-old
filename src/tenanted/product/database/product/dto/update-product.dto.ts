@@ -1,49 +1,46 @@
-import { Exclude } from 'class-transformer'
 import {
   IsArray,
   IsBoolean,
   IsDate,
   IsDecimal,
-  IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
 } from 'class-validator'
+import { Product } from '../product.entity'
 
-export class CreateProductDto {
+export class UpdateProductDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(128)
-  name: string
+  name?: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(16)
-  type: string
+  type?: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDecimal()
-  price: number
+  price?: number
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDecimal()
-  regular_price: number
+  regular_price?: number
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(16)
-  tax_status: string
+  tax_status?: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
-  manage_stock: boolean
+  manage_stock?: boolean
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(16)
-  stock_status: string
-
-  /********* OPTIONAL ***********  */
+  stock_status?: string
 
   @IsOptional()
   @IsString()
@@ -131,7 +128,7 @@ export class CreateProductDto {
   @IsOptional()
   menu_order?: number
 
-  @IsOptional()
-  @IsArray()
-  crossProductIds?: number[]
+  // @IsOptional()
+  // @IsArray()
+  // crossProducts?: Product[]
 }

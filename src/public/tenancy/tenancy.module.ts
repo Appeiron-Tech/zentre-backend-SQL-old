@@ -11,13 +11,16 @@ import { Store } from 'src/tenanted/store/database/store.entity'
 import { StoreWorker } from 'src/tenanted/store/database/store-worker.entity'
 import { StoreOpeningHour } from 'src/tenanted/store/database/store-opening-hour.entity'
 import { Announcement } from 'src/tenanted/announcement/database/announcement.entity'
-import { Product } from 'src/tenanted/product/database/product.entity'
-import { Category } from 'src/tenanted/product/database/category.entity'
-import { Variant } from 'src/tenanted/product/database/variant.entity'
-import { VariantOption } from 'src/tenanted/product/database/variantOption.entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Tenancy } from './database/tenancy.entity'
 import { TenancyService } from './tenancy.service'
+import { Product } from 'src/tenanted/product/database/product/product.entity'
+import { Category } from 'src/tenanted/product/database/category/category.entity'
+import { PAttribute } from 'src/tenanted/product/database/entities/p-attribute.entity'
+import { PTag } from 'src/tenanted/product/database/entities/p-tag.entity'
+import { Variation } from 'src/tenanted/product/database/entities/variation.entity'
+import { ProductCategory } from 'src/tenanted/product/database/category/product-category.entity'
+import { CrossProduct } from 'src/tenanted/product/database/crossProduct/cross-product.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -75,9 +78,12 @@ export class TenancyModule {
                 StoreOpeningHour,
                 Announcement,
                 Product,
+                CrossProduct,
                 Category,
-                Variant,
-                VariantOption,
+                ProductCategory,
+                PAttribute,
+                PTag,
+                Variation,
               ],
               // entities: [__dirname + '/**/*.entity{.ts,.js}'],
               synchronize: true,

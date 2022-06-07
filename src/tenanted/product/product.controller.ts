@@ -1,41 +1,111 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
-import { Category } from './database/category.entity'
-import { Product } from './database/product.entity'
-import { Variant } from './database/variant.entity'
-import { VariantOption } from './database/variantOption.entity'
+import { Product } from './database/product/product.entity'
+import { CreateProductDto } from './dto/create-product.dto'
+import { CreateProductDto as DBCreateProductDto } from './database/product/dto/create-product.dto'
 import { ProductService } from './product.service'
+import { plainToClass } from 'class-transformer'
+import { UpdateProductDto } from './database/product/dto/update-product.dto'
+import { Category } from './database/category/category.entity'
+import { CreateCategoryDto } from './database/category/dto/create-category.dto'
+import { ReadProductDto } from './dto/read-product.dto'
 
 @UseInterceptors(LoggingInterceptor)
+@UsePipes(
+  new ValidationPipe({
+    always: true,
+  }),
+)
 @Controller('api/product')
 export class ProductController {
-  constructor(private productService: ProductService) {}
+  constructor(private readonly productService: ProductService) {}
 
-  //* ****************************************** Products *************************************************
   @Get()
-  async find(): Promise<Product[]> {
-    const products = await this.productService.find()
-    return products
+  async findAll(): Promise<ReadProductDto[]> {
+    const readProducts: ReadProductDto[] = []
+    const products = await this.productService.findAll()
+    products.forEach((product) => {
+      const readProduct = plainToClass(ReadProductDto, product)
+      readProduct.categories = this.getCategories(product)
+      readProducts.push(readProduct)
+    })
+    return readProducts
   }
 
-  //* ****************************************** Categories *************************************************
-  @Get('/categories')
+  @Post()
+  async create(@Body() product: CreateProductDto): Promise<Product> {
+    const toCreateProduct: DBCreateProductDto = plainToClass(DBCreateProductDto, product)
+    const createdProduct = await this.productService.upsert(toCreateProduct)
+    await this.createCrossProducts(createdProduct.id, product.crossProductIds)
+    return createdProduct
+  }
+
+  @Patch()
+  async update(@Body() product: UpdateProductDto): Promise<Product> {
+    const createdProduct = await this.productService.upsert(product)
+    return createdProduct
+  }
+
+  /*************************** CATEGORIES ************************ */
+  @Get('category')
   async findCategories(): Promise<Category[]> {
     const categories = await this.productService.findCategories()
     return categories
   }
 
-  //* ****************************************** Variant *************************************************
-  @Get('/variant')
-  async findVariants(): Promise<Variant[]> {
-    const variants = await this.productService.findVariants()
-    return variants
+  @Post('category')
+  async createCategory(@Body() category: CreateCategoryDto): Promise<Category> {
+    const createdCategory = await this.productService.upsertCategory(category)
+    return createdCategory
   }
 
-  //* *************************************** Variant Options **********************************************
-  @Get('/variantoptions')
-  async findVariantOptions(): Promise<VariantOption[]> {
-    const variantsOptions = await this.productService.findVariantOptions()
-    return variantsOptions
+  @Post(':productId/category')
+  async createProductCategory(
+    @Param('productId') productId: number,
+    @Body() categoryIds: number[],
+  ): Promise<void> {
+    if (categoryIds?.length > 0) {
+      const validCategories: Category[] = await this.productService.findCategories(categoryIds)
+      await this.productService.dropProductCategories(productId)
+      await this.productService.createProductCategories(productId, validCategories)
+    }
+  }
+
+  /*************************** CROSS PRODUCTS ************************ */
+  // @Post(':id/crossproducts')
+  // async upsertCrossProducts(
+  //   @Param('id') productId: string,
+  //   @Body() crossProductIds: number[],
+  // ): Promise<void> {
+  //   let validProductIds = []
+  //   if (crossProductIds?.length > 0) {
+  //     const validProducts: Product[] = await this.productService.findAll(crossProductIds)
+  //     await this.productService.dropCrossProducts(productId)
+  //     await this.productService.createCrossProducts(productId, validProducts)
+  //   }
+  // }
+
+  /*********************************************************************** */
+  /********************** PRIVATE FUNCTIONS ****************************** */
+  private getCategories(product: Product): Category[] {
+    const categories = product.productCategories.map((productCategory) => productCategory.category)
+    return categories
+  }
+
+  private async createCrossProducts(productId: number, crossProductIds: number[]): Promise<void> {
+    if (crossProductIds?.length > 0) {
+      const crossProducts = await this.productService.findAll(crossProductIds)
+      await this.productService.createCrossProduct(productId, crossProducts)
+    }
   }
 }

@@ -132,6 +132,6 @@ export class CreateProductDto {
   menu_order?: number
 
   @IsOptional()
-  @IsArray()
-  crossProductIds?: number[]
+  @Exclude()
+  crossProductIds: number[]
 }

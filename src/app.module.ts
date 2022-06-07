@@ -12,8 +12,8 @@ import { AppModule as MyAppModule } from './public/app/app.module'
 import { UserModule } from './public/user/user.module'
 import { AnnouncementModule } from './tenanted/announcement/announcement.module'
 import { ClientModule } from './tenanted/client/client.module'
-import { ProductModule } from './tenanted/product/product.module'
 import { StoreModule } from './tenanted/store/store.module'
+import { ProductModule } from './tenanted/product/product.module'
 
 @Module({
   imports: [

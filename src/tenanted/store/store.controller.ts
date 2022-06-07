@@ -6,7 +6,7 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
+  // UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -21,11 +21,10 @@ import { CreateStoreWorkerDto } from './dto/worker/create-store-worker.dto'
 import { CreateStoreDto } from './dto/create-store.dto'
 import { UpdStoreWorkerDto } from './dto/worker/upd-store-worker.dto'
 import { StoreService } from './store.service'
-import { UpdStoreOpeningHourDto } from './dto/upd-store-opening-hour.dto'
 import { plainToClass } from 'class-transformer'
 import { ReqUpdateStoreDto } from './dto/req-upd-store.dto'
 import { UpdateStoreDto } from './dto/upd-store.dto'
-import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
+// import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
