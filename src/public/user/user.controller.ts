@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -19,6 +20,9 @@ import { plainToClass } from 'class-transformer'
 import { ReadTenancyDto } from './dto/read-tenancy.dto'
 import { ReadUserDto } from './dto/read-user.dto'
 import { CreateUserTenancyDto } from './dto/create-user-tenancy.dto'
+import { UpdUserPrivacyDto } from './dto/upd-user-privacy.dto'
+import { UpdateUserDto } from './database/dto/update-user.dto'
+import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -61,10 +65,37 @@ export class UserController {
 
   @Patch(':email')
   async update(@Param('email') email: string, @Body() user: UpdUserDto): Promise<void> {
-    if (user?.password) {
-      user.password = await bcryptjs.hash(user.password, this.SALT_ROUNDS)
-    }
     await this.userService.update(email, user)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':email/privacy')
+  async updatePrivacy(
+    @Param('email') email: string,
+    @Body() user: UpdUserPrivacyDto,
+  ): Promise<void> {
+    const userToUpdate: UpdateUserDto = {}
+    console.log('user to update')
+    console.log(user)
+    if (user?.currentPassword) {
+      const isValidPassword = await this.userService.isValidPassword(email, user.currentPassword)
+      if (isValidPassword) {
+        userToUpdate.password = await bcryptjs.hash(user.newPassword, this.SALT_ROUNDS)
+      } else {
+        throw new Error('Invalid password')
+      }
+    }
+    if (user?.newEmail) {
+      const emailExists = await this.userService.emailExists(user.newEmail)
+      if (!emailExists) {
+        userToUpdate.email = user.newEmail
+      } else {
+        throw new Error('Email already exists')
+      }
+    }
+    // await this.userService.update(email, userToUpdate)
+    console.log('user to update')
+    console.log(userToUpdate)
   }
 
   //* ***************************** USER TENANCY **************************** */

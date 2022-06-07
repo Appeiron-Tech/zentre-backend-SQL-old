@@ -6,7 +6,8 @@ import { User } from './database/user.entity'
 import { CreateUserTenancyDto } from './dto/create-user-tenancy.dto'
 import { CreateUserDto } from './dto/create-user.dto'
 import { ReqUserDto } from './dto/req-user.dto'
-import { UpdUserDto } from './dto/upd-user.dto'
+import * as bcryptjs from 'bcryptjs'
+import { UpdateUserDto } from './database/dto/update-user.dto'
 
 @Injectable()
 export class UserService {
@@ -35,8 +36,25 @@ export class UserService {
     return createdUser
   }
 
-  async update(email: string, user: UpdUserDto): Promise<void> {
+  async update(email: string, user: UpdateUserDto): Promise<void> {
     await this.userRepository.update({ email: email }, { ...user })
+  }
+
+  async isValidPassword(email: string, password: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ email: email })
+    if (user) {
+      const isValidPassword = await bcryptjs.compare(password, user.password)
+      return isValidPassword
+    }
+    return false
+  }
+
+  async emailExists(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ email: email })
+    if (user) {
+      return true
+    }
+    return false
   }
 
   //* ***************************** USER TENANCY **************************** */

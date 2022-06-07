@@ -1,13 +1,4 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsDate,
-  IsDecimal,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator'
-import { Product } from '../product.entity'
+import { IsBoolean, IsDate, IsDecimal, IsOptional, IsString, MaxLength } from 'class-validator'
 
 export class UpdateProductDto {
   @IsString()

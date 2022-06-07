@@ -1,4 +1,4 @@
-import { Exclude, Expose } from 'class-transformer'
+import { Exclude } from 'class-transformer'
 import { Category } from '../database/category/category.entity'
 
 export class ReadProductDto {

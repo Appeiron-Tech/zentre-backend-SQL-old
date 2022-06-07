@@ -46,22 +46,21 @@ export class AuthController {
     return request.user
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Patch(':email')
-  async patchUser(
-    @Param('email') email: string,
-    @Body(new ValidationPipe()) updateUserDTO: UpdUserDto,
-  ): Promise<void> {
-    console.info('updating User: ' + email + ' with data: ' + JSON.stringify(updateUserDTO))
-    try {
-      if (updateUserDTO?.password) {
-        updateUserDTO.password = await bcryptjs.hash(updateUserDTO.password, this.SALT_ROUNDS)
-      }
-      await this.authService.updateUser({ email: email, updateUserDTO: updateUserDTO })
-    } catch (e) {
-      throw e
-    }
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Patch(':email')
+  // async patchUser(
+  //   @Param('email') email: string,
+  //   @Body(new ValidationPipe()) updateUserDTO: UpdUserDto,
+  // ): Promise<void> {
+  //   try {
+  //     if (updateUserDTO?.password) {
+  //       updateUserDTO.password = await bcryptjs.hash(updateUserDTO.password, this.SALT_ROUNDS)
+  //     }
+  //     await this.authService.updateUser({ email: email, updateUserDTO: updateUserDTO })
+  //   } catch (e) {
+  //     throw e
+  //   }
+  // }
 
   // @UseGuards(JwtAuthGuard)
   // @Patch('upload/:email')
