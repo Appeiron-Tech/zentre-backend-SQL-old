@@ -15,10 +15,13 @@ import { Product } from './database/product/product.entity'
 import { Variation } from './database/entities/variation.entity'
 import { CrossProduct } from './database/crossProduct/cross-product.entity'
 import { CreateCrossProductDto } from './database/crossProduct/dto/create-cross-product.dto'
+import { ProductImage } from './database/image/product-image.entity'
+import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProductService {
   private readonly productRepository: Repository<Product>
+  private readonly productImageRepository: Repository<ProductImage>
   private readonly crossProductRepository: Repository<CrossProduct>
   private readonly categoryRepository: Repository<Category>
   private readonly productCategoryRepository: Repository<ProductCategory>
@@ -28,6 +31,7 @@ export class ProductService {
 
   constructor(@Inject(TENANCY_CONNECTION) connection: Connection) {
     this.productRepository = connection.getRepository(Product)
+    this.productImageRepository = connection.getRepository(ProductImage)
     this.crossProductRepository = connection.getRepository(CrossProduct)
     this.productCategoryRepository = connection.getRepository(ProductCategory)
     this.categoryRepository = connection.getRepository(Category)
@@ -47,6 +51,10 @@ export class ProductService {
       // const products = await this.productRepository.find()
       // return products.map((product) => plainToClass(ReadProductDto, product))
     }
+  }
+
+  async find(id: number): Promise<Product> {
+    return await this.productRepository.findOne(id)
   }
 
   async upsert(product: CreateProductDto | UpdateProductDto): Promise<Product> {
@@ -85,7 +93,7 @@ export class ProductService {
   }
 
   /* *********************** CROSS PRODUCTS ********************* */
-  async createCrossProduct(productId: number, crossProducts: Product[]): Promise<void> {
+  async createCrossProducts(productId: number, crossProducts: Product[]): Promise<void> {
     await asyncForEach(crossProducts, async (crossProduct: Product) => {
       const createCrossProduct: CreateCrossProductDto = {
         productId: productId,
@@ -95,7 +103,13 @@ export class ProductService {
     })
   }
 
-  // async dropCrossProducts(productId: number): Promise<void> {
-  //   await this.pro
-  // }
+  /* *********************** PRODUCT IMAGES ********************* */
+  async createProductImage(productId: number, productImage: CreateProductImageDto): Promise<void> {
+    productImage.productId = productId
+    await this.productImageRepository.save(productImage)
+  }
+
+  async dropCrossProducts(productId: number): Promise<void> {
+    await this.crossProductRepository.delete({ productId: productId })
+  }
 }

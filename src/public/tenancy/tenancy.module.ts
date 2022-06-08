@@ -25,6 +25,7 @@ import { Order } from 'src/tenanted/order/database/order.entity'
 import { OrderState } from 'src/tenanted/order/database/order-state.entity'
 import { OrderStateLog } from 'src/tenanted/order/database/order-state-log.entity'
 import { OrderPaymentState } from 'src/tenanted/order/database/order-payment-state'
+import { ProductImage } from 'src/tenanted/product/database/image/product-image.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -87,6 +88,7 @@ export class TenancyModule {
                 OrderPaymentState,
                 Product,
                 CrossProduct,
+                ProductImage,
                 Category,
                 ProductCategory,
                 PAttribute,

@@ -1,5 +1,6 @@
-import { Exclude, Expose } from 'class-transformer'
+import { Exclude } from 'class-transformer'
 import { Category } from '../database/category/category.entity'
+import { CrossProduct } from '../database/crossProduct/cross-product.entity'
 
 export class ReadProductDto {
   // @Expose()
@@ -34,7 +35,11 @@ export class ReadProductDto {
   parent_id?: number
   menu_order?: number
   categories?: Category[]
+  crossProducts?: ReadProductDto[] | number[]
 
   @Exclude()
   productCategories?: any[]
+
+  @Exclude()
+  rawCrossProducts: CrossProduct[]
 }
