@@ -13,7 +13,7 @@ export class ClientService {
     this.clientRepository = connection.getRepository(Client)
   }
 
-  async findAll(): Promise<IClient[]> {
+  async findAll(): Promise<Client[]> {
     try {
       return await this.clientRepository.find()
     } catch (err) {

@@ -15,6 +15,7 @@ import { ClientModule } from './tenanted/client/client.module'
 import { StoreModule } from './tenanted/store/store.module'
 import { ProductModule } from './tenanted/product/product.module'
 import { CloudStorageModule } from './third-party-apis/Google/cloud-storage/cloud-storage.module'
+import { PClientModule } from './public/client/client.module'
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { CloudStorageModule } from './third-party-apis/Google/cloud-storage/clou
     ThemesModule,
     MyAppModule,
     ScreenModule,
+    PClientModule,
 
     //TENANTED
     ClientModule,

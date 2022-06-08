@@ -26,6 +26,7 @@ import { OrderState } from 'src/tenanted/order/database/order-state.entity'
 import { OrderStateLog } from 'src/tenanted/order/database/order-state-log.entity'
 import { OrderPaymentState } from 'src/tenanted/order/database/order-payment-state'
 import { ProductImage } from 'src/tenanted/product/database/image/product-image.entity'
+import { ClientAnswer } from 'src/tenanted/client/database/entities/client-answer.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -76,6 +77,7 @@ export class TenancyModule {
               database: tenancy.name,
               entities: [
                 Client,
+                ClientAnswer,
                 ClientPhone,
                 Store,
                 StorePhone,

@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ClientPhone } from './client-phone.entity'
 import { IClient } from '../../interfaces/client.interface'
+import { ClientAnswer } from './client-answer.entity'
 
 @Entity({})
 export class Client implements IClient {
@@ -16,65 +17,68 @@ export class Client implements IClient {
   @Column({ nullable: false })
   name: string
 
-  @Column()
+  @Column({ length: 1028, nullable: true })
   description: string
 
-  @Column({ nullable: false })
+  @Column({ length: 16, nullable: false })
   businessType: string
 
-  @Column()
+  @Column({ length: 512, nullable: true })
   logo: string
 
-  @Column()
+  @Column({ length: 512, nullable: true })
   cover: string
 
-  @Column()
+  @Column({ length: 512, nullable: true })
   favicon: string
 
-  @Column()
+  @Column({ length: 3, nullable: true })
   currencyName: string
 
-  @Column()
+  @Column({ length: 3, nullable: true })
   currencySymbol: string
 
-  @Column()
+  @Column({ length: 512, nullable: true })
   urlIG: string
 
-  @Column()
+  @Column({ length: 512, nullable: true })
   urlFB: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   brightness: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   primary: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   onPrimary: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   secondary: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   onSecondary: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   error: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   onError: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   background: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   onBackground: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   surface: string
 
-  @Column()
+  @Column({ length: 6, nullable: true })
   onSurface: string
+
+  @OneToMany(() => ClientAnswer, (clientAnswer) => clientAnswer.client)
+  answers: ClientAnswer[]
 
   @OneToMany(() => ClientPhone, (phone) => phone.client)
   phones: ClientPhone[]
