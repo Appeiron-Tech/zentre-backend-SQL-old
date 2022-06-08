@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
-  UseInterceptors,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Controller, Get, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { AuthService } from './auth.service'
 import { SkipAuth } from './decorators/skip-auth.decorator'
@@ -36,22 +25,5 @@ export class AuthController {
   @Get('profile')
   async getProfile(@Req() request: Request) {
     return request.user
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch(':email')
-  async patchUser(
-    @Param('email') email: string,
-    @Body(new ValidationPipe()) updateUserDTO: UpdUserDto,
-  ): Promise<void> {
-    console.info('updating User: ' + email + ' with data: ' + JSON.stringify(updateUserDTO))
-    try {
-      if (updateUserDTO?.password) {
-        updateUserDTO.password = await bcryptjs.hash(updateUserDTO.password, this.SALT_ROUNDS)
-      }
-      await this.authService.updateUser({ email: email, updateUserDTO: updateUserDTO })
-    } catch (e) {
-      throw e
-    }
   }
 }

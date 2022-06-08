@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Client } from './client.entity'
-import { IClientPhone } from '../interfaces/client-phone.interface'
+import { IClientPhone } from '../../interfaces/client-phone.interface'
 
 @Entity({ name: 'clientphones' })
 export class ClientPhone implements IClientPhone {
