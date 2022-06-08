@@ -6,14 +6,11 @@ import {
   Patch,
   Post,
   Req,
-  UploadedFile,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
-import { UserService } from 'src/public/user/user.service'
 import { AuthService } from './auth.service'
 import { SkipAuth } from './decorators/skip-auth.decorator'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
@@ -22,20 +19,13 @@ import { LocalAuthGuard } from './guards/local-auth.guard'
 import * as bcryptjs from 'bcryptjs'
 import { UpdUserDto } from './dto/upd-user.dto'
 import { ValidateUserDTO } from './dto/validate-user.dto'
-import { FileInterceptor } from '@nestjs/platform-express'
-import { diskStorage } from 'multer'
-import { editFileName, getExtension } from 'src/utils/utils'
 
 @UseInterceptors(LoggingInterceptor)
 @Controller('auth')
 export class AuthController {
   readonly SALT_ROUNDS = 10
 
-  constructor(
-    private readonly authService: AuthService,
-    private configService: ConfigService,
-    private userService: UserService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
   @SkipAuth()
@@ -65,22 +55,5 @@ export class AuthController {
     } catch (e) {
       throw e
     }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch('upload/:email')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        filename: editFileName,
-      }),
-    }),
-  )
-  async updateProfilePhoto(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('email') email: string,
-  ): Promise<void> {
-    file.filename = 'users_photos/' + email.split('@')[0] + '.' + getExtension(file.originalname)
-    await this.userService.updateProfilePhoto(file, email)
   }
 }

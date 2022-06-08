@@ -51,6 +51,7 @@ export class UserService {
         this.configService.get<string>('GCS_STORAGE_MEDIA_BUCKET') +
         '/' +
         file.filename
+      console.log(fileUrl)
       await this.userRepository.update({ email: email }, { photo: fileUrl })
     } catch (e) {
       throw e

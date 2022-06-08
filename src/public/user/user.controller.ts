@@ -5,6 +5,8 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -19,6 +21,10 @@ import { plainToClass } from 'class-transformer'
 import { ReadTenancyDto } from './dto/read-tenancy.dto'
 import { ReadUserDto } from './dto/read-user.dto'
 import { CreateUserTenancyDto } from './dto/create-user-tenancy.dto'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import { editFileName, getExtension } from 'src/utils/utils'
+import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -65,6 +71,23 @@ export class UserController {
       user.password = await bcryptjs.hash(user.password, this.SALT_ROUNDS)
     }
     await this.userService.update(email, user)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('upload/:email')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        filename: editFileName,
+      }),
+    }),
+  )
+  async updateProfilePhoto(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('email') email: string,
+  ): Promise<void> {
+    file.filename = 'users_photos/' + email.split('@')[0] + '.' + getExtension(file.originalname)
+    await this.userService.updateProfilePhoto(file, email)
   }
 
   //* ***************************** USER TENANCY **************************** */
