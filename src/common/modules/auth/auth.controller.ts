@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
-  UseInterceptors,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Controller, Get, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { UserService } from 'src/public/user/user.service'
@@ -18,8 +7,6 @@ import { SkipAuth } from './decorators/skip-auth.decorator'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { Request } from 'express'
 import { LocalAuthGuard } from './guards/local-auth.guard'
-import * as bcryptjs from 'bcryptjs'
-import { UpdUserDto } from './dto/upd-user.dto'
 import { ValidateUserDTO } from './dto/validate-user.dto'
 
 @UseInterceptors(LoggingInterceptor)

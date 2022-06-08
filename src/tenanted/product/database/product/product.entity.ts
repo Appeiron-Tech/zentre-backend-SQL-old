@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp } from 'ty
 import { CrossProduct } from '../crossProduct/cross-product.entity'
 import { ProductCategory } from '../category/product-category.entity'
 import { Variation } from '../entities/variation.entity'
+import { ProductImage } from '../image/product-image.entity'
 
 @Entity({ name: 'products' })
 export class Product {
@@ -206,4 +207,7 @@ export class Product {
 
   @OneToMany(() => CrossProduct, (crossProduct) => crossProduct.product, { eager: true })
   rawCrossProducts?: CrossProduct[]
+
+  @OneToMany(() => ProductImage, (productImage) => productImage.product)
+  images?: ProductImage[]
 }

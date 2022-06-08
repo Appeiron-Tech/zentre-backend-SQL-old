@@ -21,6 +21,7 @@ import { PTag } from 'src/tenanted/product/database/entities/p-tag.entity'
 import { Variation } from 'src/tenanted/product/database/entities/variation.entity'
 import { ProductCategory } from 'src/tenanted/product/database/category/product-category.entity'
 import { CrossProduct } from 'src/tenanted/product/database/crossProduct/cross-product.entity'
+import { ProductImage } from 'src/tenanted/product/database/image/product-image.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -79,6 +80,7 @@ export class TenancyModule {
                 Announcement,
                 Product,
                 CrossProduct,
+                ProductImage,
                 Category,
                 ProductCategory,
                 PAttribute,

@@ -20,6 +20,7 @@ import { Category } from './database/category/category.entity'
 import { CreateCategoryDto } from './database/category/dto/create-category.dto'
 import { ReadProductDto } from './dto/read-product.dto'
 import { asyncForEach } from 'src/utils/utils'
+import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -108,8 +109,18 @@ export class ProductController {
     }
   }
 
-  /*********************************************************************** */
-  /********************** PRIVATE FUNCTIONS ****************************** */
+  /*************************** IMAGES ************************ */
+  @Post(':id/image')
+  async upsertImages(
+    @Param('id') productId: number,
+    @Body() productImage: CreateProductImageDto,
+  ): Promise<void> {
+    //upload image
+    await this.productService.createProductImage(productId, productImage)
+  }
+
+  /* =================================================================================== */
+  /******************************* PRIVATE FUNCTIONS *********************************** */
   private getCategories(product: Product): Category[] {
     const categories = product.productCategories.map((productCategory) => productCategory.category)
     return categories
