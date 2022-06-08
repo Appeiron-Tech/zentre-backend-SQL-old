@@ -19,6 +19,7 @@ import { UpdateProductDto } from './database/product/dto/update-product.dto'
 import { Category } from './database/category/category.entity'
 import { CreateCategoryDto } from './database/category/dto/create-category.dto'
 import { ReadProductDto } from './dto/read-product.dto'
+import { asyncForEach } from 'src/utils/utils'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -34,12 +35,25 @@ export class ProductController {
   async findAll(): Promise<ReadProductDto[]> {
     const readProducts: ReadProductDto[] = []
     const products = await this.productService.findAll()
-    products.forEach((product) => {
+    await asyncForEach(products, async (product: Product) => {
       const readProduct = plainToClass(ReadProductDto, product)
       readProduct.categories = this.getCategories(product)
+      readProduct.crossProducts = await this.getCrossProducts({ product: product })
       readProducts.push(readProduct)
     })
     return readProducts
+  }
+
+  @Get(':id')
+  async find(@Param('id') id: number): Promise<ReadProductDto> {
+    const product = await this.productService.find(id)
+    const readProduct = plainToClass(ReadProductDto, product)
+    readProduct.categories = this.getCategories(product)
+    readProduct.crossProducts = await this.getCrossProducts({
+      product: product,
+      loadCrossProducts: true,
+    })
+    return readProduct
   }
 
   @Post()
@@ -82,18 +96,17 @@ export class ProductController {
   }
 
   /*************************** CROSS PRODUCTS ************************ */
-  // @Post(':id/crossproducts')
-  // async upsertCrossProducts(
-  //   @Param('id') productId: string,
-  //   @Body() crossProductIds: number[],
-  // ): Promise<void> {
-  //   let validProductIds = []
-  //   if (crossProductIds?.length > 0) {
-  //     const validProducts: Product[] = await this.productService.findAll(crossProductIds)
-  //     await this.productService.dropCrossProducts(productId)
-  //     await this.productService.createCrossProducts(productId, validProducts)
-  //   }
-  // }
+  @Post(':id/crossproducts')
+  async upsertCrossProducts(
+    @Param('id') productId: number,
+    @Body() crossProductIds: number[],
+  ): Promise<void> {
+    if (crossProductIds?.length > 0) {
+      const validProducts: Product[] = await this.productService.findAll(crossProductIds)
+      await this.productService.dropCrossProducts(productId)
+      await this.productService.createCrossProducts(productId, validProducts)
+    }
+  }
 
   /*********************************************************************** */
   /********************** PRIVATE FUNCTIONS ****************************** */
@@ -102,10 +115,25 @@ export class ProductController {
     return categories
   }
 
+  private async getCrossProducts(params: {
+    product: Product
+    loadCrossProducts?: boolean
+  }): Promise<ReadProductDto[] | number[]> {
+    const { product, loadCrossProducts } = params
+    const crossProductsIds = product.rawCrossProducts.map(
+      (crossProduct) => crossProduct.crossProductId,
+    )
+    if (loadCrossProducts) {
+      const crossProducts = await this.productService.findAll(crossProductsIds)
+      return crossProducts.map((crossProduct) => plainToClass(ReadProductDto, crossProduct))
+    }
+    return crossProductsIds
+  }
+
   private async createCrossProducts(productId: number, crossProductIds: number[]): Promise<void> {
     if (crossProductIds?.length > 0) {
       const crossProducts = await this.productService.findAll(crossProductIds)
-      await this.productService.createCrossProduct(productId, crossProducts)
+      await this.productService.createCrossProducts(productId, crossProducts)
     }
   }
 }

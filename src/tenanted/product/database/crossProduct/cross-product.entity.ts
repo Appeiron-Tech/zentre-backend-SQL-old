@@ -10,7 +10,7 @@ export class CrossProduct {
   @Column('int', { nullable: false })
   productId: number
 
-  @ManyToOne(() => Product, (product) => product.crossProducts)
+  @ManyToOne(() => Product, (product) => product.rawCrossProducts)
   product: number
 
   @Column('int', { nullable: false })

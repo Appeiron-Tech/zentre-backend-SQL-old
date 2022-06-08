@@ -205,5 +205,5 @@ export class Product {
   productCategories?: ProductCategory[]
 
   @OneToMany(() => CrossProduct, (crossProduct) => crossProduct.product, { eager: true })
-  crossProducts?: CrossProduct[]
+  rawCrossProducts?: CrossProduct[]
 }

@@ -49,6 +49,10 @@ export class ProductService {
     }
   }
 
+  async find(id: number): Promise<Product> {
+    return await this.productRepository.findOne(id)
+  }
+
   async upsert(product: CreateProductDto | UpdateProductDto): Promise<Product> {
     const createdProduct = await this.productRepository.save(product)
     return createdProduct
@@ -85,7 +89,7 @@ export class ProductService {
   }
 
   /* *********************** CROSS PRODUCTS ********************* */
-  async createCrossProduct(productId: number, crossProducts: Product[]): Promise<void> {
+  async createCrossProducts(productId: number, crossProducts: Product[]): Promise<void> {
     await asyncForEach(crossProducts, async (crossProduct: Product) => {
       const createCrossProduct: CreateCrossProductDto = {
         productId: productId,
@@ -95,7 +99,7 @@ export class ProductService {
     })
   }
 
-  // async dropCrossProducts(productId: number): Promise<void> {
-  //   await this.pro
-  // }
+  async dropCrossProducts(productId: number): Promise<void> {
+    await this.crossProductRepository.delete({ productId: productId })
+  }
 }
