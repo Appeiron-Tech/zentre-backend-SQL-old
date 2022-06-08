@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "sentimen-analyzer",
+    "private_key_id": "9032be09291f63369f517d0b856421486354a9ac",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDqlVcpGHl/+Euf\nwiS2XocGgB/S5EcLo41f+0KtzPj8uw6O24MdEx4Vee4Y/gLq/GDUeJbBgQD2V+ea\nG8UJ0oV/e2PZn2pphRPG6ODBaghYG0HJSOIciYolJwr149wEaGtYjurwAUZ8xwEO\nmGPn/aDpiEmgd5rt0uk00mdwAoNyKV6b0w42QJ+CXNbk4Tqw5l0J2ilYJ3EOAMaU\n8Hja9W9obhVQjrU0/sgBu35G+3St3Mow3kcXbph4zn4tItgRMrNv+D9XJ9nsE0+S\nw9WJNsTRH9ZQxgcC4p/LhEsM+csgkKY9deDO7d3HBwiLbKSDtNXLYVDjhJYVUxMB\nnauxp4phAgMBAAECggEAHDE5AakdlwXb7tYKC/nVz+/vgyyopiswhy++/nzDErqX\nYA9dFU4yICIgfZPvfVa5+2cHtTdACpsbbD+4oTrSDPVjFWkthIN4EkB0HIKWAKK7\n+AkglY3pEph73nvVOhljh0fbz97TXhUbmSmy3hNy9oYI1TZyofDmUpET2dgPfJVl\nz8dZ9Eiryx9joQ81xPEHNP2y90STHfonSn6tQ/ahPkyuyqX43EqrA5eEgFIWV5Kx\nNjXmYrS5fgUXeKF2q8r61+gDxhRc/9uwZSxq5nR6A60xjYNUim7SjSKMxfyb5rGR\nLYgNCCpNJZC6PnkPEJdYhwBtVLpNw8cOm2Z/IiTNjQKBgQD3YChoqK8aoITpdYec\n4wdbE/mJJmC9snD2Lfsqoj5YfWBtPjE4XAxmZGL+uWZc+0EJixSmNw4x1ooSyI0G\nsCdOM5GPLEgQDNOSPNq/maBnnglkr2jDmbuP98gO4kmVFmMx16O/Ow/C2XHYwsd6\nk0LH7bbo7TnEwJMN/l/7lvdxNQKBgQDywwLPn5p4mEBRdsQTo1kK6hLosWWiguwG\nG7L3kIhw+kA0GWS6NlWgcTKhJmIZOm2jWXm/7e9NEhL3gVHegHpY7eEH59lXokSE\nc7rQylXGHyYJqdnxNfcUgkWcaha8kz4oO36pdvY4YUGQLjTdka/D1Frm0L0x+bUc\nS03sBMAl/QKBgDXG0qIF4aMRODOkWCnT9Npo2jtle2xhqUrrLgnToWgNQXQeLAcL\ng6qSsi6b0VPvTvErKf8EQvK0p+lzba0BiFnovgD46GWM1EWbMxap6AP+iB46P7Ud\n63ddr0EFEmf1qPTB4xgEV+XM7YHovgK4lrDtzXCPeZp7HrzRCr6f0ATtAoGAPYyD\n4fAtUfYIGJ9sBy6bHNFMCgMwKYvYG5RaQ7o5XauVK6BkkXHFM/B/TaxVot/VfFzr\nKWZCDeBPPsFi6G7alkF5lG+MA1P42zwcWWNza8/p7PlLcISmKGT/ETE0oosSb1Dm\nREENHC5MWSnd7W9KiPQGOA8kaM9Ow+Wz0+tAbGECgYAFHVh3aZ5EJyp2i2WnzDRu\nqJlS33z9SpNwzrwxWyBZtQCHP6H4cuArxOsLM4DTJqvLpasf8yxLyAtpCi2EKXVK\ng7Pt0BvvJqgHo+u36SZ9PjlLObOr0tkd8Z8YFgiFFXJ91rphhArqOJj8Nd9VyJTU\n/yDtJSSkeEuxyHpBQmIQZw==\n-----END PRIVATE KEY-----\n",
+    "client_email": "trending-analyzer@sentimen-analyzer.iam.gserviceaccount.com",
+    "client_id": "117233584295119570506",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/trending-analyzer%40sentimen-analyzer.iam.gserviceaccount.com"
+  }

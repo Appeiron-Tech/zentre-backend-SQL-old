@@ -32,5 +32,5 @@ export class ReadUserDto {
 
   @IsOptional()
   @Expose()
-  photoUrl?: string
+  photo?: string
 }

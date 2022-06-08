@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -19,6 +20,10 @@ import * as bcryptjs from 'bcryptjs'
 import { plainToClass } from 'class-transformer'
 import { ReadTenancyDto } from './dto/read-tenancy.dto'
 import { ReadUserDto } from './dto/read-user.dto'
+import { CreateUserTenancyDto } from './dto/create-user-tenancy.dto'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import { editFileName, getExtension } from 'src/utils/utils'
 import { CreateUserTenancyDto } from './database/dto/create-user-tenancy.dto'
 import { UpdUserPrivacyDto } from './dto/upd-user-privacy.dto'
 import { UpdateUserDto } from './database/dto/update-user.dto'
@@ -69,6 +74,21 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Patch(':email/uploadimage')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        filename: editFileName,
+      }),
+    }),
+  )
+  async updateProfilePhoto(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('email') email: string,
+  ): Promise<void> {
+    file.filename = 'users_photos/' + email.split('@')[0] + '.' + getExtension(file.originalname)
+    await this.userService.updateProfilePhoto(file, email)
+
   @Patch(':email/privacy')
   async updatePrivacy(
     @Param('email') email: string,
@@ -92,6 +112,7 @@ export class UserController {
       }
     }
     await this.userService.update(email, userToUpdate)
+
   }
 
   //* ***************************** USER TENANCY **************************** */

@@ -1,4 +1,4 @@
-import path from 'path'
+import { parse } from 'path'
 
 //https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
 export async function asyncForEach(array, callback) {
@@ -13,7 +13,7 @@ export function isEmpty(obj: any): boolean {
 
 export function editFileName(req, file, callback) {
   const name = file.originalname.split('.')[0]
-  const fileExtName = path.parse(file.originalname).ext
+  const fileExtName = parse(file.originalname).ext
   const randomName = Array(4)
     .fill(null)
     .map(() => Math.round(Math.random() * 16).toString(16))
