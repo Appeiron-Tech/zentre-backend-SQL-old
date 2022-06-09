@@ -20,9 +20,10 @@ export class ClientController {
 
   @Patch(':id')
   async update(@Param('id') id: number, @Body() updateClient: UpdateClientDto): Promise<void> {
+    const client = await this.clientService.findClient(id)
     if (updateClient.answers?.length >= 0) {
       await asyncForEach(updateClient.answers, async (answer: UpsertAnswerDto) => {
-        await this.clientService.upsertAnswer(answer)
+        await this.clientService.upsertAnswer(client, answer)
       })
     }
     const clientToUpdate = plainToClass(DBUpdateClientDto, updateClient)

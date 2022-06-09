@@ -30,6 +30,10 @@ export class ClientService {
     return await this.clientRepository.findOne({ tenancyName: tenancyName })
   }
 
+  async findClient(id: number): Promise<Client> {
+    return await this.clientRepository.findOne({ id: id })
+  }
+
   async create(client: CreateClientDto): Promise<Client> {
     return await this.clientRepository.save(client)
   }
@@ -38,7 +42,8 @@ export class ClientService {
     await this.clientRepository.update({ id: clientId }, { ...client })
   }
 
-  async upsertAnswer(answer: CreateAnswerDto | UpdateAnswerDto): Promise<void> {
+  async upsertAnswer(client: Client, answer: CreateAnswerDto | UpdateAnswerDto): Promise<void> {
+    answer.client = client
     await this.answerRepository.save(answer)
   }
 }

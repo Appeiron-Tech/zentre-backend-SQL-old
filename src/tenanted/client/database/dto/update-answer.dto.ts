@@ -1,6 +1,9 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator'
+import { Client } from '../entities/client.entity'
 
 export class UpdateAnswerDto {
+  client?: Client
+
   @IsNotEmpty()
   @IsNumber()
   id: number

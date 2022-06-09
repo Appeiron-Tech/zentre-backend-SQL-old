@@ -1,6 +1,9 @@
 import { IsOptional, IsString, MaxLength } from 'class-validator'
+import { Client } from '../entities/client.entity'
 
 export class CreateAnswerDto {
+  client?: Client
+
   @IsOptional()
   @IsString()
   @MaxLength(16)

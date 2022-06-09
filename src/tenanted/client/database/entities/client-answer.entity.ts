@@ -26,7 +26,7 @@ export class ClientAnswer {
   answer: string
 
   @ManyToOne(() => Client, (client) => client.answers)
-  client: number
+  client: Client
 
   @UpdateDateColumn({
     type: 'timestamp',
