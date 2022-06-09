@@ -1,13 +1,16 @@
-import { IsArray, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator'
-import { ClientAnswer } from '../database/entities/client-answer.entity'
-import { IClientPhone } from '../interfaces/client-phone.interface'
-import { UpsertAnswerDto } from './upsert-answer.dto'
+import { Exclude } from 'class-transformer'
+import { IsOptional, IsString, MaxLength } from 'class-validator'
 
 export class UpdateClientDto {
   @IsOptional()
   @IsString()
   @MaxLength(1028)
   description?: string
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(16)
+  businessType?: string
 
   @IsOptional()
   @IsString()
@@ -20,27 +23,23 @@ export class UpdateClientDto {
   currencySymbol?: string
 
   @IsOptional()
-  @MaxLength(10)
-  businessType?: string
-
-  @IsOptional()
-  @IsUrl()
+  @IsString()
   @MaxLength(512)
   urlIG?: string
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   @MaxLength(512)
   urlFB?: string
 
   @IsOptional()
   @IsString()
-  @MaxLength(32)
+  @MaxLength(6)
   brightness?: string
 
   @IsOptional()
-  @IsString()
   @MaxLength(6)
+  @IsString()
   primary?: string
 
   @IsOptional()
@@ -89,10 +88,11 @@ export class UpdateClientDto {
   onSurface?: string
 
   @IsOptional()
-  @IsArray()
-  phones?: IClientPhone[]
+  stock_quantity?: number
 
-  @IsOptional()
-  @IsArray()
-  answers?: UpsertAnswerDto[]
+  @Exclude()
+  answers?: any[]
+
+  @Exclude()
+  phones?: any[]
 }

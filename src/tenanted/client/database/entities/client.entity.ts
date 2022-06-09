@@ -77,7 +77,10 @@ export class Client implements IClient {
   @Column({ length: 6, nullable: true })
   onSurface: string
 
-  @OneToMany(() => ClientAnswer, (clientAnswer) => clientAnswer.client)
+  @OneToMany(() => ClientAnswer, (clientAnswer) => clientAnswer.client, {
+    eager: true,
+    cascade: true,
+  })
   answers: ClientAnswer[]
 
   @OneToMany(() => ClientPhone, (phone) => phone.client)
