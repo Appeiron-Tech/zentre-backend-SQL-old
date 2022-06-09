@@ -83,7 +83,7 @@ export class Client implements IClient {
   })
   answers: ClientAnswer[]
 
-  @OneToMany(() => ClientPhone, (phone) => phone.client)
+  @OneToMany(() => ClientPhone, (phone) => phone.client, { eager: true })
   phones: ClientPhone[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

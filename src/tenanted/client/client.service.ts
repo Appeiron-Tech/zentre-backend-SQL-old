@@ -7,15 +7,19 @@ import { UpdateClientDto } from './dto/update-client.dto'
 import { CreateAnswerDto } from './database/dto/create-answer.dto'
 import { UpdateAnswerDto } from './database/dto/update-answer.dto'
 import { ClientAnswer } from './database/entities/client-answer.entity'
+import { UpsertPhoneDto } from './database/dto/upsert-phone.dto'
+import { ClientPhone } from './database/entities/client-phone.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ClientService {
   private readonly clientRepository: Repository<Client>
   private readonly answerRepository: Repository<ClientAnswer>
+  private readonly phoneRepository: Repository<ClientPhone>
 
   constructor(@Inject(TENANCY_CONNECTION) connection: Connection) {
     this.clientRepository = connection.getRepository(Client)
     this.answerRepository = connection.getRepository(ClientAnswer)
+    this.phoneRepository = connection.getRepository(ClientPhone)
   }
 
   async findAll(): Promise<Client[]> {
@@ -45,5 +49,10 @@ export class ClientService {
   async upsertAnswer(client: Client, answer: CreateAnswerDto | UpdateAnswerDto): Promise<void> {
     answer.client = client
     await this.answerRepository.save(answer)
+  }
+
+  async upsertPhone(client: Client, phone: UpsertPhoneDto): Promise<void> {
+    phone.client = client
+    await this.phoneRepository.save(phone)
   }
 }

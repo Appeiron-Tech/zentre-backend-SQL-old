@@ -7,6 +7,7 @@ import { Client } from './database/entities/client.entity'
 import { UpdateClientDto } from './dto/update-client.dto'
 import { UpdateClientDto as DBUpdateClientDto } from './database/dto/update-client.dto'
 import { UpsertAnswerDto } from './dto/upsert-answer.dto'
+import { UpsertPhoneDto } from './dto/upsert-phone.dto'
 @UseInterceptors(LoggingInterceptor)
 @Controller('api/client')
 export class ClientController {
@@ -24,6 +25,11 @@ export class ClientController {
     if (updateClient.answers?.length >= 0) {
       await asyncForEach(updateClient.answers, async (answer: UpsertAnswerDto) => {
         await this.clientService.upsertAnswer(client, answer)
+      })
+    }
+    if (updateClient.phones?.length >= 0) {
+      await asyncForEach(updateClient.phones, async (phone: UpsertPhoneDto) => {
+        await this.clientService.upsertPhone(client, phone)
       })
     }
     const clientToUpdate = plainToClass(DBUpdateClientDto, updateClient)
