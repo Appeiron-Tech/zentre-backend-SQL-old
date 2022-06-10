@@ -24,9 +24,11 @@ import { CrossProduct } from 'src/tenanted/product/database/crossProduct/cross-p
 import { Order } from 'src/tenanted/order/database/order.entity'
 import { OrderState } from 'src/tenanted/order/database/order-state.entity'
 import { OrderStateLog } from 'src/tenanted/order/database/order-state-log.entity'
-import { OrderPaymentState } from 'src/tenanted/order/database/order-payment-state'
+import { OrderPaymentState } from 'src/tenanted/order/database/order-payment-state.entity'
 import { ProductImage } from 'src/tenanted/product/database/image/product-image.entity'
 import { ClientAnswer } from 'src/tenanted/client/database/entities/client-answer.entity'
+import { Cart } from 'src/tenanted/cart/database/cart.entity'
+import { PaymentMethodState } from 'src/tenanted/order/database/payment-method-state.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -88,6 +90,8 @@ export class TenancyModule {
                 OrderState,
                 OrderStateLog,
                 OrderPaymentState,
+                PaymentMethodState,
+                Cart,
                 Product,
                 CrossProduct,
                 ProductImage,

@@ -1,4 +1,14 @@
-import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Cart } from 'src/tenanted/cart/database/cart.entity'
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
+import { OrderStateLog } from './order-state-log.entity'
 import { OrderState } from './order-state.entity'
 
 @Entity({ name: 'orders' })
@@ -21,23 +31,30 @@ export class Order {
   @Column({ type: 'decimal', nullable: false })
   total: number
 
-  @Column({ type: 'decimal' })
-  receivedMoney?: number
+  @Column({ type: 'decimal', precision: 5, scale: 3, nullable: false })
+  receivedMoney: number
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 5, scale: 3, nullable: true })
   change?: number
 
-  @Column({ type: 'decimal', nullable: false })
+  @Column({ type: 'decimal', precision: 4, scale: 3, default: 0.0, nullable: true })
   discountPct: number
 
   @Column({ nullable: false })
-  serviceType: number
+  serviceType: string
 
   @Column({ nullable: false })
   sessionId: number
 
   @ManyToOne(() => OrderState, (orderState) => orderState.orders)
   orderState: OrderState
+
+  @OneToMany(() => OrderStateLog, (orderStateLog) => orderStateLog.order)
+  orderStateLogs?: OrderStateLog[]
+
+  @OneToOne(() => Cart, (cart) => cart.order, { eager: true })
+  @JoinColumn()
+  cart: Cart
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number

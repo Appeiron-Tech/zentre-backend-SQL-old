@@ -16,6 +16,8 @@ import { StoreModule } from './tenanted/store/store.module'
 import { ProductModule } from './tenanted/product/product.module'
 import { CloudStorageModule } from './third-party-apis/Google/cloud-storage/cloud-storage.module'
 import { PClientModule } from './public/client/client.module'
+import { OrderModule } from './tenanted/order/order.module'
+import { CartModule } from './tenanted/cart/cart.module'
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { PClientModule } from './public/client/client.module'
     StoreModule,
     AnnouncementModule,
     ProductModule,
+    OrderModule,
+    CartModule,
 
     //THIRD PARTY APIS
     CloudStorageModule,
