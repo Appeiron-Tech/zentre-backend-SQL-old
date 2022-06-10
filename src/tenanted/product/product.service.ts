@@ -8,7 +8,7 @@ import { CreateProductDto } from './database/product/dto/create-product.dto'
 import { UpdateCategoryDto } from './database/category/dto/update-category.dto'
 import { UpdateProductDto } from './database/product/dto/update-product.dto'
 import { Category } from './database/category/category.entity'
-import { PAttribute } from './database/entities/p-attribute.entity'
+import { Attribute } from './database/attribute/attribute.entity'
 import { PTag } from './database/entities/p-tag.entity'
 import { ProductCategory } from './database/category/product-category.entity'
 import { Product } from './database/product/product.entity'
@@ -17,6 +17,9 @@ import { CrossProduct } from './database/crossProduct/cross-product.entity'
 import { CreateCrossProductDto } from './database/crossProduct/dto/create-cross-product.dto'
 import { ProductImage } from './database/image/product-image.entity'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
+import { CreateAttributeDto } from './database/attribute/dto/create-attribute.dto'
+import { AttributeOption } from './database/attribute/attribute-option.entity'
+import { CreateAttributeOptionDto } from './database/attribute/dto/create-attribute-option.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProductService {
@@ -25,7 +28,8 @@ export class ProductService {
   private readonly crossProductRepository: Repository<CrossProduct>
   private readonly categoryRepository: Repository<Category>
   private readonly productCategoryRepository: Repository<ProductCategory>
-  private readonly attributeRepository: Repository<PAttribute>
+  private readonly attributeRepository: Repository<Attribute>
+  private readonly attributeOptionRepository: Repository<AttributeOption>
   private readonly tagRepository: Repository<PTag>
   private readonly variationRepository: Repository<Variation>
 
@@ -35,7 +39,8 @@ export class ProductService {
     this.crossProductRepository = connection.getRepository(CrossProduct)
     this.productCategoryRepository = connection.getRepository(ProductCategory)
     this.categoryRepository = connection.getRepository(Category)
-    this.attributeRepository = connection.getRepository(PAttribute)
+    this.attributeRepository = connection.getRepository(Attribute)
+    this.attributeOptionRepository = connection.getRepository(AttributeOption)
     this.tagRepository = connection.getRepository(PTag)
     this.variationRepository = connection.getRepository(Variation)
   }
@@ -63,9 +68,13 @@ export class ProductService {
   }
 
   /* *********************** CATEGORIES ********************* */
-  async upsertCategory(category: CreateCategoryDto | UpdateCategoryDto): Promise<Category> {
+  async createCategory(category: CreateCategoryDto): Promise<Category> {
     const upsertedCategory = await this.categoryRepository.save(category)
     return upsertedCategory
+  }
+
+  async updateCategory(categoryId: number, category: UpdateCategoryDto): Promise<void> {
+    await this.categoryRepository.update({ id: categoryId }, { ...category })
   }
 
   async findCategories(ids?: number[]): Promise<Category[]> {
@@ -111,5 +120,28 @@ export class ProductService {
 
   async dropCrossProducts(productId: number): Promise<void> {
     await this.crossProductRepository.delete({ productId: productId })
+  }
+
+  /* *********************** PRODUCT ATTRIBUTES ********************* */
+  async findAttributes(id?: number): Promise<Attribute[]> {
+    if (id) {
+      return await this.attributeRepository.find({ id: id })
+    }
+    return await this.attributeRepository.find()
+  }
+
+  async createAttribute(attribute: CreateAttributeDto): Promise<Attribute> {
+    const createdAttribute = await this.attributeRepository.save(attribute)
+    return createdAttribute
+  }
+
+  async createAttributeOption(
+    attributeId: number,
+    option: CreateAttributeOptionDto,
+  ): Promise<AttributeOption> {
+    const attribute = await this.attributeRepository.findOne(attributeId)
+    option.attribute = attribute
+    const createdOption = await this.attributeOptionRepository.save(option)
+    return createdOption
   }
 }

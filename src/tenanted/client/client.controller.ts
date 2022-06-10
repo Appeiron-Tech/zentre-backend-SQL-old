@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, UseInterceptors } from '@nestjs/common'
 import { plainToClass } from 'class-transformer'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { asyncForEach } from 'src/utils/utils'

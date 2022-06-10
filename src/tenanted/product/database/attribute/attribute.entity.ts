@@ -1,11 +1,12 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
+import { AttributeOption } from './attribute-option.entity'
 
 @Entity({ name: 'p_attributes' })
-export class PAttribute {
+export class Attribute {
   @PrimaryGeneratedColumn('increment')
   id: number
 
-  @Index('product_u_idx_name', { unique: true })
+  @Index('attribute_u_idx_name', { unique: true })
   @Column({ length: 64, nullable: false })
   name: string
 
@@ -17,6 +18,9 @@ export class PAttribute {
 
   @Column({ nullable: false, default: 0 })
   variation: boolean
+
+  @OneToMany(() => AttributeOption, (attributeOption) => attributeOption.attribute, { eager: true })
+  attributeOptions?: AttributeOption[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Timestamp

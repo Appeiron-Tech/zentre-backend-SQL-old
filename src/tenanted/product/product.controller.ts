@@ -21,6 +21,8 @@ import { CreateCategoryDto } from './database/category/dto/create-category.dto'
 import { ReadProductDto } from './dto/read-product.dto'
 import { asyncForEach } from 'src/utils/utils'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
+import { Attribute } from './database/attribute/attribute.entity'
+import { CreateAttributeDto } from './database/attribute/dto/create-attribute.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -34,6 +36,7 @@ export class ProductController {
 
   @Get()
   async findAll(): Promise<ReadProductDto[]> {
+    console.log('findAll')
     const readProducts: ReadProductDto[] = []
     const products = await this.productService.findAll()
     await asyncForEach(products, async (product: Product) => {
@@ -71,31 +74,6 @@ export class ProductController {
     return createdProduct
   }
 
-  /*************************** CATEGORIES ************************ */
-  @Get('category')
-  async findCategories(): Promise<Category[]> {
-    const categories = await this.productService.findCategories()
-    return categories
-  }
-
-  @Post('category')
-  async createCategory(@Body() category: CreateCategoryDto): Promise<Category> {
-    const createdCategory = await this.productService.upsertCategory(category)
-    return createdCategory
-  }
-
-  @Post(':productId/category')
-  async createProductCategory(
-    @Param('productId') productId: number,
-    @Body() categoryIds: number[],
-  ): Promise<void> {
-    if (categoryIds?.length > 0) {
-      const validCategories: Category[] = await this.productService.findCategories(categoryIds)
-      await this.productService.dropProductCategories(productId)
-      await this.productService.createProductCategories(productId, validCategories)
-    }
-  }
-
   /*************************** CROSS PRODUCTS ************************ */
   @Post(':id/crossproducts')
   async upsertCrossProducts(
@@ -106,6 +84,19 @@ export class ProductController {
       const validProducts: Product[] = await this.productService.findAll(crossProductIds)
       await this.productService.dropCrossProducts(productId)
       await this.productService.createCrossProducts(productId, validProducts)
+    }
+  }
+
+  /*************************** CATEGORIES ************************ */
+  @Post(':id/category')
+  async createProductCategory(
+    @Param('productId') id: number,
+    @Body() categoryIds: number[],
+  ): Promise<void> {
+    if (categoryIds?.length > 0) {
+      const validCategories: Category[] = await this.productService.findCategories(categoryIds)
+      await this.productService.dropProductCategories(id)
+      await this.productService.createProductCategories(id, validCategories)
     }
   }
 

@@ -1,5 +1,4 @@
 import { IsArray, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator'
-import { ClientAnswer } from '../database/entities/client-answer.entity'
 import { IClientPhone } from '../interfaces/client-phone.interface'
 import { UpsertAnswerDto } from './upsert-answer.dto'
 

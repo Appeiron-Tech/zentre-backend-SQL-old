@@ -16,7 +16,6 @@ import { Tenancy } from './database/tenancy.entity'
 import { TenancyService } from './tenancy.service'
 import { Product } from 'src/tenanted/product/database/product/product.entity'
 import { Category } from 'src/tenanted/product/database/category/category.entity'
-import { PAttribute } from 'src/tenanted/product/database/entities/p-attribute.entity'
 import { PTag } from 'src/tenanted/product/database/entities/p-tag.entity'
 import { Variation } from 'src/tenanted/product/database/entities/variation.entity'
 import { ProductCategory } from 'src/tenanted/product/database/category/product-category.entity'
@@ -27,6 +26,8 @@ import { OrderStateLog } from 'src/tenanted/order/database/order-state-log.entit
 import { OrderPaymentState } from 'src/tenanted/order/database/order-payment-state'
 import { ProductImage } from 'src/tenanted/product/database/image/product-image.entity'
 import { ClientAnswer } from 'src/tenanted/client/database/entities/client-answer.entity'
+import { Attribute } from 'src/tenanted/product/database/attribute/attribute.entity'
+import { AttributeOption } from 'src/tenanted/product/database/attribute/attribute-option.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -89,11 +90,12 @@ export class TenancyModule {
                 OrderStateLog,
                 OrderPaymentState,
                 Product,
+                Attribute,
+                AttributeOption,
                 CrossProduct,
                 ProductImage,
                 Category,
                 ProductCategory,
-                PAttribute,
                 PTag,
                 Variation,
               ],
