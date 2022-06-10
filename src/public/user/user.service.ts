@@ -58,7 +58,7 @@ export class UserService {
       throw e
     }
   }
-  
+
   async isValidPassword(email: string, password: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ email: email })
     if (user) {
