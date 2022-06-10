@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
 import { AppLoggerModule } from 'src/common/modules/app-logger/app-logger.module'
 import { TenancyModule } from 'src/public/tenancy/tenancy.module'
-import { OrderController } from './order.controller'
-import { OrderService } from './order.service'
+import { CartController } from './cart.controller'
+import { CartService } from './cart.service'
 
 @Module({
   imports: [TenancyModule, AppLoggerModule],
-  controllers: [OrderController],
-  providers: [OrderService],
+  controllers: [CartController],
+  providers: [CartService],
 })
-export class OrderModule {}
+export class CartModule {}

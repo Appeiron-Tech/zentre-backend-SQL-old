@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator'
 
-export class CreateStoreDto {
+export class CreateOrderDto {
   @IsNotEmpty()
   cartId: number
   address?: string
@@ -14,9 +14,7 @@ export class CreateStoreDto {
   change?: number
   discountPct?: number
   @IsNotEmpty()
-  serviceType: number
+  serviceType: string
   @IsNotEmpty()
   sessionId: number
-  @IsNotEmpty()
-  createdAt: number
 }

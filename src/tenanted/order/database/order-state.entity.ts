@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { OrderStateLog } from './order-state-log.entity'
 import { Order } from './order.entity'
 
-@Entity({ name: 'order-state' })
+@Entity({ name: 'order_states' })
 export class OrderState {
   @PrimaryGeneratedColumn('increment')
   id: number
