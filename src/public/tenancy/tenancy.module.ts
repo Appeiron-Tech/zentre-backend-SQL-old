@@ -29,6 +29,7 @@ import { ProductImage } from 'src/tenanted/product/database/image/product-image.
 import { ClientAnswer } from 'src/tenanted/client/database/entities/client-answer.entity'
 import { Cart } from 'src/tenanted/cart/database/cart.entity'
 import { PaymentMethodState } from 'src/tenanted/order/database/payment-method-state.entity'
+import { PaymentMethod } from 'src/tenanted/order/database/payment-method.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -90,6 +91,7 @@ export class TenancyModule {
                 OrderState,
                 OrderStateLog,
                 OrderPaymentState,
+                PaymentMethod,
                 PaymentMethodState,
                 Cart,
                 Product,

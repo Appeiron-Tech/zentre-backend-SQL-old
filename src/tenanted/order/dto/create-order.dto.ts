@@ -17,4 +17,5 @@ export class CreateOrderDto {
   serviceType: string
   @IsNotEmpty()
   sessionId: number
+  paymentMethodId?: number
 }
