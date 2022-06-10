@@ -6,10 +6,13 @@ import { OrderStateLog } from './database/order-state-log.entity'
 import { OrderState } from './database/order-state.entity'
 import { Order } from './database/order.entity'
 import { PaymentMethodState } from './database/payment-method-state.entity'
+import { PaymentMethod } from './database/payment-method.entity'
+import { CreateOrderPaymentStateDto } from './dto/create-order-payment-state.dto'
 import { CreateOrderStateLogDto } from './dto/create-order-state-log.dto'
 import { CreateOrderStateDto } from './dto/create-order-state.dto'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { CreatePaymentMethodStateDto } from './dto/create-payment-method-state.dto'
+import { CreatePaymentMethodDto } from './dto/create-payment-method.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class OrderService {
@@ -18,6 +21,7 @@ export class OrderService {
   private readonly orderStateLogRepository: Repository<OrderStateLog>
   private readonly orderPaymentStateRepository: Repository<OrderPaymentState>
   private readonly paymentMethodStateRepository: Repository<PaymentMethodState>
+  private readonly paymentMethodRepository: Repository<PaymentMethod>
 
   constructor(@Inject(TENANCY_CONNECTION) connection: Connection) {
     this.orderRepository = connection.getRepository(Order)
@@ -25,6 +29,7 @@ export class OrderService {
     this.orderStateLogRepository = connection.getRepository(OrderStateLog)
     this.orderPaymentStateRepository = connection.getRepository(OrderPaymentState)
     this.paymentMethodStateRepository = connection.getRepository(PaymentMethodState)
+    this.paymentMethodRepository = connection.getRepository(PaymentMethod)
   }
 
   // ORDERS
@@ -58,6 +63,29 @@ export class OrderService {
   async createOrderStateLog(orderStateLog: CreateOrderStateLogDto): Promise<OrderStateLog> {
     const createdOrderStateLog = await this.orderStateLogRepository.save(orderStateLog)
     return createdOrderStateLog
+  }
+
+  // ORDER PAYMENT STATES
+  async findAllOrderPaymentStates(): Promise<OrderPaymentState[]> {
+    const orderPaymentStates = await this.orderPaymentStateRepository.find()
+    return orderPaymentStates
+  }
+
+  async createOrderPaymentState(
+    orderPaymentState: CreateOrderPaymentStateDto,
+  ): Promise<OrderPaymentState> {
+    const createdOrderPaymentState = await this.orderPaymentStateRepository.save(orderPaymentState)
+    return createdOrderPaymentState
+  }
+
+  // PAYMENT METHODS
+  async findAllPaymentMethods(): Promise<PaymentMethod[]> {
+    const paymentMethods = await this.paymentMethodRepository.find()
+    return paymentMethods
+  }
+  async createPaymentMethod(paymentMethod: CreatePaymentMethodDto): Promise<PaymentMethod> {
+    const createdPaymentMethod = await this.paymentMethodRepository.save(paymentMethod)
+    return createdPaymentMethod
   }
 
   // PAYMENT METHOD STATES

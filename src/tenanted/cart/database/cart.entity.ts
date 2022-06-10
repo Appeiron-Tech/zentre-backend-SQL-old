@@ -9,6 +9,9 @@ export class Cart {
   @Column({ nullable: true })
   comment?: string
 
+  @Column({ nullable: true, type: 'decimal', precision: 5, scale: 3 })
+  totalPrice: number
+
   @OneToOne(() => Order, (order) => order.cart)
   order: Order
 
