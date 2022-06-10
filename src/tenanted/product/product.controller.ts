@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -17,12 +18,12 @@ import { ProductService } from './product.service'
 import { plainToClass } from 'class-transformer'
 import { UpdateProductDto } from './database/product/dto/update-product.dto'
 import { Category } from './database/category/category.entity'
-import { CreateCategoryDto } from './database/category/dto/create-category.dto'
 import { ReadProductDto } from './dto/read-product.dto'
 import { asyncForEach } from 'src/utils/utils'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
 import { Attribute } from './database/attribute/attribute.entity'
-import { CreateAttributeDto } from './database/attribute/dto/create-attribute.dto'
+import { AttributeOption } from './database/attribute/attribute-option.entity'
+import { CreateProductAttrOptionDto } from './dto/create-product-attr-option.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -90,7 +91,7 @@ export class ProductController {
   /*************************** CATEGORIES ************************ */
   @Post(':id/category')
   async createProductCategory(
-    @Param('productId') id: number,
+    @Param('id') id: number,
     @Body() categoryIds: number[],
   ): Promise<void> {
     if (categoryIds?.length > 0) {
@@ -98,6 +99,24 @@ export class ProductController {
       await this.productService.dropProductCategories(id)
       await this.productService.createProductCategories(id, validCategories)
     }
+  }
+
+  /*************************** ATTRIBUTES ************************ */
+  @Post(':id/attr_option')
+  async createProductAttrOption(
+    @Param('id') productId: number,
+    @Body() attrOption: CreateProductAttrOptionDto,
+  ): Promise<void> {
+    console.log('attr_option', attrOption)
+    await this.productService.createProductAttrOption(productId, attrOption.attrOptionId)
+  }
+
+  @Delete(':id/attr_option/:attrOptionId')
+  async deleteProductAttrOption(
+    @Param('id') productId: number,
+    @Param('attrOptionId') attrOptionId: number,
+  ): Promise<void> {
+    await this.productService.dropProductAttrOption(attrOptionId)
   }
 
   /*************************** IMAGES ************************ */

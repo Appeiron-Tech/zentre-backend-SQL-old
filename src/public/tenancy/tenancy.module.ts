@@ -28,6 +28,7 @@ import { ProductImage } from 'src/tenanted/product/database/image/product-image.
 import { ClientAnswer } from 'src/tenanted/client/database/entities/client-answer.entity'
 import { Attribute } from 'src/tenanted/product/database/attribute/attribute.entity'
 import { AttributeOption } from 'src/tenanted/product/database/attribute/attribute-option.entity'
+import { ProductAttrOption } from 'src/tenanted/product/database/attribute/product-attr-option.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -96,6 +97,7 @@ export class TenancyModule {
                 ProductImage,
                 Category,
                 ProductCategory,
+                ProductAttrOption,
                 PTag,
                 Variation,
               ],

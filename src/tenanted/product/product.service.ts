@@ -20,14 +20,17 @@ import { CreateProductImageDto } from './database/image/dto/create-product-image
 import { CreateAttributeDto } from './database/attribute/dto/create-attribute.dto'
 import { AttributeOption } from './database/attribute/attribute-option.entity'
 import { CreateAttributeOptionDto } from './database/attribute/dto/create-attribute-option.dto'
+import { ProductAttrOption } from './database/attribute/product-attr-option.entity'
+import { CreateProductAttrOptionDto } from './database/attribute/dto/create-product-attr-option.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProductService {
   private readonly productRepository: Repository<Product>
   private readonly productImageRepository: Repository<ProductImage>
+  private readonly productCategoryRepository: Repository<ProductCategory>
+  private readonly productAttrOptionRepository: Repository<ProductAttrOption>
   private readonly crossProductRepository: Repository<CrossProduct>
   private readonly categoryRepository: Repository<Category>
-  private readonly productCategoryRepository: Repository<ProductCategory>
   private readonly attributeRepository: Repository<Attribute>
   private readonly attributeOptionRepository: Repository<AttributeOption>
   private readonly tagRepository: Repository<PTag>
@@ -38,6 +41,7 @@ export class ProductService {
     this.productImageRepository = connection.getRepository(ProductImage)
     this.crossProductRepository = connection.getRepository(CrossProduct)
     this.productCategoryRepository = connection.getRepository(ProductCategory)
+    this.productAttrOptionRepository = connection.getRepository(ProductAttrOption)
     this.categoryRepository = connection.getRepository(Category)
     this.attributeRepository = connection.getRepository(Attribute)
     this.attributeOptionRepository = connection.getRepository(AttributeOption)
@@ -123,11 +127,14 @@ export class ProductService {
   }
 
   /* *********************** PRODUCT ATTRIBUTES ********************* */
-  async findAttributes(id?: number): Promise<Attribute[]> {
-    if (id) {
-      return await this.attributeRepository.find({ id: id })
+  async findAttributes(ids?: number[]): Promise<Attribute[]> {
+    if (ids && ids?.length > 0) {
+      return await this.attributeRepository.find({
+        where: { id: In(ids) },
+      })
+    } else {
+      return await this.attributeRepository.find()
     }
-    return await this.attributeRepository.find()
   }
 
   async createAttribute(attribute: CreateAttributeDto): Promise<Attribute> {
@@ -143,5 +150,22 @@ export class ProductService {
     option.attribute = attribute
     const createdOption = await this.attributeOptionRepository.save(option)
     return createdOption
+  }
+
+  async findAttributeOption(id: number): Promise<AttributeOption> {
+    return await this.attributeOptionRepository.findOne({ id: id })
+  }
+
+  async dropProductAttrOption(productAttrOptionId: number): Promise<void> {
+    await this.productAttrOptionRepository.delete({ id: productAttrOptionId })
+  }
+
+  async createProductAttrOption(productId: number, attrOptionId: number): Promise<void> {
+    const createProductAttrOption: CreateProductAttrOptionDto = {
+      productId: productId,
+      attributeOptionId: attrOptionId,
+    }
+    console.log(createProductAttrOption)
+    await this.productAttrOptionRepository.save(createProductAttrOption)
   }
 }
