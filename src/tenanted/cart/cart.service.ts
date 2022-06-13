@@ -21,4 +21,8 @@ export class CartService {
     const createdCart = await this.cartRepository.save(cart)
     return createdCart
   }
+
+  async delete(id: number): Promise<void> {
+    await this.cartRepository.delete(id)
+  }
 }

@@ -1,6 +1,7 @@
 import { Inject, Injectable, Scope } from '@nestjs/common'
 import { TENANCY_CONNECTION } from 'src/public/tenancy/tenancy.provider'
 import { Connection, Repository } from 'typeorm'
+import { Cart } from '../cart/database/cart.entity'
 import { OrderPaymentState } from './database/order-payment-state.entity'
 import { OrderStateLog } from './database/order-state-log.entity'
 import { OrderState } from './database/order-state.entity'
@@ -22,6 +23,7 @@ export class OrderService {
   private readonly orderPaymentStateRepository: Repository<OrderPaymentState>
   private readonly paymentMethodStateRepository: Repository<PaymentMethodState>
   private readonly paymentMethodRepository: Repository<PaymentMethod>
+  private readonly cartRepository: Repository<Cart>
 
   constructor(@Inject(TENANCY_CONNECTION) connection: Connection) {
     this.orderRepository = connection.getRepository(Order)
@@ -30,6 +32,7 @@ export class OrderService {
     this.orderPaymentStateRepository = connection.getRepository(OrderPaymentState)
     this.paymentMethodStateRepository = connection.getRepository(PaymentMethodState)
     this.paymentMethodRepository = connection.getRepository(PaymentMethod)
+    this.cartRepository = connection.getRepository(Cart)
   }
 
   // ORDERS
@@ -39,9 +42,23 @@ export class OrderService {
     return stores
   }
 
+  async findOne(id: number): Promise<Order> {
+    const order = await this.orderRepository.findOne(id)
+    return order
+  }
+
   async create(order: CreateOrderDto): Promise<Order> {
     const createdOrder = await this.orderRepository.save(order)
     return createdOrder
+  }
+
+  async delete(id: number): Promise<void> {
+    console.log('ORDER ID: ' + id)
+    await this.orderRepository.delete(id)
+  }
+
+  async updateCart(cartId: number, orderId: number): Promise<void> {
+    await this.cartRepository.update(cartId, { orderId: orderId })
   }
 
   // ORDER STATE

@@ -13,6 +13,6 @@ export class PaymentMethod {
   @ManyToOne(() => PaymentMethodState, (paymentMethodState) => paymentMethodState.paymentMethods)
   paymentMethodState: PaymentMethodState
 
-  @OneToOne(() => Order, (order) => order.paymentMethod)
+  @OneToOne(() => Order, (order) => order.paymentMethod, { onDelete: 'CASCADE' })
   order: Order
 }

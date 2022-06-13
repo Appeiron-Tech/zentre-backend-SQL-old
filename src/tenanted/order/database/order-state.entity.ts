@@ -13,6 +13,6 @@ export class OrderState {
   @OneToMany(() => OrderStateLog, (orderStateLog) => orderStateLog.orderState)
   orderStateLogs?: OrderStateLog[]
 
-  @OneToMany(() => Order, (order) => order.orderState)
+  @OneToMany(() => Order, (order) => order.orderState, { onDelete: 'CASCADE' })
   orders?: Order[]
 }

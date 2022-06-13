@@ -16,7 +16,7 @@ export class OrderStateLog {
   @ManyToOne(() => OrderState, (orderState) => orderState.orderStateLogs)
   orderState: OrderState
 
-  @ManyToOne(() => Order, (order) => order.orderStateLogs)
+  @ManyToOne(() => Order, (order) => order.orderStateLogs, { onDelete: 'CASCADE' })
   order: Order
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

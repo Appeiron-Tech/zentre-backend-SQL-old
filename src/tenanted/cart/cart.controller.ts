@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   UseInterceptors,
   UsePipes,
@@ -32,5 +34,10 @@ export class CartController {
   async create(@Body(new ValidationPipe()) cart: CreateCartDto): Promise<Cart> {
     const createdCart = await this.cartService.create(cart)
     return createdCart
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: number): Promise<void> {
+    await this.cartService.delete(id)
   }
 }

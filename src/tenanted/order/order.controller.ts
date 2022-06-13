@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   UseInterceptors,
   UsePipes,
@@ -43,7 +45,13 @@ export class OrderController {
   @Post()
   async create(@Body(new ValidationPipe()) order: CreateOrderDto): Promise<Order> {
     const createdOrder = await this.orderService.create(order)
+    await this.orderService.updateCart(createdOrder.cartId, createdOrder.id)
     return createdOrder
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: number): Promise<void> {
+    await this.orderService.delete(id)
   }
 
   // ORDER STATES

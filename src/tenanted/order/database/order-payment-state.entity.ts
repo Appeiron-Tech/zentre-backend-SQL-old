@@ -19,7 +19,7 @@ export class OrderPaymentState {
   )
   paymentMethodState: PaymentMethodState
 
-  @ManyToOne(() => Order, (order) => order.orderPaymentStates)
+  @ManyToOne(() => Order, (order) => order.orderPaymentStates, { onDelete: 'CASCADE' })
   order: Order
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

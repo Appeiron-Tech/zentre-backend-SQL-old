@@ -48,20 +48,25 @@ export class Order {
   @Column({ nullable: false })
   sessionId: number
 
-  @ManyToOne(() => OrderState, (orderState) => orderState.orders)
+  @ManyToOne(() => OrderState, (orderState) => orderState.orders, { onDelete: 'CASCADE' })
   orderState: OrderState
 
-  @OneToMany(() => OrderStateLog, (orderStateLog) => orderStateLog.order)
+  @OneToMany(() => OrderStateLog, (orderStateLog) => orderStateLog.order, { onDelete: 'CASCADE' })
   orderStateLogs?: OrderStateLog[]
 
-  @OneToMany(() => OrderPaymentState, (orderPaymentState) => orderPaymentState.order)
+  @OneToMany(() => OrderPaymentState, (orderPaymentState) => orderPaymentState.order, {
+    onDelete: 'CASCADE',
+  })
   orderPaymentStates?: OrderPaymentState[]
 
   @OneToOne(() => Cart, (cart) => cart.order, { eager: true })
   @JoinColumn()
   cart: Cart
 
-  @OneToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.order, { eager: true })
+  @OneToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.order, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   paymentMethod: PaymentMethod
 
