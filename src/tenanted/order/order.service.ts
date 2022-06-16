@@ -1,42 +1,31 @@
 import { Inject, Injectable, Scope } from '@nestjs/common'
 import { TENANCY_CONNECTION } from 'src/public/tenancy/tenancy.provider'
 import { Connection, Repository } from 'typeorm'
-import { Cart } from '../cart/database/cart.entity'
-import { OrderPaymentState } from './database/order-payment-state.entity'
-import { OrderStateLog } from './database/order-state-log.entity'
-import { OrderState } from './database/order-state.entity'
+import { OrderStatusLog } from './database/order-status-log.entity'
 import { Order } from './database/order.entity'
-import { PaymentMethodState } from './database/payment-method-state.entity'
-import { PaymentMethod } from './database/payment-method.entity'
-import { CreateOrderPaymentStateDto } from './dto/create-order-payment-state.dto'
-import { CreateOrderStateLogDto } from './dto/create-order-state-log.dto'
-import { CreateOrderStateDto } from './dto/create-order-state.dto'
-import { CreateOrderDto } from './dto/create-order.dto'
-import { CreatePaymentMethodStateDto } from './dto/create-payment-method-state.dto'
-import { CreatePaymentMethodDto } from './dto/create-payment-method.entity'
+import { CreatePaymentStatusLogDto } from './database/dto/create-payment-status-log.dto'
+import { CreateOrderDto } from './database/dto/create-order.dto'
+import { CreateStatusLogDto } from './database/dto/create-status-log.dto'
+import { OrderPaymentStatusLog } from './database/payment-status-log.entity'
+import { OrderDeliveryStatusLog } from './database/delivery-status-log.entity'
+import { CreateDeliveryStatusLogDto } from './database/dto/create-delivery-status-log.dto'
+import { UpdateOrderDto } from './database/dto/update-order.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class OrderService {
   private readonly orderRepository: Repository<Order>
-  private readonly orderStateRepository: Repository<OrderState>
-  private readonly orderStateLogRepository: Repository<OrderStateLog>
-  private readonly orderPaymentStateRepository: Repository<OrderPaymentState>
-  private readonly paymentMethodStateRepository: Repository<PaymentMethodState>
-  private readonly paymentMethodRepository: Repository<PaymentMethod>
-  private readonly cartRepository: Repository<Cart>
+  private readonly statusLogRepository: Repository<OrderStatusLog>
+  private readonly paymentStatusLogRepository: Repository<OrderPaymentStatusLog>
+  private readonly deliveryStatusLogRepository: Repository<OrderDeliveryStatusLog>
 
   constructor(@Inject(TENANCY_CONNECTION) connection: Connection) {
     this.orderRepository = connection.getRepository(Order)
-    this.orderStateRepository = connection.getRepository(OrderState)
-    this.orderStateLogRepository = connection.getRepository(OrderStateLog)
-    this.orderPaymentStateRepository = connection.getRepository(OrderPaymentState)
-    this.paymentMethodStateRepository = connection.getRepository(PaymentMethodState)
-    this.paymentMethodRepository = connection.getRepository(PaymentMethod)
-    this.cartRepository = connection.getRepository(Cart)
+    this.statusLogRepository = connection.getRepository(OrderStatusLog)
+    this.paymentStatusLogRepository = connection.getRepository(OrderPaymentStatusLog)
+    this.deliveryStatusLogRepository = connection.getRepository(OrderDeliveryStatusLog)
   }
 
   // ORDERS
-
   async findAll(): Promise<Order[]> {
     const stores = await this.orderRepository.find()
     return stores
@@ -52,70 +41,45 @@ export class OrderService {
     return createdOrder
   }
 
-  async delete(id: number): Promise<void> {
-    console.log('ORDER ID: ' + id)
-    await this.orderRepository.delete(id)
+  async update(orderId: number, order: UpdateOrderDto): Promise<void> {
+    await this.orderRepository.update({ id: orderId }, { ...order })
   }
 
-  async updateCart(cartId: number, orderId: number): Promise<void> {
-    await this.cartRepository.update(cartId, { orderId: orderId })
+  /*************************** ORDER STATUS LOGS ************************ */
+
+  async findStatusLogs(orderId: number): Promise<OrderStatusLog[]> {
+    const statusLogs = await this.statusLogRepository.find({ orderId: orderId })
+    return statusLogs
   }
 
-  // ORDER STATE
-
-  async findAllOrderStates(): Promise<OrderState[]> {
-    const orderStates = await this.orderStateRepository.find()
-    return orderStates
-  }
-  async createOrderState(orderState: CreateOrderStateDto): Promise<OrderState> {
-    const createdOrderState = await this.orderStateRepository.save(orderState)
-    return createdOrderState
+  async createStatusLog(orderStatusLog: CreateStatusLogDto): Promise<OrderStatusLog> {
+    const createdStatusLog = await this.statusLogRepository.save(orderStatusLog)
+    return createdStatusLog
   }
 
-  // ORDER STATE LOGS
-  async findAllOrderStateLogs(): Promise<OrderStateLog[]> {
-    const orderStateLogs = await this.orderStateLogRepository.find()
-    return orderStateLogs
-  }
-  async createOrderStateLog(orderStateLog: CreateOrderStateLogDto): Promise<OrderStateLog> {
-    const createdOrderStateLog = await this.orderStateLogRepository.save(orderStateLog)
-    return createdOrderStateLog
+  /*************************** ORDER PAYMENT STATUS ************************ */
+  async findPaymentStatusLogs(orderId: number): Promise<OrderPaymentStatusLog[]> {
+    const paymentStatusLogs = await this.paymentStatusLogRepository.find({ orderId: orderId })
+    return paymentStatusLogs
   }
 
-  // ORDER PAYMENT STATES
-  async findAllOrderPaymentStates(): Promise<OrderPaymentState[]> {
-    const orderPaymentStates = await this.orderPaymentStateRepository.find()
-    return orderPaymentStates
+  async createPaymentStatusLog(
+    orderPaymentState: CreatePaymentStatusLogDto,
+  ): Promise<OrderPaymentStatusLog> {
+    const createdPaymentStatusLog = await this.paymentStatusLogRepository.save(orderPaymentState)
+    return createdPaymentStatusLog
   }
 
-  async createOrderPaymentState(
-    orderPaymentState: CreateOrderPaymentStateDto,
-  ): Promise<OrderPaymentState> {
-    const createdOrderPaymentState = await this.orderPaymentStateRepository.save(orderPaymentState)
-    return createdOrderPaymentState
+  /*************************** ORDER DELIVERY STATUS ************************ */
+  async findDeliveryStatusLogs(orderId: number): Promise<OrderDeliveryStatusLog[]> {
+    const deliveryStatusLogs = await this.deliveryStatusLogRepository.find({ orderId: orderId })
+    return deliveryStatusLogs
   }
 
-  // PAYMENT METHODS
-  async findAllPaymentMethods(): Promise<PaymentMethod[]> {
-    const paymentMethods = await this.paymentMethodRepository.find()
-    return paymentMethods
-  }
-  async createPaymentMethod(paymentMethod: CreatePaymentMethodDto): Promise<PaymentMethod> {
-    const createdPaymentMethod = await this.paymentMethodRepository.save(paymentMethod)
-    return createdPaymentMethod
-  }
-
-  // PAYMENT METHOD STATES
-  async findAllPaymentMethodStates(): Promise<PaymentMethodState[]> {
-    const paymentMethodStates = await this.paymentMethodStateRepository.find()
-    return paymentMethodStates
-  }
-  async createPaymentMethodState(
-    paymentMethodState: CreatePaymentMethodStateDto,
-  ): Promise<PaymentMethodState> {
-    const createdPaymentMethodState = await this.paymentMethodStateRepository.save(
-      paymentMethodState,
-    )
-    return createdPaymentMethodState
+  async createDeliveryStatusLog(
+    deliveryStatusLog: CreateDeliveryStatusLogDto,
+  ): Promise<OrderDeliveryStatusLog> {
+    const createdDeliveryStatusLog = await this.deliveryStatusLogRepository.save(deliveryStatusLog)
+    return createdDeliveryStatusLog
   }
 }

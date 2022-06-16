@@ -12,11 +12,11 @@ export class Cart {
   @Column({ nullable: true })
   orderId?: number
 
+  @OneToOne(() => Order)
+  order: Order
+
   @Column({ nullable: true, type: 'decimal', precision: 5, scale: 3 })
   totalPrice: number
-
-  @OneToOne(() => Order, (order) => order.cart, { onDelete: 'CASCADE' })
-  order: Order
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number

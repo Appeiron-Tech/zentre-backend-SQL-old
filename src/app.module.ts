@@ -10,6 +10,7 @@ import { TenancyModule } from './public/tenancy/tenancy.module'
 import { ThemesModule } from './public/theme/theme.module'
 import { AppModule as MyAppModule } from './public/app/app.module'
 import { UserModule } from './public/user/user.module'
+import { OrderModule as POrderModule } from './public/order/order.module'
 import { AnnouncementModule } from './tenanted/announcement/announcement.module'
 import { ClientModule } from './tenanted/client/client.module'
 import { StoreModule } from './tenanted/store/store.module'
@@ -42,6 +43,7 @@ import { CartModule } from './tenanted/cart/cart.module'
     //PUBLIC
     TenancyModule,
     UserModule,
+    POrderModule,
     ThemesModule,
     MyAppModule,
     ScreenModule,

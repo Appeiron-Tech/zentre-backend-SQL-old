@@ -1,17 +1,4 @@
-import { Cart } from 'src/tenanted/cart/database/cart.entity'
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm'
-import { OrderPaymentState } from './order-payment-state.entity'
-import { OrderStateLog } from './order-state-log.entity'
-import { OrderState } from './order-state.entity'
-import { PaymentMethod } from './payment-method.entity'
+import { Column, Entity, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from 'typeorm'
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -21,54 +8,51 @@ export class Order {
   @Column({ nullable: false })
   cartId: number
 
-  @Column()
+  @Column({ nullable: true, length: 512 })
   address?: string
 
-  @Column({ nullable: false })
-  userName: string
+  @Column({ nullable: false, length: 128 })
+  username: string
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 16 })
   userPhone: string
 
-  @Column({ type: 'decimal', precision: 5, scale: 3, nullable: false })
+  @Column({ type: 'decimal', precision: 10, scale: 5, nullable: false })
   total: number
 
-  @Column({ type: 'decimal', precision: 5, scale: 3, nullable: false })
+  @Column({ type: 'decimal', precision: 10, scale: 5, nullable: true })
   receivedMoney: number
 
-  @Column({ type: 'decimal', precision: 5, scale: 3, nullable: true })
+  @Column({ type: 'decimal', precision: 10, scale: 5, nullable: true })
   change?: number
 
-  @Column({ type: 'decimal', precision: 4, scale: 3, default: 0.0, nullable: true })
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0.0, nullable: true })
   discountPct: number
 
-  @Column({ nullable: false, length: 32 })
+  @Column({ nullable: false, length: 8 })
   serviceType: string
 
   @Column({ nullable: false })
-  sessionId: number
+  sessionId: string
 
-  @ManyToOne(() => OrderState, (orderState) => orderState.orders, { onDelete: 'CASCADE' })
-  orderState: OrderState
+  @Column({ nullable: false, length: 8, default: 'PENDING' })
+  status: string
 
-  @OneToMany(() => OrderStateLog, (orderStateLog) => orderStateLog.order, { onDelete: 'CASCADE' })
-  orderStateLogs?: OrderStateLog[]
+  @Column({ nullable: false, length: 8, default: 'UNPAID' })
+  paymentStatus: string
 
-  @OneToMany(() => OrderPaymentState, (orderPaymentState) => orderPaymentState.order, {
-    onDelete: 'CASCADE',
+  @Column({ nullable: false, length: 8, default: 'UNFULFED' })
+  deliveryStatus: string
+
+  @Column({ nullable: false, length: 8 })
+  paymentMethod: string
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
-  orderPaymentStates?: OrderPaymentState[]
-
-  @OneToOne(() => Cart, (cart) => cart.order, { eager: true })
-  @JoinColumn()
-  cart: Cart
-
-  @OneToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.order, {
-    eager: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  paymentMethod: PaymentMethod
+  updatedAt: Timestamp
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number

@@ -16,22 +16,20 @@ import { Tenancy } from './database/tenancy.entity'
 import { TenancyService } from './tenancy.service'
 import { Product } from 'src/tenanted/product/database/product/product.entity'
 import { Category } from 'src/tenanted/product/database/category/category.entity'
-import { PTag } from 'src/tenanted/product/database/entities/p-tag.entity'
-import { Variation } from 'src/tenanted/product/database/entities/variation.entity'
+import { PTag } from 'src/tenanted/product/database/tag/p-tag.entity'
+import { Variation } from 'src/tenanted/product/database/variation/variation.entity'
 import { ProductCategory } from 'src/tenanted/product/database/category/product-category.entity'
 import { CrossProduct } from 'src/tenanted/product/database/crossProduct/cross-product.entity'
 import { Order } from 'src/tenanted/order/database/order.entity'
-import { OrderState } from 'src/tenanted/order/database/order-state.entity'
-import { OrderStateLog } from 'src/tenanted/order/database/order-state-log.entity'
-import { OrderPaymentState } from 'src/tenanted/order/database/order-payment-state.entity'
+import { OrderStatusLog } from 'src/tenanted/order/database/order-status-log.entity'
 import { ProductImage } from 'src/tenanted/product/database/image/product-image.entity'
 import { ClientAnswer } from 'src/tenanted/client/database/entities/client-answer.entity'
 import { Attribute } from 'src/tenanted/product/database/attribute/attribute.entity'
 import { AttributeOption } from 'src/tenanted/product/database/attribute/attribute-option.entity'
 import { ProductAttrOption } from 'src/tenanted/product/database/attribute/product-attr-option.entity'
 import { Cart } from 'src/tenanted/cart/database/cart.entity'
-import { PaymentMethodState } from 'src/tenanted/order/database/payment-method-state.entity'
-import { PaymentMethod } from 'src/tenanted/order/database/payment-method.entity'
+import { OrderPaymentStatusLog } from 'src/tenanted/order/database/payment-status-log.entity'
+import { OrderDeliveryStatusLog } from 'src/tenanted/order/database/delivery-status-log.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -90,11 +88,9 @@ export class TenancyModule {
                 StoreOpeningHour,
                 Announcement,
                 Order,
-                OrderState,
-                OrderStateLog,
-                OrderPaymentState,
-                PaymentMethod,
-                PaymentMethodState,
+                OrderStatusLog,
+                OrderPaymentStatusLog,
+                OrderDeliveryStatusLog,
                 Cart,
                 Product,
                 Attribute,

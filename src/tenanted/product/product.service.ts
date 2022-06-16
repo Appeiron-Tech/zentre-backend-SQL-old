@@ -5,14 +5,14 @@ import { Connection, In, Repository } from 'typeorm'
 import { CreateCategoryDto } from './database/category/dto/create-category.dto'
 import { CreateProductCategoryDto } from './database/category/dto/create-product-category.dto'
 import { CreateProductDto } from './database/product/dto/create-product.dto'
-import { UpdateCategoryDto } from './database/category/dto/update-category.dto'
+import { UpdateCategoryDto as UpdateVariationDto } from './database/category/dto/update-category.dto'
 import { UpdateProductDto } from './database/product/dto/update-product.dto'
 import { Category } from './database/category/category.entity'
 import { Attribute } from './database/attribute/attribute.entity'
-import { PTag } from './database/entities/p-tag.entity'
+import { PTag } from './database/tag/p-tag.entity'
 import { ProductCategory } from './database/category/product-category.entity'
 import { Product } from './database/product/product.entity'
-import { Variation } from './database/entities/variation.entity'
+import { Variation } from './database/variation/variation.entity'
 import { CrossProduct } from './database/crossProduct/cross-product.entity'
 import { CreateCrossProductDto } from './database/crossProduct/dto/create-cross-product.dto'
 import { ProductImage } from './database/image/product-image.entity'
@@ -22,6 +22,7 @@ import { AttributeOption } from './database/attribute/attribute-option.entity'
 import { CreateAttributeOptionDto } from './database/attribute/dto/create-attribute-option.dto'
 import { ProductAttrOption } from './database/attribute/product-attr-option.entity'
 import { CreateProductAttrOptionDto } from './database/attribute/dto/create-product-attr-option.dto'
+import { CreateVariationDto } from './database/variation/dto/create-variation.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProductService {
@@ -77,7 +78,7 @@ export class ProductService {
     return upsertedCategory
   }
 
-  async updateCategory(categoryId: number, category: UpdateCategoryDto): Promise<void> {
+  async updateCategory(categoryId: number, category: UpdateVariationDto): Promise<void> {
     await this.categoryRepository.update({ id: categoryId }, { ...category })
   }
 
@@ -167,5 +168,23 @@ export class ProductService {
     }
     console.log(createProductAttrOption)
     await this.productAttrOptionRepository.save(createProductAttrOption)
+  }
+
+  /* *********************** VARIATION ********************* */
+  async findVariationByProduct(productId: number): Promise<Variation[]> {
+    return await this.variationRepository.find({ productId: productId })
+  }
+
+  async createVariation(attrOptionId: number, variation: CreateVariationDto): Promise<Variation> {
+    const createdVariation = await this.variationRepository.save(variation)
+    await this.productAttrOptionRepository.update(
+      { id: attrOptionId },
+      { variationId: createdVariation.id },
+    )
+    return createdVariation
+  }
+
+  async updateVariation(variationId: number, variation: UpdateVariationDto): Promise<void> {
+    await this.variationRepository.update({ id: variationId }, { ...variation })
   }
 }

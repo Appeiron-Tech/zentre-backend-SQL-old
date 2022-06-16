@@ -21,9 +21,8 @@ import { Category } from './database/category/category.entity'
 import { ReadProductDto } from './dto/read-product.dto'
 import { asyncForEach } from 'src/utils/utils'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
-import { Attribute } from './database/attribute/attribute.entity'
-import { AttributeOption } from './database/attribute/attribute-option.entity'
 import { CreateProductAttrOptionDto } from './dto/create-product-attr-option.dto'
+import { CreateVariationDto } from './database/variation/dto/create-variation.entity'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(

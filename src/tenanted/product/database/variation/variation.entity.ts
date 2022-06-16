@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Timestamp,
+  UpdateDateColumn,
+} from 'typeorm'
 import { Product } from '../product/product.entity'
 
 @Entity({ name: 'variations' })
@@ -6,11 +13,32 @@ export class Variation {
   @PrimaryGeneratedColumn('increment')
   id: number
 
-  @Column('int', { nullable: true })
+  @Column('int', { nullable: false })
   productId: number
 
-  @ManyToOne(() => Product, (product) => product.variations)
-  product: number
+  @ManyToOne(() => Product)
+  product: Product
+
+  // @ManyToOne(() => Product, (product) => product.variations)
+  // product: number
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 5,
+    nullable: false,
+    default: 0,
+  })
+  price: number
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 5,
+    nullable: false,
+    default: 0,
+  })
+  regular_price: number
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   date_created: Timestamp
@@ -32,24 +60,6 @@ export class Variation {
 
   @Column({ length: 16, nullable: true, default: null })
   sku: string
-
-  @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 5,
-    nullable: false,
-    default: 0,
-  })
-  price: number
-
-  @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 5,
-    nullable: false,
-    default: 0,
-  })
-  regular_price: number
 
   @Column({
     type: 'decimal',
@@ -92,6 +102,9 @@ export class Variation {
 
   @Column({ nullable: false, default: 0 })
   manage_stock: boolean
+
+  @Column({ nullable: true, default: null })
+  total_sales: number
 
   @Column({ nullable: true, default: null })
   stock_quantity: number
@@ -138,7 +151,11 @@ export class Variation {
   @Column({ nullable: true, default: null })
   menu_order: number
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
   updatedAt: Timestamp
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

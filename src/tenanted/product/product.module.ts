@@ -5,10 +5,11 @@ import { ProductController } from './product.controller'
 import { ProductService } from './product.service'
 import { AttributeController } from './attribute.controller'
 import { CategoryController } from './category.controller'
+import { VariationController } from './variation.controller'
 
 @Module({
   imports: [TenancyModule, AppLoggerModule],
-  controllers: [ProductController, AttributeController, CategoryController],
+  controllers: [ProductController, AttributeController, CategoryController, VariationController],
   providers: [ProductService],
 })
 export class ProductModule {}

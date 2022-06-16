@@ -4,25 +4,23 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
-import { OrderPaymentState } from './database/order-payment-state.entity'
-import { OrderStateLog } from './database/order-state-log.entity'
-import { OrderState } from './database/order-state.entity'
+import { OrderStatusLog } from './database/order-status-log.entity'
 import { Order } from './database/order.entity'
-import { PaymentMethodState } from './database/payment-method-state.entity'
-import { PaymentMethod } from './database/payment-method.entity'
-import { CreateOrderPaymentStateDto } from './dto/create-order-payment-state.dto'
-import { CreateOrderStateLogDto } from './dto/create-order-state-log.dto'
-import { CreateOrderStateDto } from './dto/create-order-state.dto'
-import { CreateOrderDto } from './dto/create-order.dto'
-import { CreatePaymentMethodStateDto } from './dto/create-payment-method-state.dto'
-import { CreatePaymentMethodDto } from './dto/create-payment-method.entity'
+import { CreateOrderDto } from './database/dto/create-order.dto'
 import { OrderService } from './order.service'
+import { OrderPaymentStatusLog } from './database/payment-status-log.entity'
+import { OrderDeliveryStatusLog } from './database/delivery-status-log.entity'
+import { UpdateOrderDto } from './database/dto/update-order.dto'
+import { CreatePaymentStatusLogDto } from './database/dto/create-payment-status-log.dto'
+import { CreateDeliveryStatusLogDto } from './database/dto/create-delivery-status-log.dto'
+import { CreateStatusLogDto } from './database/dto/create-status-log.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(
@@ -34,8 +32,6 @@ import { OrderService } from './order.service'
 export class OrderController {
   constructor(private orderService: OrderService) {}
 
-  // ORDERS
-
   @Get()
   async findAll(): Promise<Order[]> {
     const stores = await this.orderService.findAll()
@@ -43,91 +39,73 @@ export class OrderController {
   }
 
   @Post()
-  async create(@Body(new ValidationPipe()) order: CreateOrderDto): Promise<Order> {
+  async create(@Body() order: CreateOrderDto): Promise<Order> {
     const createdOrder = await this.orderService.create(order)
-    await this.orderService.updateCart(createdOrder.cartId, createdOrder.id)
     return createdOrder
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: number): Promise<void> {
-    await this.orderService.delete(id)
+  @Patch(':id')
+  async update(@Param('id') orderId: number, @Body() order: UpdateOrderDto): Promise<void> {
+    console.log(JSON.stringify(order))
+    const dbOrder = await this.orderService.findOne(orderId)
+    if (order.paymentStatus && dbOrder.paymentStatus !== order?.paymentStatus) {
+      this.CreatePaymentStatusLogDto(orderId, order)
+    }
+    if (order.deliveryStatus && dbOrder.deliveryStatus !== order?.deliveryStatus) {
+      this.CreateDeliveryStatusLogDto(orderId, order)
+    }
+    if (order.status && dbOrder.status !== order?.status) {
+      this.CreateStatusLogDto(orderId, order)
+    }
+    await this.orderService.update(orderId, order)
   }
 
-  // ORDER STATES
-
-  @Get('/state')
-  async findAllOrderStates(): Promise<OrderState[]> {
-    const orderStates = await this.orderService.findAllOrderStates()
-    return orderStates
+  /******************************* ORDER STATUS LOGS ***************************** */
+  @Get(':id/status_logs')
+  async findStatusLogs(@Param('id') orderId: number): Promise<OrderStatusLog[]> {
+    const statusLogs = await this.orderService.findStatusLogs(orderId)
+    return statusLogs
   }
 
-  @Post('/state')
-  async createOrderState(
-    @Body(new ValidationPipe()) orderState: CreateOrderStateDto,
-  ): Promise<OrderState> {
-    const createdOrderState = await this.orderService.createOrderState(orderState)
-    return createdOrderState
+  /*************************** ORDER PAYMENT STATUS LOGS ************************* */
+  @Get(':id/payment_status_logs')
+  async findPaymentStatusLogs(@Param('id') orderId: number): Promise<OrderPaymentStatusLog[]> {
+    const paymentStatusLogs = await this.orderService.findPaymentStatusLogs(orderId)
+    return paymentStatusLogs
   }
 
-  // ORDER STATE LOGS
-  @Get('/log')
-  async findAllOrderLogs(): Promise<OrderStateLog[]> {
-    const orderStateLogs = await this.orderService.findAllOrderStateLogs()
-    return orderStateLogs
+  /*************************** ORDER DELIVERY STATUS LOGS ************************ */
+  @Get(':id/delivery_status_logs')
+  async findDeliveryStatusLogs(@Param('id') orderId: number): Promise<OrderDeliveryStatusLog[]> {
+    const deliveryStatusLogs = await this.orderService.findDeliveryStatusLogs(orderId)
+    return deliveryStatusLogs
   }
 
-  @Post('/log')
-  async createOrderLog(
-    @Body(new ValidationPipe()) orderState: CreateOrderStateLogDto,
-  ): Promise<OrderStateLog> {
-    const createdOrderStateLog = await this.orderService.createOrderStateLog(orderState)
-    return createdOrderStateLog
+  /* ======================================================================================= */
+  /* *********************************** PRIVATE FUNCTIONS ********************************* */
+  /* ======================================================================================= */
+  private async CreatePaymentStatusLogDto(orderId: number, order: UpdateOrderDto): Promise<void> {
+    const paymentStatusLog: CreatePaymentStatusLogDto = {
+      orderId,
+      paymentStatus: order.paymentStatus,
+    }
+    await this.orderService.createPaymentStatusLog(paymentStatusLog)
   }
 
-  // ORDER PAYMENT STATE
-  @Get('/payment-state')
-  async findAllOrderPaymentStates(): Promise<OrderPaymentState[]> {
-    const orderPaymentStates = await this.orderService.findAllOrderPaymentStates()
-    return orderPaymentStates
-  }
-  @Post('/payment-state')
-  async createOrderPaymentState(
-    @Body(new ValidationPipe()) orderPaymentState: CreateOrderPaymentStateDto,
-  ) {
-    const createdOrderPaymentState = await this.orderService.createOrderPaymentState(
-      orderPaymentState,
-    )
-    return createdOrderPaymentState
+  private async CreateDeliveryStatusLogDto(orderId: number, order: UpdateOrderDto): Promise<void> {
+    console.log('delivery status from req: ' + order.deliveryStatus)
+    const paymentStatusLog: CreateDeliveryStatusLogDto = {
+      orderId,
+      deliveryStatus: order.deliveryStatus,
+    }
+    await this.orderService.createDeliveryStatusLog(paymentStatusLog)
   }
 
-  // PAYMENT METHODS
-  @Get('/payment-method')
-  async findAllPaymentMethods(): Promise<PaymentMethod[]> {
-    const paymentMethods = await this.orderService.findAllPaymentMethods()
-    return paymentMethods
-  }
-
-  @Post('/payment-method')
-  async createPaymentMethod(@Body(new ValidationPipe()) paymentMethod: CreatePaymentMethodDto) {
-    const createdPaymentMethod = await this.orderService.createPaymentMethod(paymentMethod)
-    return createdPaymentMethod
-  }
-
-  // PAYMENT METHOD STATES
-  @Get('/payment-method/state')
-  async findAllPaymentMethodStates(): Promise<PaymentMethodState[]> {
-    const paymentMethodStates = await this.orderService.findAllPaymentMethodStates()
-    return paymentMethodStates
-  }
-
-  @Post('/payment-method/state')
-  async createPaymentMethodState(
-    @Body(new ValidationPipe()) paymentMethodState: CreatePaymentMethodStateDto,
-  ): Promise<PaymentMethodState> {
-    const createdPaymentMethodState = await this.orderService.createPaymentMethodState(
-      paymentMethodState,
-    )
-    return createdPaymentMethodState
+  private async CreateStatusLogDto(orderId: number, order: UpdateOrderDto): Promise<void> {
+    const statusLog: CreateStatusLogDto = {
+      orderId,
+      status: order.status,
+    }
+    await this.orderService.createStatusLog(statusLog)
   }
 }

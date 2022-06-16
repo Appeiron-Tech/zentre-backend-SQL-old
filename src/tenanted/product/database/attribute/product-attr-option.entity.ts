@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Product } from '../product/product.entity'
+import { Variation } from '../variation/variation.entity'
 import { AttributeOption } from './attribute-option.entity'
 
 @Entity({ name: 'product_attr_options' })
@@ -18,4 +19,11 @@ export class ProductAttrOption {
 
   @ManyToOne(() => AttributeOption)
   attributeOption: AttributeOption
+
+  @Column('int', { nullable: true })
+  variationId: number
+
+  @OneToOne(() => Variation)
+  @JoinColumn()
+  variation: Variation
 }

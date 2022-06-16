@@ -1,8 +1,15 @@
 // https://woocommerce.github.io/woocommerce-rest-api-docs/?javascript#product-properties
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Timestamp,
+  UpdateDateColumn,
+} from 'typeorm'
 import { CrossProduct } from '../crossProduct/cross-product.entity'
 import { ProductCategory } from '../category/product-category.entity'
-import { Variation } from '../entities/variation.entity'
+import { Variation } from '../variation/variation.entity'
 import { ProductImage } from '../image/product-image.entity'
 import { ProductAttrOption } from '../attribute/product-attr-option.entity'
 
@@ -194,7 +201,11 @@ export class Product {
   @Column({ nullable: true, default: null })
   menu_order: number
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
   updatedAt: Timestamp
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
