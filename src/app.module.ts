@@ -19,6 +19,7 @@ import { CloudStorageModule } from './third-party-apis/Google/cloud-storage/clou
 import { PClientModule } from './public/client/client.module'
 import { OrderModule } from './tenanted/order/order.module'
 import { CartModule } from './tenanted/cart/cart.module'
+import { GoogleAnalyticsModule } from './third-party-apis/Google/google-analytics/google-analytics.module'
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { CartModule } from './tenanted/cart/cart.module'
 
     //THIRD PARTY APIS
     CloudStorageModule,
+    GoogleAnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

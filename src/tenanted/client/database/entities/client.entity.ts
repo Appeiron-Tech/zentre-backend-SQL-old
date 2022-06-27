@@ -44,6 +44,15 @@ export class Client implements IClient {
   @Column({ length: 512, nullable: true })
   urlFB: string
 
+  @Column()
+  email_analytics: string
+
+  @Column()
+  view_id: string
+
+  @Column({ type: 'text', nullable: true })
+  api_key: string
+
   @Column({ length: 6, nullable: true })
   brightness: string
 
