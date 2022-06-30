@@ -1,6 +1,7 @@
 import { Controller, Get, Param, UseInterceptors } from '@nestjs/common'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { GoogleAnalyticsService } from './google-analytics.service'
+import { IAnalyticsResponse } from './interfaces/IAnalyticsResponse'
 
 @UseInterceptors(LoggingInterceptor)
 @Controller('api/analytics')
@@ -8,7 +9,7 @@ export class GoogleAnalyticsController {
   constructor(private readonly analyticsService: GoogleAnalyticsService) {}
 
   @Get('/geonetwork/:startDate')
-  getGeoNetwork(@Param('startDate') startDate: string): any {
+  getGeoNetwork(@Param('startDate') startDate: string): Promise<IAnalyticsResponse> {
     return this.analyticsService.getGeoNetwork(startDate)
   }
 

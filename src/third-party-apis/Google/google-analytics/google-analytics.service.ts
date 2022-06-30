@@ -3,6 +3,8 @@ import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
 import { ClientService } from 'src/tenanted/client/client.service'
 import { Client } from 'src/tenanted/client/database/entities/client.entity'
+import { IAnalyticsResponse } from './interfaces/IAnalyticsResponse'
+import { ICountryResults } from './interfaces/ICountryResults'
 
 @Injectable()
 export class GoogleAnalyticsService {
@@ -31,7 +33,7 @@ export class GoogleAnalyticsService {
     this.viewId = this.client.view_id
   }
 
-  async getGeoNetwork(startDate: string) {
+  async getGeoNetwork(startDate: string): Promise<IAnalyticsResponse> {
     await this.setUp()
     const response = await this.jwt.authorize()
     const endDate = this.getEndDate(startDate)
@@ -41,9 +43,32 @@ export class GoogleAnalyticsService {
       'start-date': startDate,
       'end-date': endDate,
       metrics: 'ga:pageviews,ga:sessions,ga:users',
-      dimensions: 'ga:country,ga:region',
+      dimensions: 'ga:country',
     })
-    return result
+
+    // const analyticsResponse: IAnalyticsResponse = {
+    //   pageViews: result.data.totalsForAllResults['ga:pageviews'],
+    //   sessions: result.data.totalsForAllResults['ga:sessions'],
+    //   users: result.data.totalsForAllResults['ga:users'],
+    //   countries: this.convertToCountryResults(result.data.rows),
+    // }
+
+    const analyticsResponse: IAnalyticsResponse = {
+      pageViews: result.data.totalsForAllResults['ga:pageviews'],
+      sessions: result.data.totalsForAllResults['ga:sessions'],
+      users: result.data.totalsForAllResults['ga:users'],
+      countries: [],
+    }
+
+    result.data.rows.forEach((row) => {
+      analyticsResponse.countries.push({
+        country: row[0],
+        pageViews: row[1],
+        sessions: row[2],
+        users: row[3],
+      })
+    })
+    return analyticsResponse
   }
 
   async getAudience(startDate: string) {
@@ -70,4 +95,18 @@ export class GoogleAnalyticsService {
       return endDate
     }
   }
+
+  // convertToCountryResults(rows: any): ICountryResults[] {
+  //   const countryResults: ICountryResults[] = []
+  //   rows.reduce((acc, row) => {
+  //     const countryResultsItem: ICountryResults = {
+  //       country: row[0],
+  //       pageViews: row[1],
+  //       sessions: row[2],
+  //       users: row[3],
+  //     }
+  //     countryResults.push(countryResultsItem)
+  //   })
+  //   return countryResults
+  // }
 }
