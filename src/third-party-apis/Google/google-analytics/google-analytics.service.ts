@@ -3,8 +3,10 @@ import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
 import { ClientService } from 'src/tenanted/client/client.service'
 import { Client } from 'src/tenanted/client/database/entities/client.entity'
-import { IAnalyticsResponse } from './interfaces/IAnalyticsResponse'
-import { ICountryResults } from './interfaces/ICountryResults'
+import { IAnalyticsCountryRegionResponse } from './interfaces/IAnalyticsCountryRegionsResponse'
+import { IAnalyticsCountryResponse } from './interfaces/IAnalyticsCountryResponse'
+import { IBasicResults } from './interfaces/IBasicResults'
+import { IRegionResults } from './interfaces/IRegionResults'
 
 @Injectable()
 export class GoogleAnalyticsService {
@@ -33,7 +35,7 @@ export class GoogleAnalyticsService {
     this.viewId = this.client.view_id
   }
 
-  async getGeoNetwork(startDate: string): Promise<IAnalyticsResponse> {
+  async getGeoNetworkCountry(startDate: string): Promise<any> {
     await this.setUp()
     const response = await this.jwt.authorize()
     const endDate = this.getEndDate(startDate)
@@ -43,7 +45,7 @@ export class GoogleAnalyticsService {
       'start-date': startDate,
       'end-date': endDate,
       metrics: 'ga:pageviews,ga:sessions,ga:users',
-      dimensions: 'ga:country',
+      dimensions: 'ga:country,ga:region',
     })
 
     // const analyticsResponse: IAnalyticsResponse = {
@@ -53,7 +55,7 @@ export class GoogleAnalyticsService {
     //   countries: this.convertToCountryResults(result.data.rows),
     // }
 
-    const analyticsResponse: IAnalyticsResponse = {
+    const analyticsResponse: IAnalyticsCountryResponse = {
       pageViews: result.data.totalsForAllResults['ga:pageviews'],
       sessions: result.data.totalsForAllResults['ga:sessions'],
       users: result.data.totalsForAllResults['ga:users'],
@@ -62,12 +64,57 @@ export class GoogleAnalyticsService {
 
     result.data.rows.forEach((row) => {
       analyticsResponse.countries.push({
-        country: row[0],
+        name: row[0],
         pageViews: row[1],
         sessions: row[2],
         users: row[3],
       })
     })
+    return analyticsResponse
+  }
+
+  async getGeoNetworkCountryRegion(country: string, startDate: string): Promise<any> {
+    await this.setUp()
+    const response = await this.jwt.authorize()
+    const endDate = this.getEndDate(startDate)
+    const result = await google.analytics('v3').data.ga.get({
+      auth: this.jwt,
+      ids: 'ga:' + this.viewId,
+      'start-date': startDate,
+      'end-date': endDate,
+      metrics: 'ga:pageviews,ga:sessions,ga:users',
+      dimensions: 'ga:country,ga:region',
+    })
+
+    result.data.rows = result.data.rows.filter((e) => e[0] == country)
+
+    let pageViews = 0
+    let sessions = 0
+    let users = 0
+
+    const data = []
+
+    result.data.rows.forEach((item) => {
+      pageViews += Number(item[2])
+      sessions += Number(item[3])
+      users += Number(item[4])
+      data.push({
+        name: item[1],
+        pageViews: item[2],
+        sessions: item[3],
+        users: item[4],
+      })
+    })
+
+    const analyticsResponse: IAnalyticsCountryRegionResponse = {
+      pageViews: pageViews.toString(),
+      sessions: sessions.toString(),
+      users: users.toString(),
+      data: {
+        country: country,
+        regions: data,
+      },
+    }
     return analyticsResponse
   }
 
