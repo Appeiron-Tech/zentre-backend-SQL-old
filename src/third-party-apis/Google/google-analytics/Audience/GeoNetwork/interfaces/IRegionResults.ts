@@ -1,4 +1,4 @@
-import { IBasicResults } from './IBasicResults'
+import { IBasicResults } from '../../../IBasicResults'
 
 export interface IRegionResults {
   country: string

@@ -1,6 +1,6 @@
 import { IRegionResults } from './IRegionResults'
 
-export interface IAnalyticsCountryRegionResponse {
+export interface IAnalyticsRegionResponse {
   pageViews: string
   sessions: string
   users: string

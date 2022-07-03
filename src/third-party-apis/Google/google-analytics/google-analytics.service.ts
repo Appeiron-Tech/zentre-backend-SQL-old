@@ -3,10 +3,10 @@ import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
 import { ClientService } from 'src/tenanted/client/client.service'
 import { Client } from 'src/tenanted/client/database/entities/client.entity'
-import { IAnalyticsCountryRegionResponse } from './interfaces/IAnalyticsCountryRegionsResponse'
-import { IAnalyticsCountryResponse } from './interfaces/IAnalyticsCountryResponse'
-import { IBasicResults } from './interfaces/IBasicResults'
-import { IRegionResults } from './interfaces/IRegionResults'
+import { AnalyticsParser } from 'src/utils/AnalyticsParser'
+import { IAnalyticsRegionResponse } from './Audience/GeoNetwork/interfaces/IAnalyticsRegionResponse'
+import { IAnalyticsCountryResponse } from './Audience/GeoNetwork/interfaces/IAnalyticsCountryResponse'
+import { IBasicResults } from './IBasicResults'
 
 @Injectable()
 export class GoogleAnalyticsService {
@@ -23,7 +23,7 @@ export class GoogleAnalyticsService {
 
   async setUp(): Promise<void> {
     this.client = await this.clientService.findClient(1)
-    const key = this.start.concat(this.client.api_key.concat(this.end))
+    //const key = this.start.concat(this.client.api_key.concat(this.end))
     // console.log(key)
     this.jwt = new google.auth.JWT(
       this.client.email_analytics,
@@ -35,9 +35,56 @@ export class GoogleAnalyticsService {
     this.viewId = this.client.view_id
   }
 
-  async getGeoNetworkCountry(startDate: string): Promise<any> {
+  // ************************************************************************************
+  // ************************************************************************************
+  //                                     GENERAL
+  // ************************************************************************************
+  // ************************************************************************************
+
+  async getGeneralData(startDate: string): Promise<IBasicResults> {
     await this.setUp()
-    const response = await this.jwt.authorize()
+    const endDate = this.getEndDate(startDate)
+    const result = await google.analytics('v3').data.ga.get({
+      auth: this.jwt,
+      ids: 'ga:' + this.viewId,
+      'start-date': startDate,
+      'end-date': endDate,
+      metrics: 'ga:pageviews,ga:sessions,ga:users',
+    })
+    const analyticsResponse: IBasicResults = {
+      pageViews: result.data.rows[0][0],
+      sessions: result.data.rows[0][1],
+      users: result.data.rows[0][2],
+    }
+    return analyticsResponse
+  }
+
+  // ************************************************************************************
+  // ************************************************************************************
+  //                                     GEO NETWORK
+  // ************************************************************************************
+  // ************************************************************************************
+
+  async getGeoNetworkCountry(startDate: string): Promise<IAnalyticsCountryResponse> {
+    await this.setUp()
+    const endDate = this.getEndDate(startDate)
+    const result = await google.analytics('v3').data.ga.get({
+      auth: this.jwt,
+      ids: 'ga:' + this.viewId,
+      'start-date': startDate,
+      'end-date': endDate,
+      metrics: 'ga:pageviews,ga:sessions,ga:users',
+      dimensions: 'ga:country',
+    })
+
+    const parser: AnalyticsParser = new AnalyticsParser(result.data)
+    const analyticsResponse: IAnalyticsCountryResponse = parser.toCountryResponse()
+
+    return analyticsResponse
+  }
+
+  async getGeoNetworkRegion(country: string, startDate: string): Promise<IAnalyticsRegionResponse> {
+    await this.setUp()
     const endDate = this.getEndDate(startDate)
     const result = await google.analytics('v3').data.ga.get({
       auth: this.jwt,
@@ -46,81 +93,23 @@ export class GoogleAnalyticsService {
       'end-date': endDate,
       metrics: 'ga:pageviews,ga:sessions,ga:users',
       dimensions: 'ga:country,ga:region',
+      filters: 'ga:country==' + country,
     })
 
-    // const analyticsResponse: IAnalyticsResponse = {
-    //   pageViews: result.data.totalsForAllResults['ga:pageviews'],
-    //   sessions: result.data.totalsForAllResults['ga:sessions'],
-    //   users: result.data.totalsForAllResults['ga:users'],
-    //   countries: this.convertToCountryResults(result.data.rows),
-    // }
+    const parser: AnalyticsParser = new AnalyticsParser(result.data)
+    const analyticsResponse: IAnalyticsRegionResponse = parser.toRegionResponse(country)
 
-    const analyticsResponse: IAnalyticsCountryResponse = {
-      pageViews: result.data.totalsForAllResults['ga:pageviews'],
-      sessions: result.data.totalsForAllResults['ga:sessions'],
-      users: result.data.totalsForAllResults['ga:users'],
-      countries: [],
-    }
-
-    result.data.rows.forEach((row) => {
-      analyticsResponse.countries.push({
-        name: row[0],
-        pageViews: row[1],
-        sessions: row[2],
-        users: row[3],
-      })
-    })
     return analyticsResponse
   }
 
-  async getGeoNetworkCountryRegion(country: string, startDate: string): Promise<any> {
-    await this.setUp()
-    const response = await this.jwt.authorize()
-    const endDate = this.getEndDate(startDate)
-    const result = await google.analytics('v3').data.ga.get({
-      auth: this.jwt,
-      ids: 'ga:' + this.viewId,
-      'start-date': startDate,
-      'end-date': endDate,
-      metrics: 'ga:pageviews,ga:sessions,ga:users',
-      dimensions: 'ga:country,ga:region',
-    })
-
-    result.data.rows = result.data.rows.filter((e) => e[0] == country)
-
-    let pageViews = 0
-    let sessions = 0
-    let users = 0
-
-    const data = []
-
-    result.data.rows.forEach((item) => {
-      pageViews += Number(item[2])
-      sessions += Number(item[3])
-      users += Number(item[4])
-      data.push({
-        name: item[1],
-        pageViews: item[2],
-        sessions: item[3],
-        users: item[4],
-      })
-    })
-
-    const analyticsResponse: IAnalyticsCountryRegionResponse = {
-      pageViews: pageViews.toString(),
-      sessions: sessions.toString(),
-      users: users.toString(),
-      data: {
-        country: country,
-        regions: data,
-      },
-    }
-    return analyticsResponse
-  }
+  // ************************************************************************************
+  // ************************************************************************************
+  //                                     AUDIENCE
+  // ************************************************************************************
+  // ************************************************************************************
 
   async getAudience(startDate: string) {
     await this.setUp()
-    const response = await this.jwt.authorize()
     const endDate = this.getEndDate(startDate)
     const result = await google.analytics('v3').data.ga.get({
       auth: this.jwt,
@@ -133,7 +122,33 @@ export class GoogleAnalyticsService {
     return result
   }
 
-  getEndDate(startDate: string): string {
+  // ************************************************************************************
+  // ************************************************************************************
+  //                                     BEHAVIOUR
+  // ************************************************************************************
+  // ************************************************************************************
+
+  async getAudienceEngagement(startDate: string) {
+    await this.setUp()
+    const endDate = this.getEndDate(startDate)
+    const result = await google.analytics('v3').data.ga.get({
+      auth: this.jwt,
+      ids: 'ga:' + this.viewId,
+      'start-date': startDate,
+      'end-date': '2022-06-30', // esta seteado de esta forma para coincidir con los datos de la captura
+      metrics: 'ga:sessions,ga:pageviews',
+      dimensions: 'ga:sessionDurationBucket',
+    })
+    return result
+  }
+
+  // ************************************************************************************
+  // ************************************************************************************
+  //                                PRIVATE FUNCTIONS
+  // ************************************************************************************
+  // ************************************************************************************
+
+  private getEndDate(startDate: string): string {
     if (startDate == 'today' || startDate == 'yesterday') {
       return 'today'
     } else {
@@ -142,18 +157,4 @@ export class GoogleAnalyticsService {
       return endDate
     }
   }
-
-  // convertToCountryResults(rows: any): ICountryResults[] {
-  //   const countryResults: ICountryResults[] = []
-  //   rows.reduce((acc, row) => {
-  //     const countryResultsItem: ICountryResults = {
-  //       country: row[0],
-  //       pageViews: row[1],
-  //       sessions: row[2],
-  //       users: row[3],
-  //     }
-  //     countryResults.push(countryResultsItem)
-  //   })
-  //   return countryResults
-  // }
 }

@@ -1,5 +1,5 @@
 export interface IBasicResults {
-  name: string
+  name?: string
   pageViews: string
   sessions: string
   users: string
