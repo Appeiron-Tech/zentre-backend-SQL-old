@@ -5,6 +5,7 @@ import { IAnalyticsCountryResponse } from './Audience/GeoNetwork/interfaces/IAna
 import { IBasicResults } from './IBasicResults'
 import { IAnalyticsRegionResponse } from './Audience/GeoNetwork/interfaces/IAnalyticsRegionResponse'
 import { IAnalyticsBehaviourResponse } from './Audience/Behaviour/interfaces/IAnalyticsBehaviourResponse'
+import { IAnalyticsDevicesResponse } from './Audience/Devices/interfaces/IAnalyticsDevicesResponse'
 
 @UseInterceptors(LoggingInterceptor)
 @Controller('api/analytics')
@@ -39,5 +40,10 @@ export class GoogleAnalyticsController {
     @Param('startDate') startDate: string,
   ): Promise<IAnalyticsBehaviourResponse> {
     return this.analyticsService.getAudienceEngagement(startDate)
+  }
+
+  @Get('audience/devices/:startDate')
+  getAudienceDevices(@Param('startDate') startDate: string): Promise<IAnalyticsDevicesResponse> {
+    return this.analyticsService.getAudienceDevices(startDate)
   }
 }

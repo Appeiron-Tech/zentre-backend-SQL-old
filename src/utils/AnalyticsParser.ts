@@ -2,6 +2,8 @@ import { IAnalyticsRegionResponse } from 'src/third-party-apis/Google/google-ana
 import { IAnalyticsCountryResponse } from 'src/third-party-apis/Google/google-analytics/Audience/GeoNetwork/interfaces/IAnalyticsCountryResponse'
 import { IAnalyticsBehaviourResponse } from 'src/third-party-apis/Google/google-analytics/Audience/Behaviour/interfaces/IAnalyticsBehaviourResponse'
 import { IAnalyticsIntervals } from 'src/third-party-apis/Google/google-analytics/Audience/Behaviour/interfaces/IAnalyticsIntervals'
+import { IAnalyticsDevicesResponse } from 'src/third-party-apis/Google/google-analytics/Audience/Devices/interfaces/IAnalyticsDevicesResponse'
+import { roundNumber } from './utils'
 
 export class AnalyticsParser {
   rawData: any
@@ -47,6 +49,34 @@ export class AnalyticsParser {
         regions: data,
       },
     }
+    return analyticsResponse
+  }
+
+  toDevicesResponse(): IAnalyticsDevicesResponse {
+    const analyticsResponse: IAnalyticsDevicesResponse = {
+      sessions: Number(this.rawData.totalsForAllResults['ga:sessions']),
+      users: Number(this.rawData.totalsForAllResults['ga:users']),
+      newUsers: Number(this.rawData.totalsForAllResults['ga:newUsers']),
+      bounceRate: roundNumber(Number(this.rawData.totalsForAllResults['ga:bounceRate'])),
+      viewsPerSession: roundNumber(
+        Number(this.rawData.totalsForAllResults['ga:avgSessionDuration']),
+      ),
+      avgSessionDuration: roundNumber(
+        Number(this.rawData.totalsForAllResults['ga:avgSessionDuration']),
+      ),
+      devices: [],
+    }
+    this.rawData.rows.forEach((row) => {
+      analyticsResponse.devices.push({
+        device: row[0],
+        sessions: Number(row[1]),
+        users: Number(row[2]),
+        newUsers: Number(row[3]),
+        bounceRate: roundNumber(Number(row[4])),
+        viewsPerSession: roundNumber(Number(row[5])),
+        avgSessionDuration: roundNumber(Number(row[6])),
+      })
+    })
     return analyticsResponse
   }
 
