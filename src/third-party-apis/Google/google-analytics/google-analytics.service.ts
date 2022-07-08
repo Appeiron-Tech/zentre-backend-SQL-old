@@ -7,6 +7,7 @@ import { AnalyticsParser } from 'src/utils/AnalyticsParser'
 import { IAnalyticsRegionResponse } from './Audience/GeoNetwork/interfaces/IAnalyticsRegionResponse'
 import { IAnalyticsCountryResponse } from './Audience/GeoNetwork/interfaces/IAnalyticsCountryResponse'
 import { IBasicResults } from './IBasicResults'
+import { IAnalyticsBehaviourResponse } from './Audience/Behaviour/interfaces/IAnalyticsBehaviourResponse'
 
 @Injectable()
 export class GoogleAnalyticsService {
@@ -52,9 +53,9 @@ export class GoogleAnalyticsService {
       metrics: 'ga:pageviews,ga:sessions,ga:users',
     })
     const analyticsResponse: IBasicResults = {
-      pageViews: result.data.rows[0][0],
-      sessions: result.data.rows[0][1],
-      users: result.data.rows[0][2],
+      pageViews: Number(result.data.rows[0][0]),
+      sessions: Number(result.data.rows[0][1]),
+      users: Number(result.data.rows[0][2]),
     }
     return analyticsResponse
   }
@@ -128,18 +129,20 @@ export class GoogleAnalyticsService {
   // ************************************************************************************
   // ************************************************************************************
 
-  async getAudienceEngagement(startDate: string) {
+  async getAudienceEngagement(startDate: string): Promise<IAnalyticsBehaviourResponse> {
     await this.setUp()
     const endDate = this.getEndDate(startDate)
     const result = await google.analytics('v3').data.ga.get({
       auth: this.jwt,
       ids: 'ga:' + this.viewId,
       'start-date': startDate,
-      'end-date': '2022-06-30', // esta seteado de esta forma para coincidir con los datos de la captura
-      metrics: 'ga:sessions,ga:pageviews',
+      'end-date': endDate,
+      metrics: 'ga:pageviews,ga:sessions',
       dimensions: 'ga:sessionDurationBucket',
     })
-    return result
+    const parser: AnalyticsParser = new AnalyticsParser(result.data)
+    const analyticsResponse: IAnalyticsBehaviourResponse = parser.toBehaviourResponse()
+    return analyticsResponse
   }
 
   // ************************************************************************************
