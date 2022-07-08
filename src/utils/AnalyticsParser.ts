@@ -2,7 +2,7 @@ import { IAnalyticsRegionResponse } from 'src/third-party-apis/Google/google-ana
 import { IAnalyticsCountryResponse } from 'src/third-party-apis/Google/google-analytics/Audience/GeoNetwork/interfaces/IAnalyticsCountryResponse'
 import { IAnalyticsBehaviourResponse } from 'src/third-party-apis/Google/google-analytics/Audience/Behaviour/interfaces/IAnalyticsBehaviourResponse'
 import { IAnalyticsIntervals } from 'src/third-party-apis/Google/google-analytics/Audience/Behaviour/interfaces/IAnalyticsIntervals'
-import { IAnalyticsDevicesResponse } from 'src/third-party-apis/Google/google-analytics/Audience/Devices/interfaces/IAnalyticsDevicesResponse'
+import { IAnalyticsAudienceGenResponse } from 'src/third-party-apis/Google/google-analytics/Audience/common/interfaces/IAnalyticsAudienceGenResponse'
 import { roundNumber } from './utils'
 
 export class AnalyticsParser {
@@ -52,8 +52,8 @@ export class AnalyticsParser {
     return analyticsResponse
   }
 
-  toDevicesResponse(): IAnalyticsDevicesResponse {
-    const analyticsResponse: IAnalyticsDevicesResponse = {
+  toDevicesResponse(): IAnalyticsAudienceGenResponse {
+    const analyticsResponse: IAnalyticsAudienceGenResponse = {
       sessions: Number(this.rawData.totalsForAllResults['ga:sessions']),
       users: Number(this.rawData.totalsForAllResults['ga:users']),
       newUsers: Number(this.rawData.totalsForAllResults['ga:newUsers']),
@@ -64,11 +64,11 @@ export class AnalyticsParser {
       avgSessionDuration: roundNumber(
         Number(this.rawData.totalsForAllResults['ga:avgSessionDuration']),
       ),
-      devices: [],
+      data: [],
     }
     this.rawData.rows.forEach((row) => {
-      analyticsResponse.devices.push({
-        device: row[0],
+      analyticsResponse.data.push({
+        name: row[0],
         sessions: Number(row[1]),
         users: Number(row[2]),
         newUsers: Number(row[3]),

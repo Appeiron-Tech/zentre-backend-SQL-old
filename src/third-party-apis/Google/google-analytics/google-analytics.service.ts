@@ -8,7 +8,7 @@ import { IAnalyticsRegionResponse } from './Audience/GeoNetwork/interfaces/IAnal
 import { IAnalyticsCountryResponse } from './Audience/GeoNetwork/interfaces/IAnalyticsCountryResponse'
 import { IBasicResults } from './IBasicResults'
 import { IAnalyticsBehaviourResponse } from './Audience/Behaviour/interfaces/IAnalyticsBehaviourResponse'
-import { IAnalyticsDevicesResponse } from './Audience/Devices/interfaces/IAnalyticsDevicesResponse'
+import { IAnalyticsAudienceGenResponse } from './Audience/common/interfaces/IAnalyticsAudienceGenResponse'
 
 @Injectable()
 export class GoogleAnalyticsService {
@@ -140,20 +140,37 @@ export class GoogleAnalyticsService {
     return analyticsResponse
   }
 
-  async getAudienceDevices(startDate: string): Promise<IAnalyticsDevicesResponse> {
+  async getAudienceDevices(startDate: string): Promise<IAnalyticsAudienceGenResponse> {
     await this.setUp()
     const endDate = this.getEndDate(startDate)
     const result = await google.analytics('v3').data.ga.get({
       auth: this.jwt,
       ids: 'ga:' + this.viewId,
       'start-date': startDate,
-      'end-date': '2022-07-07',
+      'end-date': endDate,
       metrics:
         'ga:sessions,ga:users,ga:newUsers,ga:bounceRate,ga:pageviewsPerSession,ga:avgSessionDuration',
       dimensions: 'ga:deviceCategory',
     })
     const parser: AnalyticsParser = new AnalyticsParser(result.data)
-    const analyticsResponse: IAnalyticsDevicesResponse = parser.toDevicesResponse()
+    const analyticsResponse: IAnalyticsAudienceGenResponse = parser.toDevicesResponse()
+    return analyticsResponse
+  }
+
+  async getAudienceType(startDate: string): Promise<IAnalyticsAudienceGenResponse> {
+    await this.setUp()
+    const endDate = this.getEndDate(startDate)
+    const result = await google.analytics('v3').data.ga.get({
+      auth: this.jwt,
+      ids: 'ga:' + this.viewId,
+      'start-date': startDate,
+      'end-date': endDate,
+      metrics:
+        'ga:sessions,ga:users,ga:newUsers,ga:bounceRate,ga:pageviewsPerSession,ga:avgSessionDuration',
+      dimensions: 'ga:userType',
+    })
+    const parser: AnalyticsParser = new AnalyticsParser(result.data)
+    const analyticsResponse: IAnalyticsAudienceGenResponse = parser.toDevicesResponse()
     return analyticsResponse
   }
 
