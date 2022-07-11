@@ -6,8 +6,8 @@ import { GoogleAnalyticsController } from './google-analytics.controller'
 import { GoogleAnalyticsService } from './google-analytics.service'
 
 @Module({
-  imports: [TenancyModule, AppLoggerModule],
-  providers: [GoogleAnalyticsService, ClientService],
+  imports: [AppLoggerModule],
+  providers: [GoogleAnalyticsService],
   exports: [GoogleAnalyticsService],
   controllers: [GoogleAnalyticsController],
 })

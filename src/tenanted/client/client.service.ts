@@ -9,6 +9,8 @@ import { UpdateAnswerDto } from './database/dto/update-answer.dto'
 import { ClientAnswer } from './database/entities/client-answer.entity'
 import { UpsertPhoneDto } from './database/dto/upsert-phone.dto'
 import { ClientPhone } from './database/entities/client-phone.entity'
+import { ConfigService } from '@nestjs/config'
+import { CloudStorageService } from 'src/third-party-apis/Google/cloud-storage/cloud-storage.service'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ClientService {
@@ -16,7 +18,11 @@ export class ClientService {
   private readonly answerRepository: Repository<ClientAnswer>
   private readonly phoneRepository: Repository<ClientPhone>
 
-  constructor(@Inject(TENANCY_CONNECTION) connection: Connection) {
+  constructor(
+    private configService: ConfigService,
+    private cloudStorageService: CloudStorageService,
+    @Inject(TENANCY_CONNECTION) connection: Connection,
+  ) {
     this.clientRepository = connection.getRepository(Client)
     this.answerRepository = connection.getRepository(ClientAnswer)
     this.phoneRepository = connection.getRepository(ClientPhone)
@@ -44,6 +50,36 @@ export class ClientService {
 
   async update(clientId: number, client: UpdateClientDto): Promise<void> {
     await this.clientRepository.update({ id: clientId }, { ...client })
+  }
+
+  async updateLogo(file: Express.Multer.File, clientId: number): Promise<void> {
+    try {
+      await this.cloudStorageService.uploadLogo(file)
+      const fileUrl =
+        'https://storage.googleapis.com/' +
+        this.configService.get<string>('GCS_STORAGE_MEDIA_BUCKET') +
+        '/' +
+        file.filename
+      console.log(fileUrl)
+      await this.clientRepository.update({ id: clientId }, { logo: fileUrl })
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async updateCover(file: Express.Multer.File, clientId: number): Promise<void> {
+    try {
+      await this.cloudStorageService.uploadCover(file)
+      const fileUrl =
+        'https://storage.googleapis.com/' +
+        this.configService.get<string>('GCS_STORAGE_MEDIA_BUCKET') +
+        '/' +
+        file.filename
+      console.log(fileUrl)
+      await this.clientRepository.update({ id: clientId }, { cover: fileUrl })
+    } catch (e) {
+      throw e
+    }
   }
 
   async upsertAnswer(client: Client, answer: CreateAnswerDto | UpdateAnswerDto): Promise<void> {
