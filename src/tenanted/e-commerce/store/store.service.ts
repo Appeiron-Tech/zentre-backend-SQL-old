@@ -1,7 +1,7 @@
 import { Inject, Injectable, Scope } from '@nestjs/common'
 import { asyncForEach } from 'src/utils/utils'
 import { Connection, Repository } from 'typeorm'
-import { TENANCY_CONNECTION } from '../../public/tenancy/tenancy.provider'
+import { TENANCY_CONNECTION } from '../../../public/tenancy/tenancy.provider'
 import { StoreOpeningHour } from './database/store-opening-hour.entity'
 import { StorePhone } from './database/store-phone.entity'
 import { StoreWorker } from './database/store-worker.entity'

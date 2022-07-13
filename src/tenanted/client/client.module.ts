@@ -10,5 +10,6 @@ import { CloudStorageService } from 'src/third-party-apis/Google/cloud-storage/c
   imports: [TenancyModule, AppLoggerModule, CloudStorageModule],
   providers: [ClientService, CloudStorageService],
   controllers: [ClientController],
+  exports: [ClientService],
 })
 export class ClientModule {}

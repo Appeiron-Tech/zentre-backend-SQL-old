@@ -11,15 +11,16 @@ import { ThemesModule } from './public/theme/theme.module'
 import { AppModule as MyAppModule } from './public/app/app.module'
 import { UserModule } from './public/user/user.module'
 import { OrderModule as POrderModule } from './public/order/order.module'
-import { AnnouncementModule } from './tenanted/announcement/announcement.module'
+import { AnnouncementModule } from './tenanted/appeiron-app/announcement/announcement.module'
 import { ClientModule } from './tenanted/client/client.module'
-import { StoreModule } from './tenanted/store/store.module'
-import { ProductModule } from './tenanted/product/product.module'
+import { StoreModule } from './tenanted/e-commerce/store/store.module'
+import { ProductModule } from './tenanted/e-commerce/product/product.module'
 import { CloudStorageModule } from './third-party-apis/Google/cloud-storage/cloud-storage.module'
 import { PClientModule } from './public/client/client.module'
-import { OrderModule } from './tenanted/order/order.module'
-import { CartModule } from './tenanted/cart/cart.module'
+import { OrderModule } from './tenanted/e-commerce/order/order.module'
+import { CartModule } from './tenanted/e-commerce/cart/cart.module'
 import { GoogleAnalyticsModule } from './third-party-apis/Google/google-analytics/google-analytics.module'
+import { AnalyticsModule as WebAnalyticsModule } from './tenanted/web/analytics/analytics.module'
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { GoogleAnalyticsModule } from './third-party-apis/Google/google-analytic
     ProductModule,
     OrderModule,
     CartModule,
+    WebAnalyticsModule,
 
     //THIRD PARTY APIS
     CloudStorageModule,

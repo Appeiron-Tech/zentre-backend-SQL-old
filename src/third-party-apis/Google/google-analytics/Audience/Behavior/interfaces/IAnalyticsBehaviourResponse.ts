@@ -1,6 +1,6 @@
 import { IAnalyticsIntervals } from './IAnalyticsIntervals'
 
-export interface IAnalyticsBehaviourResponse {
+export interface IAnalyticsBehaviorResponse {
   pageViews: string
   sessions: string
   intervals: IAnalyticsIntervals

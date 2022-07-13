@@ -1,4 +1,4 @@
-import { IBasicResults } from '../../../IBasicResults'
+import { IBasicResults } from '../../../interfaces/IBasicResults'
 
 export interface IAnalyticsIntervals {
   '0-10 seconds': IBasicResults

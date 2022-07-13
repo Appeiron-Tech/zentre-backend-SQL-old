@@ -1,8 +1,8 @@
 import { IAnalyticsRegionResponse } from 'src/third-party-apis/Google/google-analytics/Audience/GeoNetwork/interfaces/IAnalyticsRegionResponse'
 import { IAnalyticsCountryResponse } from 'src/third-party-apis/Google/google-analytics/Audience/GeoNetwork/interfaces/IAnalyticsCountryResponse'
-import { IAnalyticsBehaviourResponse } from 'src/third-party-apis/Google/google-analytics/Audience/Behaviour/interfaces/IAnalyticsBehaviourResponse'
-import { IAnalyticsIntervals } from 'src/third-party-apis/Google/google-analytics/Audience/Behaviour/interfaces/IAnalyticsIntervals'
-import { IAnalyticsAudienceGenResponse } from 'src/third-party-apis/Google/google-analytics/Audience/common/interfaces/IAnalyticsAudienceGenResponse'
+import { IAnalyticsBehaviorResponse } from 'src/third-party-apis/Google/google-analytics/Audience/Behavior/interfaces/IAnalyticsBehaviourResponse'
+import { IAnalyticsIntervals } from 'src/third-party-apis/Google/google-analytics/Audience/Behavior/interfaces/IAnalyticsIntervals'
+import { IAnalyticsAudienceGenResponse } from 'src/third-party-apis/Google/google-analytics/Audience/audience/IAnalyticsAudienceGenResponse'
 import { roundNumber } from './utils'
 
 export class AnalyticsParser {
@@ -80,7 +80,7 @@ export class AnalyticsParser {
     return analyticsResponse
   }
 
-  toBehaviourResponse(): IAnalyticsBehaviourResponse {
+  toBehaviourResponse(): IAnalyticsBehaviorResponse {
     const intervals: IAnalyticsIntervals = {
       '0-10 seconds': { pageViews: 0, sessions: 0 },
       '11-30 seconds': { pageViews: 0, sessions: 0 },
@@ -115,7 +115,7 @@ export class AnalyticsParser {
         intervals['>1800 seconds'].sessions += Number(row[2])
       }
     })
-    const analyticsResponse: IAnalyticsBehaviourResponse = {
+    const analyticsResponse: IAnalyticsBehaviorResponse = {
       pageViews: this.rawData.totalsForAllResults['ga:pageviews'],
       sessions: this.rawData.totalsForAllResults['ga:sessions'],
       intervals: intervals,

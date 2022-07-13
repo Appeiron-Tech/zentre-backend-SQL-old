@@ -1,4 +1,4 @@
-import { Order } from 'src/tenanted/order/database/order.entity'
+import { Order } from 'src/tenanted/e-commerce/order/database/order.entity'
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity({ name: 'carts' })
