@@ -70,8 +70,7 @@ export class AnalyticsService {
   // --------------------------- PRIVATE ----------------------------
   private async getAnalyticsKeys(): Promise<IAnalyticsKeys> {
     const client = await this.findClient()
-    console.log(client)
-    const analyticsAPIKey = this.googleAnalytics.getAnalyticsKey(
+    const analyticsAPIKey = await this.googleAnalytics.getAnalyticsKey(
       client.api_key,
       client.email_analytics,
     )

@@ -7,28 +7,19 @@ import { IAnalyticsCountryResponse } from './Audience/GeoNetwork/interfaces/IAna
 import { IBasicResults } from './interfaces/IBasicResults'
 import { IAnalyticsBehaviorResponse } from './Audience/Behavior/interfaces/IAnalyticsBehaviourResponse'
 import { IAnalyticsAudienceGenResponse } from './Audience/audience/IAnalyticsAudienceGenResponse'
-import { ANALYTICS_SCOPE, HASH_END, HASH_START } from 'src/third-party-apis/common/constants'
+import { ANALYTICS_SCOPE } from 'src/third-party-apis/common/constants'
 import { IAnalyticsKeyReq } from './interfaces/IAnalyticsKeyReq'
 
 @Injectable()
 export class GoogleAnalyticsService {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor() {}
-
   // ************************************************************************************
   // ************************************************************************************
   //                                     GENERAL
   // ************************************************************************************
   // ************************************************************************************
 
-  getAnalyticsKey(clientAPIkey: string, emailAnalytics: string): JWT {
-    const jwt = new google.auth.JWT(
-      emailAnalytics,
-      null,
-      // clientAPIkey,
-      '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDhynt5lkfvdJGC\nPDlopdjv/bFoVVST5JFs6VN1GqGr2XQoXyy6gkfwMLQRZjRs9zrTpT5GOemWzzyo\nvCllcQN7u8bpIkD8RG6h3Y8vMoWhW/67XVJj2BAOjMtFveodKF2lOlUb/bK/Qzkf\n8lVV4arHmdT9PuCc4ywBuPyJqw0/hSWT61KXSgFhQ7zWB6UJMHq78nK6+Iwu/jGG\n70mR4oWaMg+sR3IoqTfyP5/fAd5Adaymnv8D8wAJHvTmuv+zMCj8ejcFypvl9hkT\n9TGWP3fMShxwzS5WX4DTjWuNvA2XlwwxOiuiwqD9Ou7fcG9tFGjcHSVqlpHN7Oce\nLIrVRvT7AgMBAAECggEAJozxPwWzG4W+EEvjC2SBoRwiDavACI42bC98Qdq9rr8u\nb3QsiV2UFcTjAbN/EPm3MAqfEtNxd//DHhYeRUUh8J7Ta9ue19OBRh6zgz3vhejU\nmb3pwsVRnIJadHpj/f1126+Vd3V97tz15Gf2PPcONw0jSefR5sd8rICekYzEcssh\nUH5ADRP4eyrzUttbLQEKSOVdtvqQJ4OdCjK0zY1gn6kUWH7TU6v9uCNfbbcJ5p5V\no58+FaZ7dWi4sPrW++Oljg1gAD+P0+QnK8hHb2y/yBpmb2U0+DqHjbiVyIfQyPuy\n6lTfckxORJ77R9NwvcyWVpKHpi9sy0sciUgbWnt50QKBgQDzA2TNauI5neNm/jpq\n6MWBTCF32erS6DqVNuWoymRqvr/B8ftKlF0Eq7us8RqiEhn+qGzuL1o1z+QFt9Ko\nzafGDVyOjwkM/jdsL60wwbup186rDx/QQKUKugBG1uQTIb/y6Ntd96KV0H9jZQ6V\nDrgvd2B971fD99y/sEIGP0t5sQKBgQDt23lo5kJWkXTwDJEol+hmTldsauzSPyOw\nITvbo9UKHuNP8frk163k9YXqO8KGE0mQu3MyRRy6cJef54C2MTB0MP8Rc2/v5m4D\n9SqzxTdftNpJBFc7kvFi6Q6XI4yNRt7v3yr/+X1xqTtwO+srNGHH0g3Jv6aPFi65\nRXmTHJqYawKBgDFGqeUBXFgEjPzwZhYRlyLttgegd35GusJQ/Gaqi4wdm7KPB76K\nsQXmcMrTpOviMcUyj8wIbAlnWzxRlvTFptSBFxiNJm+tCL32OO8fCZeZ+/0xtui6\ngvzW1IGIx3ydpldyIjE+qogoW/xinH9bGbv+P+Gpa6mAFBIGgozTvtExAoGAWs57\nX2zozpvhhPOHR3QXKVenUKDRoMKyIT/O1l+Jqb95EMBVBKDCprKFWZNPBFjAsRyf\nMgXondT2TfnXzbahxPofps3nYjMatTAYCWG1bjhhTZb2pqvGs/g9tb3Anv77haAx\njl/1YDs3kfWOJoRtABhVYzxjniTd2aWIcH1vF9kCgYEAtqsu6E6lYPLZA/UH16sM\npUeLmzEcxvYSCIRogIJZBrWVY3APrlR0PfYarMlJY6uOw1rJ6rR6EE/Y2QI8Ri30\n9s+k6eL0UZguSxUG1MDKkxXlI7g9c2MEzMUPqeRgC6X016I4PrRRuTlxpdElj66M\nvsD8Z9yspzkWT7N1cKh4h58=\n-----END PRIVATE KEY-----\n',
-      ANALYTICS_SCOPE,
-    )
+  async getAnalyticsKey(clientAPIkey: string, emailAnalytics: string): Promise<JWT> {
+    const jwt = new google.auth.JWT(emailAnalytics, null, clientAPIkey, ANALYTICS_SCOPE)
     return jwt
   }
 
@@ -104,7 +95,6 @@ export class GoogleAnalyticsService {
   // ************************************************************************************
 
   async getAudience(analyticsKeys: IAnalyticsKeyReq, startDate: string) {
-    // await this.setUp()
     const endDate = this.getEndDate(startDate)
     const result = await google.analytics('v3').data.ga.get({
       auth: analyticsKeys.APIKey,
@@ -185,7 +175,6 @@ export class GoogleAnalyticsService {
       return 'today'
     } else {
       const endDate = new Date().toISOString().slice(0, 10)
-      console.log(endDate)
       return endDate
     }
   }
