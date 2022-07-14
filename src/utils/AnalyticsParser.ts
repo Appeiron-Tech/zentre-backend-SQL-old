@@ -25,7 +25,7 @@ export class AnalyticsParser {
     }
     this.rawData.rows.forEach((row) => {
       analyticsResponse.dates.push({
-        date: row[0],
+        date: row[0].substring(4, 6) + '/' + row[0].substring(6, 8) + '/' + row[0].substring(0, 4),
         users: Number(row[1]),
         sessions: Number(row[2]),
         bounceRate: roundNumber(Number(row[3])),
