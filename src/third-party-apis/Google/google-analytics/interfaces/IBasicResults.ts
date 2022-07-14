@@ -3,4 +3,7 @@ export interface IBasicResults {
   pageViews?: number
   sessions?: number
   users?: number
+  bounceRate?: number
+  sessionDuration?: number
+  date?: string
 }

@@ -1,17 +1,17 @@
 import { Controller, Get, Param } from '@nestjs/common'
 import { AnalyticsService } from './analytics.service'
-import { IBasicResponse } from './interfaces/IBasicResponse'
 import { ICountryResponse } from './interfaces/geo/ICountryResponse'
 import { IRegionResponse } from './interfaces/geo/IRegionResponse'
 import { IBehaviorResponse } from './interfaces/behavior/IBehaviorResponse'
 import { IAudienceResponse } from './interfaces/audience/IAudienceGlobalResponse'
+import { IAnalyticsViewsResponse } from 'src/third-party-apis/Google/google-analytics/interfaces/IAnalyticsViewsResponse'
 
 @Controller('web/analytics')
 export class AnalyticsController {
   constructor(private analyticsService: AnalyticsService) {}
 
   @Get('views/:startDate')
-  getGeneral(@Param('startDate') startDate: string): Promise<IBasicResponse> {
+  getGeneral(@Param('startDate') startDate: string): Promise<IAnalyticsViewsResponse> {
     return this.analyticsService.getViewStats(startDate)
   }
 

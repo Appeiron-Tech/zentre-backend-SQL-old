@@ -4,12 +4,35 @@ import { IAnalyticsBehaviorResponse } from 'src/third-party-apis/Google/google-a
 import { IAnalyticsIntervals } from 'src/third-party-apis/Google/google-analytics/Audience/Behavior/interfaces/IAnalyticsIntervals'
 import { IAnalyticsAudienceGenResponse } from 'src/third-party-apis/Google/google-analytics/Audience/audience/IAnalyticsAudienceGenResponse'
 import { roundNumber } from './utils'
+import { IAnalyticsViewsResponse } from 'src/third-party-apis/Google/google-analytics/interfaces/IAnalyticsViewsResponse'
 
 export class AnalyticsParser {
   rawData: any
 
   constructor(rawData: any) {
     this.rawData = rawData
+  }
+
+  toViewsResponse(): IAnalyticsViewsResponse {
+    const analyticsResponse: IAnalyticsViewsResponse = {
+      users: Number(this.rawData.totalsForAllResults['ga:users']),
+      sessions: Number(this.rawData.totalsForAllResults['ga:sessions']),
+      bounceRate: roundNumber(Number(this.rawData.totalsForAllResults['ga:bounceRate'])),
+      sessionDuration: roundNumber(
+        Number(this.rawData.totalsForAllResults['ga:avgSessionDuration']),
+      ),
+      dates: [],
+    }
+    this.rawData.rows.forEach((row) => {
+      analyticsResponse.dates.push({
+        date: row[0],
+        users: Number(row[1]),
+        sessions: Number(row[2]),
+        bounceRate: roundNumber(Number(row[3])),
+        sessionDuration: roundNumber(Number(row[4])),
+      })
+    })
+    return analyticsResponse
   }
 
   toCountryResponse(): IAnalyticsCountryResponse {
@@ -80,7 +103,7 @@ export class AnalyticsParser {
     return analyticsResponse
   }
 
-  toBehaviourResponse(): IAnalyticsBehaviorResponse {
+  toBehaviorResponse(): IAnalyticsBehaviorResponse {
     const intervals: IAnalyticsIntervals = {
       '0-10 seconds': { pageViews: 0, sessions: 0 },
       '11-30 seconds': { pageViews: 0, sessions: 0 },

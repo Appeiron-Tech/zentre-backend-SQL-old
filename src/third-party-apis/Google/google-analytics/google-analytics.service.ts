@@ -4,11 +4,11 @@ import { google } from 'googleapis'
 import { AnalyticsParser } from 'src/utils/AnalyticsParser'
 import { IAnalyticsRegionResponse } from './Audience/GeoNetwork/interfaces/IAnalyticsRegionResponse'
 import { IAnalyticsCountryResponse } from './Audience/GeoNetwork/interfaces/IAnalyticsCountryResponse'
-import { IBasicResults } from './interfaces/IBasicResults'
 import { IAnalyticsBehaviorResponse } from './Audience/Behavior/interfaces/IAnalyticsBehaviourResponse'
 import { IAnalyticsAudienceGenResponse } from './Audience/audience/IAnalyticsAudienceGenResponse'
 import { ANALYTICS_SCOPE } from 'src/third-party-apis/common/constants'
 import { IAnalyticsKeyReq } from './interfaces/IAnalyticsKeyReq'
+import { IAnalyticsViewsResponse } from './interfaces/IAnalyticsViewsResponse'
 
 @Injectable()
 export class GoogleAnalyticsService {
@@ -23,20 +23,21 @@ export class GoogleAnalyticsService {
     return jwt
   }
 
-  async getViewStats(analyticsKeys: IAnalyticsKeyReq, startDate: string): Promise<IBasicResults> {
+  async getViewStats(
+    analyticsKeys: IAnalyticsKeyReq,
+    startDate: string,
+  ): Promise<IAnalyticsViewsResponse> {
     const endDate = this.getEndDate(startDate)
     const result = await google.analytics('v3').data.ga.get({
       auth: analyticsKeys.APIKey,
       ids: 'ga:' + analyticsKeys.viewId,
       'start-date': startDate,
       'end-date': endDate,
-      metrics: 'ga:pageviews,ga:sessions,ga:users',
+      metrics: 'ga:users,ga:sessions,ga:bounceRate,ga:avgSessionDuration',
+      dimensions: 'ga:date',
     })
-    const analyticsResponse: IBasicResults = {
-      pageViews: Number(result.data.rows[0][0]),
-      sessions: Number(result.data.rows[0][1]),
-      users: Number(result.data.rows[0][2]),
-    }
+    const parser: AnalyticsParser = new AnalyticsParser(result.data)
+    const analyticsResponse: IAnalyticsViewsResponse = parser.toViewsResponse()
     return analyticsResponse
   }
 
@@ -121,7 +122,7 @@ export class GoogleAnalyticsService {
       dimensions: 'ga:sessionDurationBucket',
     })
     const parser: AnalyticsParser = new AnalyticsParser(result.data)
-    const analyticsResponse: IAnalyticsBehaviorResponse = parser.toBehaviourResponse()
+    const analyticsResponse: IAnalyticsBehaviorResponse = parser.toBehaviorResponse()
     return analyticsResponse
   }
 

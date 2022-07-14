@@ -1,6 +1,5 @@
 import { Inject, Injectable, Scope } from '@nestjs/common'
 import { GoogleAnalyticsService } from 'src/third-party-apis/Google/google-analytics/google-analytics.service'
-import { IBasicResponse } from './interfaces/IBasicResponse'
 import { ICountryResponse } from './interfaces/geo/ICountryResponse'
 import { IRegionResponse } from './interfaces/geo/IRegionResponse'
 import { IBehaviorResponse } from './interfaces/behavior/IBehaviorResponse'
@@ -8,6 +7,7 @@ import { IAudienceResponse } from './interfaces/audience/IAudienceGlobalResponse
 import { Connection, Repository } from 'typeorm'
 import { Client } from 'src/tenanted/client/database/entities/client.entity'
 import { TENANCY_CONNECTION } from 'src/public/tenancy/tenancy.provider'
+import { IAnalyticsViewsResponse } from 'src/third-party-apis/Google/google-analytics/interfaces/IAnalyticsViewsResponse'
 
 // @Injectable()
 @Injectable({ scope: Scope.REQUEST })
@@ -32,7 +32,7 @@ export class AnalyticsService {
   // private readonly clientService: ClientService
   // constructor(private googleAnalytics: GoogleAnalyticsService) {}
 
-  async getViewStats(startDate: string): Promise<IBasicResponse> {
+  async getViewStats(startDate: string): Promise<IAnalyticsViewsResponse> {
     const analyticKeys = await this.getAnalyticsKeys()
     return await this.googleAnalytics.getViewStats(analyticKeys, startDate)
   }
