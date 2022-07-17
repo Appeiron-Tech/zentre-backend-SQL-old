@@ -46,11 +46,13 @@ export class TenancyModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(async (req: Request, res: Response, next: NextFunction) => {
-        // const tenancyHost: string = req.params['0'].split('/')[0]
-        const tenancyHost: string = this.getTenancyHost(req.hostname)
+        // const tenancyHost: string = this.getTenancyHost(req.hostname)
+        const tenancyHost = this.getTenancyHost(req.headers)
         console.log('tenancyHost: ' + tenancyHost)
         if (tenancyHost === null) {
-          throw new BadRequestException('Invalid Hostname, more than one subdomain')
+          throw new BadRequestException(
+            'There is not a tenancy name for this call and its needed. try using a Public call',
+          )
         }
 
         if (tenancyHost) {
@@ -124,16 +126,21 @@ export class TenancyModule {
       .forRoutes('*')
   }
 
-  private getTenancyHost(fullHostname: string): string {
-    const hostnames = fullHostname.split('.')
-    if (hostnames.length > 2) {
-      console.log('returning null')
-      return null
-    }
-    if (hostnames.length === 1) {
-      console.log('returning an empty array')
-      return ''
-    }
-    return hostnames[0]
+  // private getTenancyHost(fullHostname: string): string {
+  //   const hostnames = fullHostname.split('.')
+  //   if (hostnames.length > 2) {
+  //     console.log('returning null')
+  //     return null
+  //   }
+  //   if (hostnames.length === 1) {
+  //     console.log('returning an empty array')
+  //     return ''
+  //   }
+  //   return hostnames[0]
+  // }
+
+  private getTenancyHost(headers: any): string {
+    const tenancyNames = headers.tenancy
+    return typeof tenancyNames === 'string' ? tenancyNames : tenancyNames[0]
   }
 }

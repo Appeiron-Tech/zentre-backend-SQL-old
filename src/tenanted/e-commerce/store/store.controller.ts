@@ -32,7 +32,7 @@ import { UpdateStoreDto } from './dto/upd-store.dto'
     always: true,
   }),
 )
-@Controller('api/store')
+@Controller('tenant/store')
 export class StoreController {
   constructor(private storeService: StoreService) {}
 
