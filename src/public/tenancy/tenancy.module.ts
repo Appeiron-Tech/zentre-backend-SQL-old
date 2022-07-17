@@ -49,11 +49,11 @@ export class TenancyModule {
         // const tenancyHost: string = this.getTenancyHost(req.hostname)
         const tenancyHost = this.getTenancyHost(req.headers)
         console.log('tenancyHost: ' + tenancyHost)
-        if (tenancyHost === null) {
-          throw new BadRequestException(
-            'There is not a tenancy name for this call and its needed. try using a Public call',
-          )
-        }
+        // if (tenancyHost === null) {
+        //   throw new BadRequestException(
+        //     'There is not a tenancy name for this call and its needed. try using a Public call',
+        //   )
+        // }
 
         if (tenancyHost) {
           const tenancy: Tenancy = await this.tenancyService.findOne(tenancyHost)
@@ -140,7 +140,10 @@ export class TenancyModule {
   // }
 
   private getTenancyHost(headers: any): string {
-    const tenancyNames = headers.tenancy
-    return typeof tenancyNames === 'string' ? tenancyNames : tenancyNames[0]
+    if (headers.tenancy) {
+      const tenancyNames = headers.tenancy
+      return typeof tenancyNames === 'string' ? tenancyNames : tenancyNames[0]
+    }
+    return null
   }
 }
