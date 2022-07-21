@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common'
-import { PayFormConfigResp } from './dto/pay-form-config-resp.interface'
+import { PayConfigurationResp } from './dto/pay-config-resp.interface'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 import { PaymentsService } from './payments.service'
 
@@ -8,7 +8,7 @@ export class PaymentsController {
   constructor(private paymentService: PaymentsService) {}
 
   @Get()
-  async getFormConfig(@Query('item_code') item_code?: string): Promise<PayFormConfigResp> {
+  async getFormConfig(@Query('item_code') item_code?: string): Promise<PayConfigurationResp> {
     let mpItem = null
     const payForm = await this.paymentService.getPayConfiguration()
     if (item_code) mpItem = await this.paymentService.getMPItem(item_code)
@@ -19,8 +19,9 @@ export class PaymentsController {
   }
 
   @Post('mercadopago')
-  async sendMPPayment(@Body() submittedForm: SubmittedFormDto): Promise<string> {
+  async sendMPPayment(@Body() submittedForm: SubmittedFormDto): Promise<any> {
     const mpResponse = await this.paymentService.createMPPayment(submittedForm)
+    // await this.paymentService.saveMPCallLog(mpResponse)
     return mpResponse
   }
 

@@ -2,7 +2,7 @@ import { IMPItem } from './mp-item.interface'
 import { IMPPayer } from './mp-payer.interface'
 import { IBasicKayValue } from './mp-preference.interface'
 
-export interface IMPPayResp {
+export interface IMPAPIResp {
   additional_info: string
   auto_return: string
   back_urls: {

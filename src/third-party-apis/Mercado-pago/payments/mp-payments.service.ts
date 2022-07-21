@@ -1,4 +1,4 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import axios from 'axios'
 import { IMPPreference } from './interfaces/mp-preference.interface'

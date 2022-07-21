@@ -34,6 +34,7 @@ import { PayFormShort } from 'src/tenanted/pay/payments/database/pay-form-shorts
 import { PayConfiguration } from 'src/tenanted/pay/payments/database/pay-configuration.entity'
 import { PayMPPreference } from 'src/tenanted/pay/payments/database/pay-mp-preference.entity'
 import { PayMPItem } from 'src/tenanted/pay/payments/database/pay-mp-item.entity'
+import { PayMPCallLogs } from 'src/tenanted/pay/payments/database/pay-mp-call-logs.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -113,6 +114,7 @@ export class TenancyModule {
                 PayFormShort,
                 PayMPPreference,
                 PayMPItem,
+                PayMPCallLogs,
               ],
               // entities: [__dirname + '/**/*.entity{.ts,.js}'],
               synchronize: true,
