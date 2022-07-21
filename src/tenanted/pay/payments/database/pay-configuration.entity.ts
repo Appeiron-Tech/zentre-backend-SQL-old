@@ -1,8 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
 import { PayFormShort } from './pay-form-shorts.entity'
 
-@Entity({ name: 'pay_form' })
-export class PayForm {
+@Entity({ name: 'pay_configuration' })
+export class PayConfiguration {
   @PrimaryGeneratedColumn('increment')
   id: number
 
@@ -21,7 +21,13 @@ export class PayForm {
   @Column({ length: 512, nullable: true })
   cover: string
 
-  @OneToMany(() => PayFormShort, (payFormShort) => payFormShort.payForm, { eager: true })
+  @Column({ length: 512, nullable: true })
+  mp_prod_access_token: string
+
+  @Column({ length: 512, nullable: true })
+  mp_prod_public_key: string
+
+  @OneToMany(() => PayFormShort, (payFormShort) => payFormShort.payConfiguration, { eager: true })
   formShorts: PayFormShort[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

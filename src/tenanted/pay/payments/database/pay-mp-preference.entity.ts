@@ -51,4 +51,4 @@ export class PayMPPreference {
   createdAt: Timestamp
 }
 
-export const CUSTOM_PREFERENCE = 'CSTM'
+export const DEFAULT_PREFERENCE = 'DFLT'

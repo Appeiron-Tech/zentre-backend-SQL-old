@@ -10,7 +10,7 @@ export class PaymentsController {
   @Get()
   async getFormConfig(@Query('item_code') item_code?: string): Promise<PayFormConfigResp> {
     let mpItem = null
-    const payForm = await this.paymentService.getFormConfig()
+    const payForm = await this.paymentService.getPayConfiguration()
     if (item_code) mpItem = await this.paymentService.getMPItem(item_code)
     return {
       pay_form: payForm,

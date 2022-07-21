@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm'
-import { PayForm } from './pay-form.entity'
+import { PayConfiguration } from './pay-configuration.entity'
 
 @Entity({ name: 'pay_form_shorts' })
 export class PayFormShort {
@@ -24,8 +24,8 @@ export class PayFormShort {
   })
   price: number
 
-  @ManyToOne(() => PayForm, (payForm) => payForm.formShorts)
-  payForm: PayForm
+  @ManyToOne(() => PayConfiguration, (payConfiguration) => payConfiguration.formShorts)
+  payConfiguration: PayConfiguration
 
   @Column({ nullable: false, default: false })
   isActive: boolean

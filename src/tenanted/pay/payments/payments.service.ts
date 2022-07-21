@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common'
 import { TENANCY_CONNECTION } from 'src/public/tenancy/tenancy.provider'
 import { MPPaymentsService } from 'src/third-party-apis/Mercado-pago/payments/mp-payments.service'
 import { Repository, Connection } from 'typeorm'
-import { PayForm } from './database/pay-form.entity'
+import { PayConfiguration } from './database/pay-configuration.entity'
 import { PayMPItem } from './database/pay-mp-item.entity'
-import { CUSTOM_PREFERENCE, PayMPPreference } from './database/pay-mp-preference.entity'
+import { DEFAULT_PREFERENCE, PayMPPreference } from './database/pay-mp-preference.entity'
 import { IMPPreference } from './dto/mp-preference.interface'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 
@@ -12,22 +12,26 @@ import { SubmittedFormDto } from './dto/submittedForm.dto'
 export class PaymentsService {
   private readonly mpPreferenceRepository: Repository<PayMPPreference>
   private readonly mpItemRepository: Repository<PayMPItem>
-  private readonly payFormRepository: Repository<PayForm>
+  private readonly payConfigurationRepository: Repository<PayConfiguration>
 
   constructor(
     private mpPaymentService: MPPaymentsService,
     @Inject(TENANCY_CONNECTION) connection: Connection,
   ) {
     this.mpPreferenceRepository = connection.getRepository(PayMPPreference)
-    this.payFormRepository = connection.getRepository(PayForm)
+    this.payConfigurationRepository = connection.getRepository(PayConfiguration)
     this.mpItemRepository = connection.getRepository(PayMPItem)
   }
 
   async createMPPayment(submittedForm: SubmittedFormDto): Promise<any> {
     try {
-      const payConfig = await this.getMPPreference(CUSTOM_PREFERENCE)
-      const mpPreference = this.prepareToMP(submittedForm, payConfig)
-      const payment = await this.mpPaymentService.createPayment(mpPreference)
+      const defaultPreference = await this.getMPPreference(DEFAULT_PREFERENCE)
+      const payConfiguration = await this.getPayConfiguration()
+      const mpPreference = this.prepareToMP(submittedForm, defaultPreference)
+      const payment = await this.mpPaymentService.createPayment(
+        mpPreference,
+        payConfiguration.mp_prod_access_token,
+      )
       return payment
     } catch (error) {
       return { error: true, msg: 'Failed to create payment' }
@@ -51,8 +55,8 @@ export class PaymentsService {
     }
   }
 
-  async getFormConfig(): Promise<PayForm> {
-    const payForm = await this.payFormRepository.findOne()
+  async getPayConfiguration(): Promise<PayConfiguration> {
+    const payForm = await this.payConfigurationRepository.findOne()
     return payForm
   }
 
