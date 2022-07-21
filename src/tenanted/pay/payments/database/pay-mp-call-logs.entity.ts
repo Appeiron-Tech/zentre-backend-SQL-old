@@ -1,9 +1,20 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { PayMPPreference } from './pay-mp-preference.entity'
-import { PayMPItem } from './pay-mp-item.entity'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+
+export interface IPayMPCallLog {
+  client_id: string
+  collector_id?: number
+  coupon_code?: string
+  coupon_labels?: string
+  expiration_date_from?: string
+  expiration_date_to?: string
+  external_reference?: string
+  init_point?: string
+  mp_preference_code?: string
+  mp_item_code?: string
+}
 
 @Entity({ name: 'pay_mp_call_logs' })
-export class PayMPCallLogs {
+export class PayMPCallLogs implements IPayMPCallLog {
   @PrimaryGeneratedColumn('increment')
   id: number
 
@@ -31,11 +42,11 @@ export class PayMPCallLogs {
   @Column({ length: 256, nullable: true })
   init_point: string
 
-  @ManyToOne(() => PayMPPreference)
-  mp_preference: PayMPPreference
+  @Column({ length: 4, nullable: true })
+  mp_preference_code: string
 
-  @ManyToOne(() => PayMPItem)
-  mp_item: PayMPItem
+  @Column({ length: 4, nullable: true })
+  mp_item_code: string
   // @Column({length: 256, nullable: true})
   // total_amount: number
 }

@@ -3,8 +3,10 @@ import { TENANCY_CONNECTION } from 'src/public/tenancy/tenancy.provider'
 import { MPPaymentsService } from 'src/third-party-apis/Mercado-pago/payments/mp-payments.service'
 import { Repository, Connection } from 'typeorm'
 import { PayConfiguration } from './database/pay-configuration.entity'
+import { IPayMPCallLog, PayMPCallLogs } from './database/pay-mp-call-logs.entity'
 import { PayMPItem } from './database/pay-mp-item.entity'
 import { DEFAULT_PREFERENCE, PayMPPreference } from './database/pay-mp-preference.entity'
+import { IMPAPIResp } from './dto/mp-api-resp.interface'
 import { IMPPreference } from './dto/mp-preference.interface'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 
@@ -13,6 +15,7 @@ export class PaymentsService {
   private readonly mpPreferenceRepository: Repository<PayMPPreference>
   private readonly mpItemRepository: Repository<PayMPItem>
   private readonly payConfigurationRepository: Repository<PayConfiguration>
+  private readonly payMPCallLogsRepository: Repository<PayMPCallLogs>
 
   constructor(
     private mpPaymentService: MPPaymentsService,
@@ -21,6 +24,7 @@ export class PaymentsService {
     this.mpPreferenceRepository = connection.getRepository(PayMPPreference)
     this.payConfigurationRepository = connection.getRepository(PayConfiguration)
     this.mpItemRepository = connection.getRepository(PayMPItem)
+    this.payMPCallLogsRepository = connection.getRepository(PayMPCallLogs)
   }
 
   async createMPPayment(submittedForm: SubmittedFormDto): Promise<any> {
@@ -60,7 +64,29 @@ export class PaymentsService {
     return payForm
   }
 
-  // async saveMPCallLog(mpResponse: )
+  async saveMPCallLog(mpRawResponse: any): Promise<void> {
+    try {
+      const mpResponse = <IMPAPIResp>mpRawResponse
+      const mpCallLog: IPayMPCallLog = {
+        client_id: mpResponse.client_id,
+        collector_id: mpResponse.collector_id,
+        coupon_code: mpResponse.coupon_code,
+        coupon_labels: mpResponse.coupon_labels,
+        expiration_date_from: mpResponse.expiration_date_from,
+        expiration_date_to: mpResponse.expiration_date_to,
+        external_reference: mpResponse.external_reference,
+        init_point: mpResponse.init_point,
+        mp_preference_code: DEFAULT_PREFERENCE,
+        mp_item_code: mpResponse.items[0]?.id,
+      }
+      await this.payMPCallLogsRepository.save(mpCallLog)
+    } catch (err) {
+      const mpCallLog: IPayMPCallLog = {
+        client_id: 'ERR',
+      }
+      await this.payMPCallLogsRepository.save(mpCallLog)
+    }
+  }
 
   // ***************************************************************************
   // ***************************** PRIVATE METHODS *****************************
