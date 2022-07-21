@@ -21,6 +21,7 @@ import { OrderModule } from './tenanted/e-commerce/order/order.module'
 import { CartModule } from './tenanted/e-commerce/cart/cart.module'
 import { GoogleAnalyticsModule } from './third-party-apis/Google/google-analytics/google-analytics.module'
 import { AnalyticsModule as WebAnalyticsModule } from './tenanted/web/analytics/analytics.module'
+import { PaymentsModule } from './tenanted/pay/payments/payments.module'
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { AnalyticsModule as WebAnalyticsModule } from './tenanted/web/analytics/
     //THIRD PARTY APIS
     CloudStorageModule,
     GoogleAnalyticsModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

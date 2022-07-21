@@ -30,6 +30,10 @@ import { ProductAttrOption } from 'src/tenanted/e-commerce/product/database/attr
 import { Cart } from 'src/tenanted/e-commerce/cart/database/cart.entity'
 import { OrderPaymentStatusLog } from 'src/tenanted/e-commerce/order/database/payment-status-log.entity'
 import { OrderDeliveryStatusLog } from 'src/tenanted/e-commerce/order/database/delivery-status-log.entity'
+import { PayFormShort } from 'src/tenanted/pay/payments/database/pay-form-shorts.entity'
+import { PayForm } from 'src/tenanted/pay/payments/database/pay-form.entity'
+import { PayMPPreference } from 'src/tenanted/pay/payments/database/pay-mp-preference.entity'
+import { PayMPItem } from 'src/tenanted/pay/payments/database/pay-mp-item.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -104,6 +108,11 @@ export class TenancyModule {
                 ProductAttrOption,
                 PTag,
                 Variation,
+                // PAY
+                PayForm,
+                PayFormShort,
+                PayMPPreference,
+                PayMPItem,
               ],
               // entities: [__dirname + '/**/*.entity{.ts,.js}'],
               synchronize: true,

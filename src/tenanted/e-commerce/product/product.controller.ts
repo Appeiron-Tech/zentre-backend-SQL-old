@@ -36,7 +36,6 @@ export class ProductController {
 
   @Get()
   async findAll(): Promise<ReadProductDto[]> {
-    console.log('findAll')
     const readProducts: ReadProductDto[] = []
     const products = await this.productService.findAll()
     await asyncForEach(products, async (product: Product) => {
