@@ -20,9 +20,12 @@ export class PaymentsController {
 
   @Post('mercadopago')
   async sendMPPayment(@Body() submittedForm: SubmittedFormDto): Promise<string> {
-    const mpResponse = await this.paymentService.createMPPayment(submittedForm)
-    await this.paymentService.saveMPCallLog(mpResponse)
-    return mpResponse?.init_point
+    try {
+      const mpResponse = await this.paymentService.createMPPayment(submittedForm)
+      return mpResponse?.init_point || mpResponse
+    } catch (err) {
+      return err
+    }
   }
 
   // @Post('paypal')

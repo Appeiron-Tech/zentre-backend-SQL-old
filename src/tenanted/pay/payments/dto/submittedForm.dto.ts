@@ -1,6 +1,7 @@
-import { IsArray, IsNotEmpty, IsObject, IsString, MaxLength } from 'class-validator'
+import { IsArray, IsNotEmpty, IsObject, IsOptional, IsString, MaxLength } from 'class-validator'
 import { MPItemDto } from './mp-item.dto'
 import { MPPayer } from './mp-payer.dto'
+import { IMPShipment } from './mp-preference.interface'
 
 export class SubmittedFormDto {
   @IsNotEmpty()
@@ -11,13 +12,27 @@ export class SubmittedFormDto {
   @IsObject()
   payer: MPPayer
 
+  @IsOptional()
+  @IsObject()
+  shipment: IMPShipment
+
   @IsNotEmpty()
   @IsString()
   @MaxLength(3)
   user_type: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  @MaxLength(32)
-  external_reference: string
+  @MaxLength(16)
+  coupon: string
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(16)
+  coupon_label: string
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(256)
+  additional_info: string
 }

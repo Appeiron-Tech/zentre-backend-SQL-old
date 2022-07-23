@@ -21,7 +21,7 @@ export interface IMPPreference {
   }
   notification_url: string
   statement_descriptor: string
-  external_reference: string
+  external_reference?: string
   expires: boolean
   expiration_date_from?: string
   expiration_date_to?: string
