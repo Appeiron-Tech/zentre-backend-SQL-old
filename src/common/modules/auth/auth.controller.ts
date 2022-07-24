@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Controller, Get, Post, Req, Response, UseGuards, UseInterceptors } from '@nestjs/common'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { AuthService } from './auth.service'
 import { SkipAuth } from './decorators/skip-auth.decorator'
@@ -17,8 +17,15 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @SkipAuth()
   @Post('login')
-  async login(@Req() request: Request): Promise<{ access_token: string }> {
-    return await this.authService.login(request.user as ValidateUserDTO)
+  async login(@Req() request: Request, @Response() res): Promise<{ access_token: string }> {
+    const resLogin = await this.authService.login(request.user as ValidateUserDTO)
+
+    res.cookie('accessToken', resLogin.access_token, {
+      expires: new Date(new Date().getTime() + 20 * 1000),
+      // sameSite: 'strict',
+      httpOnly: true,
+    })
+    return res.send(resLogin) ;
   }
 
   @UseGuards(JwtAuthGuard)
