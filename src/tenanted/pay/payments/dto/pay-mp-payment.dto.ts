@@ -1,4 +1,4 @@
-import { IMPPaymentStatus } from './pay-mp-payment-status.interface'
+import { IMPPaymentStatus } from './interfaces/pay-mp-payment-status.interface'
 
 export interface IPayMPPayment {
   id?: number

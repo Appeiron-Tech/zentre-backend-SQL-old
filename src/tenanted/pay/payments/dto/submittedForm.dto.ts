@@ -1,7 +1,7 @@
 import { IsArray, IsNotEmpty, IsObject, IsOptional, IsString, MaxLength } from 'class-validator'
 import { MPItemDto } from './mp-item.dto'
 import { MPPayer } from './mp-payer.dto'
-import { IMPShipment } from './mp-preference.interface'
+import { IMPShipment } from './interfaces/mp-preference.interface'
 
 export class SubmittedFormDto {
   @IsNotEmpty()

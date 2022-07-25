@@ -6,17 +6,17 @@ import { ConfigService } from '@nestjs/config'
 import { ReadUserDto } from '../dto/read-user.dto'
 import { plainToClass } from 'class-transformer'
 import { ReadTenancyDto } from '../dto/read-tenancy.dto'
-import { Request } from 'express';
+import { Request } from 'express'
 
 function getCookie(cookies: string, name: string): string | null {
-  const nameEQ = name + "=";
-  const ca = cookies.split(';');
-  for(let i=0;i < ca.length;i++) {
-    let c = ca[i];
-    while (c.charAt(0)==' ') c = c.substring(1,c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  const nameEQ = name + '='
+  const ca = cookies.split(';')
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i]
+    while (c.charAt(0) == ' ') c = c.substring(1, c.length)
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length)
   }
-  return null;
+  return null
 }
 
 /**
@@ -24,11 +24,11 @@ function getCookie(cookies: string, name: string): string | null {
  * @param req Http Request
  */
 //https://stackoverflow.com/questions/39163413/node-js-passport-jwt-how-to-send-token-in-a-cookie
-const cookieExtractor = (req: Request ) => {
-  let jwt: string | null = null 
+const cookieExtractor = (req: Request) => {
+  let jwt: string | null = null
 
   if (req && req.headers.cookie) {
-      jwt = getCookie(req.headers.cookie,'accessToken')
+    jwt = getCookie(req.headers.cookie, 'accessToken')
   }
   return jwt
 }
@@ -40,12 +40,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
   ) {
     super({
-//      jwtFromRequest: cookieExtractor,
+      //      jwtFromRequest: cookieExtractor,
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Take jwt from http header, Development environment
         ExtractJwt.fromAuthHeaderAsBearerToken(),
         // Take jwt from cookie, Production environment
-        cookieExtractor
+        cookieExtractor,
       ]),
       ignoreExpiration: false,
       secretOrKey: 'mysecretejwtpassword',

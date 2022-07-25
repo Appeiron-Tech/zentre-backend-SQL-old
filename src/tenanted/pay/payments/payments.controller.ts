@@ -1,7 +1,9 @@
-import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common'
-import { IMPPaymentStatus } from './dto/pay-mp-payment-status.interface'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { plainToClass } from 'class-transformer'
+import { IMPPaymentStatus } from './dto/interfaces/pay-mp-payment-status.interface'
 import { IPNBody } from './dto/mp-ipn.dto'
 import { PayConfigurationResp } from './dto/pay-config-resp.interface'
+import { PayConfigurationReadDto } from './dto/pay-configuration-read.dto'
 import { IPayMPPayment } from './dto/pay-mp-payment.dto'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 import { PaymentsService } from './payments.service'
@@ -13,7 +15,8 @@ export class PaymentsController {
   @Get()
   async getFormConfig(@Query('item_code') item_code?: string): Promise<PayConfigurationResp> {
     let mpItem = null
-    const payForm = await this.paymentService.getPayConfiguration()
+    const rawPayForm = await this.paymentService.getPayConfiguration()
+    const payForm = plainToClass(PayConfigurationReadDto, rawPayForm)
     if (item_code) mpItem = await this.paymentService.getMPItem(item_code)
     return {
       pay_form: payForm,
