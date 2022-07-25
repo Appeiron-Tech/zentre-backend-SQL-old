@@ -1,5 +1,8 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common'
+import { IMPPaymentStatus } from './dto/pay-mp-payment-status.interface'
+import { IPNBody } from './dto/mp-ipn.dto'
 import { PayConfigurationResp } from './dto/pay-config-resp.interface'
+import { IPayMPPayment } from './dto/pay-mp-payment.dto'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 import { PaymentsService } from './payments.service'
 
@@ -21,10 +24,42 @@ export class PaymentsController {
   @Post('mercadopago')
   async sendMPPayment(@Body() submittedForm: SubmittedFormDto): Promise<string> {
     try {
-      const mpResponse = await this.paymentService.createMPPayment(submittedForm)
+      const mpResponse = await this.paymentService.createMPCall(submittedForm)
       return mpResponse?.init_point || mpResponse
     } catch (err) {
       return err
+    }
+  }
+
+  @Post('ipn')
+  async mercadopagoIPN(
+    @Query('data.id') data_id: string,
+    @Query('type') type: string,
+    @Body() ipnBody: IPNBody,
+  ): Promise<any> {
+    if (ipnBody) {
+      const basicMPPayment: IPayMPPayment = {
+        mp_id: ipnBody.data.id,
+        operation_type: ipnBody.type,
+      }
+      const createdMPPayment = await this.paymentService.createMPPayment(basicMPPayment)
+      try {
+        const mpPaymentStatus = await this.getMPPaymentStatus(ipnBody.data.id)
+        await this.paymentService.updateMPPayment(createdMPPayment.id, mpPaymentStatus)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  }
+
+  @Get('payment_status/:payment_id')
+  async getMPPaymentStatus(@Param('payment_id') paymentId: string): Promise<IMPPaymentStatus> {
+    if (paymentId) {
+      try {
+        return await this.paymentService.getMPPaymentStatus(paymentId)
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 

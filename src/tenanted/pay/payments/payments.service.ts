@@ -6,8 +6,11 @@ import { Repository, Connection } from 'typeorm'
 import { PayConfiguration } from './database/pay-configuration.entity'
 import { IPayMPCallLog, PayMPCallLogs } from './database/pay-mp-call-logs.entity'
 import { PayMPItem } from './database/pay-mp-item.entity'
+import { IMPPaymentStatus } from './dto/pay-mp-payment-status.interface'
+import { PayMPPayment } from './database/pay-mp-payment.entity'
 import { DEFAULT_PREFERENCE, PayMPPreference } from './database/pay-mp-preference.entity'
 import { IMPPreference } from './dto/mp-preference.interface'
+import { IPayMPPayment, toMPPayment } from './dto/pay-mp-payment.dto'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 
 @Injectable()
@@ -16,6 +19,7 @@ export class PaymentsService {
   private readonly mpItemRepository: Repository<PayMPItem>
   private readonly payConfigurationRepository: Repository<PayConfiguration>
   private readonly payMPCallLogsRepository: Repository<PayMPCallLogs>
+  private readonly payMPPaymentsRepository: Repository<PayMPPayment>
 
   constructor(
     private mpPaymentService: MPPaymentsService,
@@ -25,9 +29,10 @@ export class PaymentsService {
     this.payConfigurationRepository = connection.getRepository(PayConfiguration)
     this.mpItemRepository = connection.getRepository(PayMPItem)
     this.payMPCallLogsRepository = connection.getRepository(PayMPCallLogs)
+    this.payMPPaymentsRepository = connection.getRepository(PayMPPayment)
   }
 
-  async createMPPayment(submittedForm: SubmittedFormDto): Promise<any> {
+  async createMPCall(submittedForm: SubmittedFormDto): Promise<any> {
     try {
       const defaultPreference = await this.getMPPreference(DEFAULT_PREFERENCE)
       const payConfiguration = await this.getPayConfiguration()
@@ -70,6 +75,50 @@ export class PaymentsService {
   async getPayConfiguration(): Promise<PayConfiguration> {
     const payForm = await this.payConfigurationRepository.findOne()
     return payForm
+  }
+
+  async createMPPayment(mpPayments: IPayMPPayment): Promise<IPayMPPayment> {
+    try {
+      return await this.payMPPaymentsRepository.save(mpPayments)
+    } catch (err) {
+      console.log(err.sqlMessage || 'error sql')
+      return await this.payMPPaymentsRepository.findOne({ mp_id: mpPayments.mp_id })
+    }
+  }
+
+  async updateMPPayment(mpPaymentId: number, paymentStatus: IMPPaymentStatus): Promise<void> {
+    try {
+      console.log('*********** STATUS ***********')
+      console.log(paymentStatus)
+      const mpPayment: IPayMPPayment = toMPPayment(paymentStatus)
+      mpPayment.id = mpPaymentId
+      await this.payMPPaymentsRepository.save(mpPayment)
+    } catch (err) {
+      console.error(err)
+      throw new Error('Error parsing API response to Payment Entity')
+    }
+  }
+
+  async getMPPaymentStatus(paymentId: string): Promise<IMPPaymentStatus> {
+    try {
+      const payConfiguration = await this.payConfigurationRepository.findOne()
+      if (payConfiguration?.mp_prod_access_token) {
+        try {
+          console.log('token in db: ' + payConfiguration.mp_prod_access_token.split(' ')[1])
+          return await this.mpPaymentService.getPaymentStatus(
+            paymentId,
+            'APP_USR-7422375236748514-071800-5cf4da2be6d0df61015acfaca7d26e21-1162617732', //test
+            // payConfiguration.mp_prod_access_token.split(' ')[1],
+          )
+        } catch (err) {
+          console.error(err)
+          throw new Error('Error getting payment status from mercadopago')
+        }
+      }
+      throw new Error('there is not an access token for client')
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   async saveMPCallLog(mpPreference: IMPPreference): Promise<IPayMPCallLog> {
