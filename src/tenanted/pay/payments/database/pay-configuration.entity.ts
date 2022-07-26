@@ -21,6 +21,15 @@ export class PayConfiguration {
   @Column({ length: 512, nullable: true })
   cover: string
 
+  @Column({ length: 64, nullable: false })
+  client_name: string
+
+  @Column({ length: 256, nullable: true })
+  client_description: string
+
+  @Column({ length: 512, nullable: true })
+  footer: string
+
   @Column({ length: 512, nullable: true })
   mp_prod_access_token: string
 

@@ -28,6 +28,15 @@ export class PayConfigurationReadDto {
   @Expose()
   cover: string
 
+  @Expose()
+  client_name: string
+
+  @Expose()
+  client_description: string
+
+  @Expose()
+  footer: string
+
   @IsArray()
   @Expose()
   formShorts: PayFormShort[]
