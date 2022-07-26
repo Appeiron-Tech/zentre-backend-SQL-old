@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
+import { AppMenus } from './app-menus.entity'
 import { Plan } from './plan.entity'
 
 @Entity({ name: 'apps' })
@@ -16,4 +17,9 @@ export class App {
     eager: true,
   })
   plans?: Plan[]
+
+  @OneToMany(() => AppMenus, (appMenus) => appMenus.app, {
+    eager: true,
+  })
+  menus?: AppMenus[]
 }

@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer'
-import { IsEmail, IsOptional } from 'class-validator'
+import { IsArray, IsEmail, IsNotEmpty, IsOptional } from 'class-validator'
 import { ReadTenancyDto } from './read-tenancy.dto'
 
 @Exclude()

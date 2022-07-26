@@ -25,7 +25,7 @@ export class AuthController {
       // sameSite: 'strict',
       httpOnly: true,
     })
-    return res.send(resLogin) ;
+    return res.send(resLogin)
   }
 
   @UseGuards(JwtAuthGuard)
