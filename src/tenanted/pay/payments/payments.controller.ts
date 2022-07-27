@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { plainToClass } from 'class-transformer'
+import { PayMPItem } from './database/pay-mp-item.entity'
 import { IMPPaymentStatus } from './dto/interfaces/pay-mp-payment-status.interface'
-import { IPNBody } from './dto/mp-ipn.dto'
+import { MPCreateLinkDto } from './dto/mp-create-link.dto'
 import { PayConfigurationResp } from './dto/pay-config-resp.interface'
 import { PayConfigurationReadDto } from './dto/pay-configuration-read.dto'
 import { IPayMPPayment } from './dto/pay-mp-payment.dto'
@@ -13,11 +14,11 @@ export class PaymentsController {
   constructor(private paymentService: PaymentsService) {}
 
   @Get()
-  async getFormConfig(@Query('item_code') item_code?: string): Promise<PayConfigurationResp> {
+  async getFormConfig(@Query('item_id') item_id?: string): Promise<PayConfigurationResp> {
     let mpItem = null
     const rawPayForm = await this.paymentService.getPayConfiguration()
     const payForm = plainToClass(PayConfigurationReadDto, rawPayForm)
-    if (item_code) mpItem = await this.paymentService.getMPItem(item_code)
+    if (item_id) mpItem = await this.paymentService.getMPItem(Number(item_id))
     return {
       pay_form: payForm,
       item: mpItem,
@@ -34,24 +35,30 @@ export class PaymentsController {
     }
   }
 
+  @Post('create-link')
+  async createLink(@Body() createLink: MPCreateLinkDto): Promise<PayMPItem> {
+    try {
+      return await this.paymentService.createMPLink(createLink)
+    } catch (err) {
+      return err
+    }
+  }
+
   @Post('ipn')
   async mercadopagoIPN(
     @Query('data.id') data_id: string,
     @Query('type') type: string,
-    @Body() ipnBody: IPNBody,
   ): Promise<any> {
-    if (ipnBody) {
-      const basicMPPayment: IPayMPPayment = {
-        mp_id: ipnBody.data.id,
-        operation_type: ipnBody.type,
-      }
-      const createdMPPayment = await this.paymentService.createMPPayment(basicMPPayment)
-      try {
-        const mpPaymentStatus = await this.getMPPaymentStatus(ipnBody.data.id)
-        await this.paymentService.updateMPPayment(createdMPPayment.id, mpPaymentStatus)
-      } catch (err) {
-        console.log(err)
-      }
+    const basicMPPayment: IPayMPPayment = {
+      mp_id: data_id,
+      operation_type: type,
+    }
+    const createdMPPayment = await this.paymentService.createMPPayment(basicMPPayment)
+    try {
+      const mpPaymentStatus = await this.getMPPaymentStatus(data_id)
+      await this.paymentService.updateMPPayment(createdMPPayment.id, mpPaymentStatus)
+    } catch (err) {
+      console.log(err)
     }
   }
 

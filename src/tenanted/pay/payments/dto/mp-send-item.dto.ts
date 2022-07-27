@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsPositive, IsString, MaxLength } from 'class-validator'
 
-export class MPItemDto {
+export class MPSendItemDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(4)

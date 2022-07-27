@@ -1,12 +1,12 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, Timestamp } from 'typeorm'
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
 import { PayMPPreference } from './pay-mp-preference.entity'
 
 @Entity({ name: 'pay_mp_items' })
 export class PayMPItem {
-  @PrimaryColumn()
-  code: string
+  @PrimaryGeneratedColumn('increment')
+  id: number
 
-  @Column({ length: 16, nullable: true })
+  @Column({ length: 64, nullable: false })
   title: string
 
   @Column({ length: 3, nullable: false, default: 'PEN' })
@@ -18,7 +18,7 @@ export class PayMPItem {
   @Column({ length: 256, nullable: true })
   description: string
 
-  @Column({ length: 16, nullable: false, default: 'default' })
+  @Column({ length: 16, nullable: false, default: 'custom' })
   category_id: string
 
   @Column({ nullable: false, default: 1 })
@@ -33,8 +33,11 @@ export class PayMPItem {
   })
   unit_price: number
 
+  @Column({ nullable: false, default: 'DFLT' })
+  mpPreferenceCode: string
+
   @ManyToOne(() => PayMPPreference)
-  mp_preference: PayMPPreference
+  mpPreference: PayMPPreference
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Timestamp

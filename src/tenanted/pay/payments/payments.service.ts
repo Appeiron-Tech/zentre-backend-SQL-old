@@ -12,6 +12,7 @@ import { DEFAULT_PREFERENCE, PayMPPreference } from './database/pay-mp-preferenc
 import { IMPPreference } from './dto/interfaces/mp-preference.interface'
 import { IPayMPPayment, toMPPayment } from './dto/pay-mp-payment.dto'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
+import { MPCreateLinkDto } from './dto/mp-create-link.dto'
 
 @Injectable()
 export class PaymentsService {
@@ -64,9 +65,9 @@ export class PaymentsService {
     }
   }
 
-  async getMPItem(code: string): Promise<PayMPItem> {
+  async getMPItem(id: number): Promise<PayMPItem> {
     try {
-      return await this.mpItemRepository.findOne({ code: code })
+      return await this.mpItemRepository.findOne({ id: id })
     } catch (error) {
       return error
     }
@@ -75,6 +76,15 @@ export class PaymentsService {
   async getPayConfiguration(): Promise<PayConfiguration> {
     const payForm = await this.payConfigurationRepository.findOne()
     return payForm
+  }
+
+  async createMPLink(createLink: MPCreateLinkDto): Promise<PayMPItem> {
+    try {
+      return await this.mpItemRepository.save(createLink)
+    } catch (err) {
+      console.error(err)
+      throw new Error('Error creating Mercado Pago Item')
+    }
   }
 
   async createMPPayment(mpPayments: IPayMPPayment): Promise<IPayMPPayment> {
