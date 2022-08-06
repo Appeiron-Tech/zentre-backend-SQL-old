@@ -206,14 +206,13 @@ export class PaymentsService {
     try {
       const summaryStats = await this.payMPPaymentsRepository
         .createQueryBuilder()
-        .select("DATE_FORMAT(date_approved, '%Y-%m-%d %H-00-00')", 'time')
-        .addSelect('count(*)', 'sell_quantity')
+        .select("DATE_FORMAT( date_approved, '%Y-%m-%d %H:00:00' )", 'time')
+        .addSelect('count(mp_id)', 'sell_quantity')
         .addSelect('SUM(transaction_amount)', 'sells')
         .addSelect('AVG(transaction_amount)', 'ticket_avg')
         .where('status = :status', { status: 'approved' })
         .andWhere('date_approved >= :date_approved', { date_approved: min_date })
-        .groupBy('hour(date_approved)')
-        .addGroupBy('date(date_approved)')
+        .groupBy('time')
         .getRawMany()
       const normalizedSummaryStats = this.normalizeStatsLogs(summaryStats)
       return normalizedSummaryStats
