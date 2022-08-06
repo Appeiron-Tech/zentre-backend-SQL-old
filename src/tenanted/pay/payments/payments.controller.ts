@@ -1,5 +1,9 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query, UseInterceptors } from '@nestjs/common'
 import { plainToClass } from 'class-transformer'
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
+import { AppLoggerService } from 'src/common/modules/app-logger/app-logger.service'
+import { readPaymentDto } from './dashboard/payments-list.dto'
+import { ISummaryStats } from './dashboard/summary-stats.interface'
 import { PayMPItem } from './database/pay-mp-item.entity'
 import { IMPPaymentStatus } from './dto/interfaces/pay-mp-payment-status.interface'
 import { MPCreateLinkDto } from './dto/mp-create-link.dto'
@@ -9,8 +13,10 @@ import { IPayMPPayment } from './dto/pay-mp-payment.dto'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 import { PaymentsService } from './payments.service'
 
+@UseInterceptors(LoggingInterceptor)
 @Controller('tenant/pay')
 export class PaymentsController {
+  private readonly appLogger = new AppLoggerService(PaymentsController.name)
   constructor(private paymentService: PaymentsService) {}
 
   @Get()
@@ -29,7 +35,13 @@ export class PaymentsController {
   async sendMPPayment(@Body() submittedForm: SubmittedFormDto): Promise<string> {
     try {
       const mpResponse = await this.paymentService.createMPCall(submittedForm)
-      return mpResponse?.init_point || mpResponse
+      if (mpResponse) {
+        this.appLogger.info(
+          this.sendMPPayment.name,
+          'payment submitted: ' + submittedForm.additional_info,
+        )
+        return mpResponse?.init_point || mpResponse
+      }
     } catch (err) {
       return err
     }
@@ -57,6 +69,9 @@ export class PaymentsController {
     try {
       const mpPaymentStatus = await this.getMPPaymentStatus(data_id)
       await this.paymentService.updateMPPayment(createdMPPayment.id, mpPaymentStatus)
+      if (mpPaymentStatus) {
+        this.appLogger.info(this.mercadopagoIPN.name, 'IPN processed for : ' + data_id)
+      }
     } catch (err) {
       console.log(err)
     }
@@ -71,6 +86,31 @@ export class PaymentsController {
         console.log(err)
       }
     }
+  }
+
+  // -------------------------- DASHBOARD -------------------------- //
+  @Get('dashboard/payments/:days_ago')
+  async getSummaryStats(@Param('days_ago') daysAgo: number): Promise<ISummaryStats> {
+    const initDate = new Date()
+    initDate.setDate(initDate.getDate() - daysAgo)
+    const summaryStatsRaw = await this.paymentService.getSummaryStats(initDate)
+    const summaryStatsByTime = await this.paymentService.getSummaryStatsHour(initDate)
+    const summaryStats: ISummaryStats = { ...summaryStatsRaw }
+    summaryStats.stats_by_time = summaryStatsByTime
+    return summaryStats
+  }
+
+  @Get('dashboard/paymentlist/:days_ago')
+  async getPaymentList(@Param('days_ago') daysAgo: number): Promise<readPaymentDto[]> {
+    const paymentList: readPaymentDto[] = []
+    const initDate = new Date()
+    initDate.setDate(initDate.getDate() - daysAgo)
+    const rawPaymentList = await this.paymentService.getPaymentList(initDate)
+    rawPaymentList.forEach((payment) => {
+      const readPayment = new readPaymentDto(payment)
+      paymentList.push(readPayment)
+    })
+    return paymentList
   }
 
   // @Post('paypal')

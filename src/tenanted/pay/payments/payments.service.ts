@@ -13,6 +13,9 @@ import { IMPPreference } from './dto/interfaces/mp-preference.interface'
 import { IPayMPPayment, toMPPayment } from './dto/pay-mp-payment.dto'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 import { MPCreateLinkDto } from './dto/mp-create-link.dto'
+import { IDBStats, IStatsByTime, ISummaryStats } from './dashboard/summary-stats.interface'
+import { Dashboard } from '../constants'
+import { ReqBasicSearchDTO } from './dashboard/req-basic-search.dto'
 
 @Injectable()
 export class PaymentsService {
@@ -98,14 +101,12 @@ export class PaymentsService {
 
   async updateMPPayment(mpPaymentId: number, paymentStatus: IMPPaymentStatus): Promise<void> {
     try {
-      console.log('*********** STATUS ***********')
-      console.log(paymentStatus)
       const mpPayment: IPayMPPayment = toMPPayment(paymentStatus)
       mpPayment.id = mpPaymentId
       await this.payMPPaymentsRepository.save(mpPayment)
     } catch (err) {
       console.error(err)
-      throw new Error('Error parsing API response to Payment Entity')
+      throw new Error('Error parsing API response to Payment Entity OR duplicate payment ID')
     }
   }
 
@@ -114,7 +115,7 @@ export class PaymentsService {
       const payConfiguration = await this.payConfigurationRepository.findOne()
       if (payConfiguration?.mp_prod_access_token) {
         try {
-          console.log('token in db: ' + payConfiguration.mp_prod_access_token.split(' ')[1])
+          // console.log('token in db: ' + payConfiguration.mp_prod_access_token.split(' ')[1])
           return await this.mpPaymentService.getPaymentStatus(
             paymentId,
             'APP_USR-7422375236748514-071800-5cf4da2be6d0df61015acfaca7d26e21-1162617732', //test
@@ -154,7 +155,7 @@ export class PaymentsService {
         coupon_labels: mpPreference.coupon_labels,
         expiration_date_from: mpPreference.expiration_date_from,
         expiration_date_to: mpPreference.expiration_date_to,
-        additional_info: mpPreference.additional_info,
+        additional_info: mpPreference.additional_info + ' - ' + mpPreference.items[0]?.id,
         marketplace: mpPreference.marketplace,
         marketplace_fee: mpPreference.marketplace_fee,
         expires: mpPreference.expires,
@@ -182,6 +183,71 @@ export class PaymentsService {
         mp_date_created: new Date(payment.date_created),
       },
     )
+  }
+
+  // ------------------------------- DASHBOARD ----------------------------------//
+  async getSummaryStats(min_date: Date): Promise<IDBStats> {
+    try {
+      const summaryStats = await this.payMPPaymentsRepository
+        .createQueryBuilder()
+        .select('count(*)', 'sell_quantity')
+        .addSelect('SUM(transaction_amount)', 'sells')
+        .addSelect('AVG(transaction_amount)', 'ticket_avg')
+        .where('status = :status', { status: 'approved' })
+        .andWhere('date_approved >= :date_approved', { date_approved: min_date })
+        .getRawOne()
+      return <IDBStats>summaryStats
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async getSummaryStatsHour(min_date: Date): Promise<IStatsByTime[]> {
+    try {
+      const summaryStats = await this.payMPPaymentsRepository
+        .createQueryBuilder()
+        .select("DATE_FORMAT(date_approved, '%Y-%m-%d %H-00-00')", 'time')
+        .addSelect('count(*)', 'sell_quantity')
+        .addSelect('SUM(transaction_amount)', 'sells')
+        .addSelect('AVG(transaction_amount)', 'ticket_avg')
+        .where('status = :status', { status: 'approved' })
+        .andWhere('date_approved >= :date_approved', { date_approved: min_date })
+        .groupBy('hour(date_approved)')
+        .addGroupBy('date(date_approved)')
+        .getRawMany()
+      const normalizedSummaryStats = this.normalizeStatsLogs(summaryStats)
+      return normalizedSummaryStats
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async getPaymentList(min_date: Date): Promise<IPayMPPayment[]> {
+    const paymentList = await this.payMPPaymentsRepository
+      .createQueryBuilder()
+      .select('mp_id')
+      .addSelect('operation_type')
+      .addSelect('card_id_type')
+      .addSelect('card_id_number')
+      .addSelect('card_first_six_digits')
+      .addSelect('date_approved')
+      .addSelect('date_created')
+      .addSelect('external_reference')
+      .addSelect('fee_details_amount')
+      .addSelect('fee_details_type')
+      .addSelect('installments')
+      .addSelect('order_type')
+      .addSelect('payment_method_id')
+      .addSelect('payment_type_id')
+      .addSelect('status')
+      .addSelect('status_detail')
+      .addSelect('taxes_amount')
+      .addSelect('transaction_amount')
+      .addSelect('trans_details_net_received_amount')
+      .addSelect('trans_details_total_paid_amount')
+      .where('date_approved >= :date_approved', { date_approved: min_date })
+      .getRawMany()
+    return <IPayMPPayment[]>paymentList
   }
 
   // ***************************************************************************
@@ -223,5 +289,20 @@ export class PaymentsService {
         : null,
     }
     return mpPreference
+  }
+
+  private normalizeStatsLogs(stats_logs: IStatsByTime[]): IStatsByTime[] {
+    if (!stats_logs) return []
+    const averages: IStatsByTime[] = []
+    const daysByGroup = Math.ceil(stats_logs.length / Dashboard.STATS.GRAPH_POINTS)
+    if (daysByGroup > 1) {
+      for (let i = 0; i < Dashboard.STATS.GRAPH_POINTS && stats_logs.length > 0; i++) {
+        const logs = stats_logs.splice(0, daysByGroup)
+        const middleLog = logs[Math.floor(logs.length / 2)]
+        averages.push(middleLog)
+      }
+      return averages
+    }
+    return stats_logs
   }
 }

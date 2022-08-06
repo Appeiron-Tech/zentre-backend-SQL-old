@@ -11,9 +11,17 @@ export const TenancyProvider: Provider = {
   inject: [REQUEST, Connection],
   scope: Scope.REQUEST,
   useFactory: async (req: Request, connection: Connection) => {
-    const name = req.headers.tenancy
-    // const name: string = req.hostname.split('.')[0]
-    const tenant: Tenancy = await connection.getRepository(Tenancy).findOne({ where: { name } })
-    return getConnection(tenant.name)
+    try {
+      const name = req.headers?.tenancy
+      // const name: string = req.hostname.split('.')[0]
+      if (name) {
+        const tenant: Tenancy = await connection.getRepository(Tenancy).findOne({ where: { name } })
+        return getConnection(tenant.name)
+      } else {
+        throw new Error('not tenant name provided for tenanted request')
+      }
+    } catch (err) {
+      console.log(err)
+    }
   },
 }
