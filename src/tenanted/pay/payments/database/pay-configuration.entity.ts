@@ -18,6 +18,9 @@ export class PayConfiguration {
   @Column({ length: 512, nullable: true })
   logo: string
 
+  @Column({ length: 6, nullable: true })
+  color: string
+
   @Column({ length: 512, nullable: true })
   cover: string
 

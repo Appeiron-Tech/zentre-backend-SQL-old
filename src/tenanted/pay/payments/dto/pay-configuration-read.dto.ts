@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer'
-import { IsArray, IsBoolean, IsNumber, IsUrl } from 'class-validator'
+import { IsArray, IsBoolean, IsNumber, IsString, IsUrl } from 'class-validator'
 import { PayFormShort } from '../database/pay-form-shorts.entity'
 
 @Exclude()
@@ -23,6 +23,10 @@ export class PayConfigurationReadDto {
   @IsUrl()
   @Expose()
   logo: string
+
+  @IsString()
+  @Expose()
+  color: string
 
   @IsUrl()
   @Expose()
