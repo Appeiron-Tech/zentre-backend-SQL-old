@@ -67,6 +67,10 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Build docker image for ADM64
+
+docker build --platform amd64 -t appeiron/hub-backend .
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
