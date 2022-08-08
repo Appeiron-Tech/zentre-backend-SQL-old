@@ -226,7 +226,10 @@ export class PaymentsService {
       if (max_date) {
         summaryStatsQuery.andWhere('date_approved <= :max_date', { max_date: max_date })
       }
-      const summaryStats = await summaryStatsQuery.groupBy('time').getRawMany()
+      const summaryStats = await summaryStatsQuery
+        .groupBy('time')
+        .orderBy('time', 'ASC')
+        .getRawMany()
       const normalizedSummaryStats = this.normalizeStatsLogs(summaryStats)
       return normalizedSummaryStats
     } catch (e) {
@@ -258,6 +261,7 @@ export class PaymentsService {
       .addSelect('trans_details_net_received_amount')
       .addSelect('trans_details_total_paid_amount')
       .where('date_approved >= :date_approved', { date_approved: min_date })
+      .orderBy('date_created', 'DESC')
       .getRawMany()
     return <IPayMPPayment[]>paymentList
   }

@@ -124,17 +124,35 @@ export class PaymentsController {
     console.log('not correct day/month/year format')
   }
 
-  @Get('dashboard/paymentlist/:days_ago')
-  async getPaymentList(@Param('days_ago') daysAgo: number): Promise<readPaymentDto[]> {
+  @Get('dashboard/paymentlist/:time_ago')
+  async getPaymentList(@Param('time_ago') timeAgo: string): Promise<readPaymentDto[]> {
     const paymentList: readPaymentDto[] = []
-    const initDate = new Date()
-    initDate.setDate(initDate.getDate() - daysAgo)
-    const rawPaymentList = await this.paymentService.getPaymentList(initDate)
-    rawPaymentList.forEach((payment) => {
-      const readPayment = new readPaymentDto(payment)
-      paymentList.push(readPayment)
-    })
-    return paymentList
+    if (timeAgo.indexOf('-')) {
+      const timeQuantity = Number(timeAgo.split('-')[0])
+      const timeType = timeAgo.split('-')[1].toLowerCase()
+      const initDate = new Date()
+      switch (timeType) {
+        case 'm': {
+          initDate.setMonth(initDate.getMonth() - timeQuantity)
+          break
+        }
+        case 'y': {
+          initDate.setFullYear(initDate.getFullYear() - timeQuantity)
+          break
+        }
+        default: {
+          initDate.setDate(initDate.getDate() - timeQuantity)
+          break
+        }
+      }
+      const rawPaymentList = await this.paymentService.getPaymentList(initDate)
+      rawPaymentList.forEach((payment) => {
+        const readPayment = new readPaymentDto(payment)
+        paymentList.push(readPayment)
+      })
+      return paymentList
+    }
+    console.log('not correct day/month/year format')
   }
 
   // ******************************* PRIVATE FUNCTIONS ********************************
