@@ -3,7 +3,7 @@ import { plainToClass } from 'class-transformer'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { AppLoggerService } from 'src/common/modules/app-logger/app-logger.service'
 import { readPaymentDto } from './dashboard/payments-list.dto'
-import { ISummaryStats } from './dashboard/summary-stats.interface'
+import { IPeriodSummaryStats, ISummaryStats } from './dashboard/summary-stats.interface'
 import { PayMPItem } from './database/pay-mp-item.entity'
 import { IMPPaymentStatus } from './dto/interfaces/pay-mp-payment-status.interface'
 import { MPCreateLinkDto } from './dto/mp-create-link.dto'
@@ -89,15 +89,39 @@ export class PaymentsController {
   }
 
   // -------------------------- DASHBOARD -------------------------- //
-  @Get('dashboard/payments/:days_ago')
-  async getSummaryStats(@Param('days_ago') daysAgo: number): Promise<ISummaryStats> {
-    const initDate = new Date()
-    initDate.setDate(initDate.getDate() - daysAgo)
-    const summaryStatsRaw = await this.paymentService.getSummaryStats(initDate)
-    const summaryStatsByTime = await this.paymentService.getSummaryStatsHour(initDate)
-    const summaryStats: ISummaryStats = { ...summaryStatsRaw }
-    summaryStats.stats_by_time = summaryStatsByTime
-    return summaryStats
+  @Get('dashboard/payments/:time_ago')
+  async getSummaryStats(@Param('time_ago') timeAgo: string): Promise<ISummaryStats> {
+    if (timeAgo.indexOf('-')) {
+      const timeQuantity = Number(timeAgo.split('-')[0])
+      const timeType = timeAgo.split('-')[1].toLowerCase()
+      const currentInitDate = new Date()
+      const prevInitDate = new Date()
+      switch (timeType) {
+        case 'm': {
+          currentInitDate.setMonth(currentInitDate.getMonth() - timeQuantity)
+          prevInitDate.setMonth(prevInitDate.getMonth() - timeQuantity * 2)
+          break
+        }
+        case 'y': {
+          currentInitDate.setFullYear(currentInitDate.getFullYear() - timeQuantity)
+          prevInitDate.setFullYear(prevInitDate.getFullYear() - timeQuantity * 2)
+          break
+        }
+        default: {
+          currentInitDate.setDate(currentInitDate.getDate() - timeQuantity)
+          prevInitDate.setDate(prevInitDate.getDate() - timeQuantity * 2)
+          break
+        }
+      }
+      const prevSummaryStats = await this.getPeriodSummaryStats(prevInitDate, currentInitDate)
+      const currentSummaryStats = await this.getPeriodSummaryStats(currentInitDate)
+      const summaryStats: ISummaryStats = {
+        prev: prevSummaryStats,
+        current: currentSummaryStats,
+      }
+      return summaryStats
+    }
+    console.log('not correct day/month/year format')
   }
 
   @Get('dashboard/paymentlist/:days_ago')
@@ -113,9 +137,15 @@ export class PaymentsController {
     return paymentList
   }
 
-  // @Post('paypal')
-  // async sendPPPayment(@Body() submittedInfo: SubmittedInfoDto): Promise<string> {
-  //   const payConfig = this.paymentService.getMPConfigurations
-  //   return 'erwre'
-  // }
+  // ******************************* PRIVATE FUNCTIONS ********************************
+  private async getPeriodSummaryStats(
+    initDate: Date,
+    finishDate?: Date,
+  ): Promise<IPeriodSummaryStats> {
+    const summaryStatsRaw = await this.paymentService.getSummaryStats(initDate, finishDate)
+    const summaryStatsByTime = await this.paymentService.getSummaryStatsHour(initDate, finishDate)
+    const summaryStats: IPeriodSummaryStats = { ...summaryStatsRaw }
+    summaryStats.stats_by_time = summaryStatsByTime
+    return summaryStats
+  }
 }

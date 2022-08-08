@@ -186,34 +186,47 @@ export class PaymentsService {
   }
 
   // ------------------------------- DASHBOARD ----------------------------------//
-  async getSummaryStats(min_date: Date): Promise<IDBStats> {
+  async getSummaryStats(min_date: Date, max_date?: Date): Promise<IDBStats> {
     try {
-      const summaryStats = await this.payMPPaymentsRepository
+      // console.log('*** summary Stats: ')
+      // console.log(' -- min date: ' + min_date)
+      // console.log(' -- max date: ' + max_date)
+      const summaryStatsQuery = this.payMPPaymentsRepository
         .createQueryBuilder()
         .select('count(*)', 'sell_quantity')
         .addSelect('SUM(transaction_amount)', 'sells')
         .addSelect('AVG(transaction_amount)', 'ticket_avg')
         .where('status = :status', { status: 'approved' })
-        .andWhere('date_approved >= :date_approved', { date_approved: min_date })
-        .getRawOne()
+        .andWhere('date_approved >= :min_date', { min_date: min_date })
+
+      if (max_date) {
+        summaryStatsQuery.andWhere('date_approved <= :max_date', { max_date: max_date })
+      }
+      const summaryStats = await summaryStatsQuery.getRawOne()
       return <IDBStats>summaryStats
     } catch (e) {
       throw e
     }
   }
 
-  async getSummaryStatsHour(min_date: Date): Promise<IStatsByTime[]> {
+  async getSummaryStatsHour(min_date: Date, max_date?: Date): Promise<IStatsByTime[]> {
     try {
-      const summaryStats = await this.payMPPaymentsRepository
+      // console.log('*** summary Stats by hour: ')
+      // console.log(' -- min date: ' + min_date)
+      // console.log(' -- max date: ' + max_date)
+      const summaryStatsQuery = this.payMPPaymentsRepository
         .createQueryBuilder()
         .select("DATE_FORMAT( date_approved, '%Y-%m-%d %H:00:00' )", 'time')
         .addSelect('count(mp_id)', 'sell_quantity')
         .addSelect('SUM(transaction_amount)', 'sells')
         .addSelect('AVG(transaction_amount)', 'ticket_avg')
         .where('status = :status', { status: 'approved' })
-        .andWhere('date_approved >= :date_approved', { date_approved: min_date })
-        .groupBy('time')
-        .getRawMany()
+        .andWhere('date_approved >= :min_date', { min_date: min_date })
+
+      if (max_date) {
+        summaryStatsQuery.andWhere('date_approved <= :max_date', { max_date: max_date })
+      }
+      const summaryStats = await summaryStatsQuery.groupBy('time').getRawMany()
       const normalizedSummaryStats = this.normalizeStatsLogs(summaryStats)
       return normalizedSummaryStats
     } catch (e) {
