@@ -162,7 +162,9 @@ export class PaymentsController {
   ): Promise<IPeriodSummaryStats> {
     const summaryStatsRaw = await this.paymentService.getSummaryStats(initDate, finishDate)
     const summaryStatsByTime = await this.paymentService.getSummaryStatsHour(initDate, finishDate)
-    const summaryStats: IPeriodSummaryStats = { ...summaryStatsRaw }
+    const init_time = initDate
+    const finish_time = finishDate || new Date()
+    const summaryStats: IPeriodSummaryStats = { ...summaryStatsRaw, init_time, finish_time }
     summaryStats.stats_by_time = summaryStatsByTime
     return summaryStats
   }
