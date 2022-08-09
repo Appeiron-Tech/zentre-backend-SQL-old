@@ -46,8 +46,8 @@ export class PaymentsService {
         mpPreference.external_reference = mpSavedPreference.id.toString()
         const payment = await this.mpPaymentService.createPayment(
           mpPreference,
-          // payConfiguration.mp_prod_access_token,
-          'Bearer APP_USR-7422375236748514-071800-5cf4da2be6d0df61015acfaca7d26e21-1162617732', //test
+          payConfiguration.mp_prod_access_token,
+          // 'Bearer APP_USR-7422375236748514-071800-5cf4da2be6d0df61015acfaca7d26e21-1162617732', //test
         )
         if (payment) {
           await this.updateMPCallLog(mpSavedPreference.id, payment)
@@ -118,8 +118,8 @@ export class PaymentsService {
           // console.log('token in db: ' + payConfiguration.mp_prod_access_token.split(' ')[1])
           return await this.mpPaymentService.getPaymentStatus(
             paymentId,
-            'APP_USR-7422375236748514-071800-5cf4da2be6d0df61015acfaca7d26e21-1162617732', //test
-            // payConfiguration.mp_prod_access_token.split(' ')[1],
+            // 'APP_USR-7422375236748514-071800-5cf4da2be6d0df61015acfaca7d26e21-1162617732', //test
+            payConfiguration.mp_prod_access_token.split(' ')[1],
           )
         } catch (err) {
           console.error(err)
