@@ -17,6 +17,8 @@ import { IDBStats, IStatsByTime, ISummaryStats } from './dashboard/summary-stats
 import { Dashboard } from '../constants'
 import { ReqBasicSearchDTO } from './dashboard/req-basic-search.dto'
 import { PayFormReq } from './dto/pay-form-req.dto'
+import { IPaymentsByType } from './dashboard/payments-by-type.interface'
+import { IPaymentsByStatus } from './dashboard/payments-by-status.interface'
 
 @Injectable()
 export class PaymentsService {
@@ -235,6 +237,36 @@ export class PaymentsService {
       return normalizedSummaryStats
     } catch (e) {
       throw e
+    }
+  }
+
+  async getPaymentByType(min_date: Date): Promise<IPaymentsByType[]> {
+    const paymentsByType = this.payMPPaymentsRepository
+      .createQueryBuilder()
+      .select('payment_type_id', 'payment_type')
+      .addSelect('SUM(transaction_amount)', 'amount')
+      .addSelect('COUNT(mp_id)', 'quantity')
+      .where('status = :status', { status: 'approved' })
+      .andWhere('date_approved >= :min_date', { min_date: min_date })
+      .groupBy('payment_type')
+      .getRawMany()
+
+    return paymentsByType
+  }
+
+  async getPaymentByStatus(min_date: Date): Promise<IPaymentsByStatus[]> {
+    try {
+      const paymentsByType = this.payMPPaymentsRepository
+        .createQueryBuilder()
+        .select('status', 'status')
+        .addSelect('COUNT(mp_id)', 'quantity')
+        .where('date_created >= :min_date', { min_date: min_date })
+        .groupBy('status')
+        .getRawMany()
+
+      return paymentsByType
+    } catch (err) {
+      throw err
     }
   }
 

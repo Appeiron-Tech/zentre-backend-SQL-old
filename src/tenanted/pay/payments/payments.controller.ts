@@ -2,6 +2,8 @@ import { Body, Controller, Get, Param, Post, Query, UseInterceptors } from '@nes
 import { plainToClass } from 'class-transformer'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { AppLoggerService } from 'src/common/modules/app-logger/app-logger.service'
+import { IPaymentsByStatus } from './dashboard/payments-by-status.interface'
+import { IPaymentsByType } from './dashboard/payments-by-type.interface'
 import { readPaymentDto } from './dashboard/payments-list.dto'
 import { IPeriodSummaryStats, ISummaryStats } from './dashboard/summary-stats.interface'
 import { PayMPItem } from './database/pay-mp-item.entity'
@@ -95,27 +97,11 @@ export class PaymentsController {
     if (timeAgo.indexOf('-')) {
       const timeQuantity = Number(timeAgo.split('-')[0])
       const timeType = timeAgo.split('-')[1].toLowerCase()
-      const currentInitDate = new Date()
-      const prevInitDate = new Date()
-      switch (timeType) {
-        case 'm': {
-          currentInitDate.setMonth(currentInitDate.getMonth() - timeQuantity)
-          prevInitDate.setMonth(prevInitDate.getMonth() - timeQuantity * 2)
-          break
-        }
-        case 'y': {
-          currentInitDate.setFullYear(currentInitDate.getFullYear() - timeQuantity)
-          prevInitDate.setFullYear(prevInitDate.getFullYear() - timeQuantity * 2)
-          break
-        }
-        default: {
-          currentInitDate.setDate(currentInitDate.getDate() - timeQuantity)
-          prevInitDate.setDate(prevInitDate.getDate() - timeQuantity * 2)
-          break
-        }
+      const { currentMinDate, prevMinDate } = {
+        ...this.getCurrentAndPrevMinDates(timeType, timeQuantity),
       }
-      const prevSummaryStats = await this.getPeriodSummaryStats(prevInitDate, currentInitDate)
-      const currentSummaryStats = await this.getPeriodSummaryStats(currentInitDate)
+      const prevSummaryStats = await this.getPeriodSummaryStats(prevMinDate, currentMinDate)
+      const currentSummaryStats = await this.getPeriodSummaryStats(currentMinDate)
       const summaryStats: ISummaryStats = {
         prev: prevSummaryStats,
         current: currentSummaryStats,
@@ -131,26 +117,36 @@ export class PaymentsController {
     if (timeAgo.indexOf('-')) {
       const timeQuantity = Number(timeAgo.split('-')[0])
       const timeType = timeAgo.split('-')[1].toLowerCase()
-      const initDate = new Date()
-      switch (timeType) {
-        case 'm': {
-          initDate.setMonth(initDate.getMonth() - timeQuantity)
-          break
-        }
-        case 'y': {
-          initDate.setFullYear(initDate.getFullYear() - timeQuantity)
-          break
-        }
-        default: {
-          initDate.setDate(initDate.getDate() - timeQuantity)
-          break
-        }
-      }
+      const initDate = this.getCurrentAndPrevMinDates(timeType, timeQuantity).currentMinDate
       const rawPaymentList = await this.paymentService.getPaymentList(initDate)
       rawPaymentList.forEach((payment) => {
         const readPayment = new readPaymentDto(payment)
         paymentList.push(readPayment)
       })
+      return paymentList
+    }
+    console.log('not correct day/month/year format')
+  }
+
+  @Get('dashboard/by_method/:time_ago')
+  async paymentsByMethod(@Param('time_ago') timeAgo: string): Promise<IPaymentsByType[]> {
+    if (timeAgo.indexOf('-')) {
+      const timeQuantity = Number(timeAgo.split('-')[0])
+      const timeType = timeAgo.split('-')[1].toLowerCase()
+      const initDate = this.getCurrentAndPrevMinDates(timeType, timeQuantity).currentMinDate
+      const paymentList = await this.paymentService.getPaymentByType(initDate)
+      return paymentList
+    }
+    console.log('not correct day/month/year format')
+  }
+
+  @Get('dashboard/by_status/:time_ago')
+  async paymentsByStatus(@Param('time_ago') timeAgo: string): Promise<IPaymentsByStatus[]> {
+    if (timeAgo.indexOf('-')) {
+      const timeQuantity = Number(timeAgo.split('-')[0])
+      const timeType = timeAgo.split('-')[1].toLowerCase()
+      const initDate = this.getCurrentAndPrevMinDates(timeType, timeQuantity).currentMinDate
+      const paymentList = await this.paymentService.getPaymentByStatus(initDate)
       return paymentList
     }
     console.log('not correct day/month/year format')
@@ -181,4 +177,32 @@ export class PaymentsController {
     summaryStats.stats_by_time = summaryStatsByTime
     return summaryStats
   }
+
+  private getCurrentAndPrevMinDates(timeType: string, timeQuantity: number): IMinDates {
+    const currentMinDate = new Date()
+    const prevMinDate = new Date()
+    switch (timeType) {
+      case 'm': {
+        currentMinDate.setMonth(currentMinDate.getMonth() - timeQuantity)
+        prevMinDate.setMonth(prevMinDate.getMonth() - timeQuantity * 2)
+        break
+      }
+      case 'y': {
+        currentMinDate.setFullYear(currentMinDate.getFullYear() - timeQuantity)
+        prevMinDate.setFullYear(prevMinDate.getFullYear() - timeQuantity * 2)
+        break
+      }
+      default: {
+        currentMinDate.setDate(currentMinDate.getDate() - timeQuantity)
+        prevMinDate.setDate(prevMinDate.getDate() - timeQuantity * 2)
+        break
+      }
+    }
+    return { currentMinDate: currentMinDate, prevMinDate: prevMinDate }
+  }
+}
+
+interface IMinDates {
+  currentMinDate: Date
+  prevMinDate: Date
 }
