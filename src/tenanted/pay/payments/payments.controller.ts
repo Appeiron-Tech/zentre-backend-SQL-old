@@ -9,6 +9,7 @@ import { IMPPaymentStatus } from './dto/interfaces/pay-mp-payment-status.interfa
 import { MPCreateLinkDto } from './dto/mp-create-link.dto'
 import { PayConfigurationResp } from './dto/pay-config-resp.interface'
 import { PayConfigurationReadDto } from './dto/pay-configuration-read.dto'
+import { PayFormReq } from './dto/pay-form-req.dto'
 import { IPayMPPayment } from './dto/pay-mp-payment.dto'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 import { PaymentsService } from './payments.service'
@@ -153,6 +154,18 @@ export class PaymentsController {
       return paymentList
     }
     console.log('not correct day/month/year format')
+  }
+
+  // -------------------------- FORM -------------------------- //
+  @Post('form')
+  async updateForm(@Body() form: PayFormReq): Promise<void> {
+    if (form) {
+      try {
+        await this.paymentService.saveConfiguration(form)
+      } catch (err) {
+        throw err
+      }
+    }
   }
 
   // ******************************* PRIVATE FUNCTIONS ********************************

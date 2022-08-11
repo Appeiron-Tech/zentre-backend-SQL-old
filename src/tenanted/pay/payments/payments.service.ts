@@ -16,6 +16,7 @@ import { MPCreateLinkDto } from './dto/mp-create-link.dto'
 import { IDBStats, IStatsByTime, ISummaryStats } from './dashboard/summary-stats.interface'
 import { Dashboard } from '../constants'
 import { ReqBasicSearchDTO } from './dashboard/req-basic-search.dto'
+import { PayFormReq } from './dto/pay-form-req.dto'
 
 @Injectable()
 export class PaymentsService {
@@ -155,7 +156,7 @@ export class PaymentsService {
         coupon_labels: mpPreference.coupon_labels,
         expiration_date_from: mpPreference.expiration_date_from,
         expiration_date_to: mpPreference.expiration_date_to,
-        additional_info: mpPreference.additional_info + ' - ' + mpPreference.items[0]?.id,
+        additional_info: mpPreference.additional_info + ' - ' + (mpPreference.items[0]?.id || ''),
         marketplace: mpPreference.marketplace,
         marketplace_fee: mpPreference.marketplace_fee,
         expires: mpPreference.expires,
@@ -264,6 +265,14 @@ export class PaymentsService {
       .orderBy('date_created', 'DESC')
       .getRawMany()
     return <IPayMPPayment[]>paymentList
+  }
+
+  async saveConfiguration(form: PayFormReq): Promise<void> {
+    try {
+      await this.payConfigurationRepository.update({ id: 1 }, { ...form })
+    } catch (err) {
+      throw err
+    }
   }
 
   // ***************************************************************************
