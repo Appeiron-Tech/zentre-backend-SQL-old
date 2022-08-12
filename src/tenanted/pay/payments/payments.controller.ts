@@ -128,7 +128,7 @@ export class PaymentsController {
     console.log('not correct day/month/year format')
   }
 
-  @Get('dashboard/by_method/:time_ago')
+  @Get('dashboard/by_type/:time_ago')
   async paymentsByMethod(@Param('time_ago') timeAgo: string): Promise<IPaymentsByType[]> {
     if (timeAgo.indexOf('-')) {
       const timeQuantity = Number(timeAgo.split('-')[0])
