@@ -2,10 +2,15 @@ import { Body, Controller, Get, Param, Post, Query, UseInterceptors } from '@nes
 import { plainToClass } from 'class-transformer'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { AppLoggerService } from 'src/common/modules/app-logger/app-logger.service'
+import { TimeRange } from '../constants'
 import { IPaymentsByStatus } from './dashboard/payments-by-status.interface'
 import { IPaymentsByType } from './dashboard/payments-by-type.interface'
 import { readPaymentDto } from './dashboard/payments-list.dto'
-import { IPeriodSummaryStats, ISummaryStats } from './dashboard/summary-stats.interface'
+import {
+  IPeriodSummaryStats,
+  IStatsByTime,
+  ISummaryStats,
+} from './dashboard/summary-stats.interface'
 import { PayMPItem } from './database/pay-mp-item.entity'
 import { IMPPaymentStatus } from './dto/interfaces/pay-mp-payment-status.interface'
 import { MPCreateLinkDto } from './dto/mp-create-link.dto'
@@ -92,23 +97,23 @@ export class PaymentsController {
   }
 
   // -------------------------- DASHBOARD -------------------------- //
-  @Get('dashboard/payments/:time_ago')
-  async getSummaryStats(@Param('time_ago') timeAgo: string): Promise<ISummaryStats> {
-    if (timeAgo.indexOf('-')) {
-      const timeQuantity = Number(timeAgo.split('-')[0])
-      const timeType = timeAgo.split('-')[1].toLowerCase()
-      const { currentMinDate, prevMinDate } = {
-        ...this.getCurrentAndPrevMinDates(timeType, timeQuantity),
-      }
-      const prevSummaryStats = await this.getPeriodSummaryStats(prevMinDate, currentMinDate)
-      const currentSummaryStats = await this.getPeriodSummaryStats(currentMinDate)
-      const summaryStats: ISummaryStats = {
-        prev: prevSummaryStats,
-        current: currentSummaryStats,
-      }
-      return summaryStats
+  @Get('dashboard/payments')
+  async getSummaryStats(
+    @Query('group_type') groupType: string,
+    @Query('prev_init_date') rawPrevInitDate: string,
+    @Query('init_date') rawInitDate: string,
+    @Query('finish_date') rawFinishDate?: string,
+  ): Promise<ISummaryStats> {
+    const prevInitDate = new Date(rawPrevInitDate)
+    const initDate = new Date(rawInitDate)
+    const finishDate = new Date(rawFinishDate)
+    const prevSummaryStats = await this.getPeriodSummaryStats(groupType, prevInitDate, initDate)
+    const currentSummaryStats = await this.getPeriodSummaryStats(groupType, initDate, finishDate)
+    const summaryStats: ISummaryStats = {
+      prev: prevSummaryStats,
+      current: currentSummaryStats,
     }
-    console.log('not correct day/month/year format')
+    return summaryStats
   }
 
   @Get('dashboard/paymentlist/:time_ago')
@@ -166,14 +171,17 @@ export class PaymentsController {
 
   // ******************************* PRIVATE FUNCTIONS ********************************
   private async getPeriodSummaryStats(
+    groupType: string,
     initDate: Date,
     finishDate?: Date,
   ): Promise<IPeriodSummaryStats> {
     const summaryStatsRaw = await this.paymentService.getSummaryStats(initDate, finishDate)
-    const summaryStatsByTime = await this.paymentService.getSummaryStatsHour(initDate, finishDate)
-    const init_time = initDate
-    const finish_time = finishDate || new Date()
-    const summaryStats: IPeriodSummaryStats = { ...summaryStatsRaw, init_time, finish_time }
+    const summaryStatsByTime = await this.getSummaryStatsGroupByPeriod(
+      groupType,
+      initDate,
+      finishDate,
+    )
+    const summaryStats: IPeriodSummaryStats = { ...summaryStatsRaw }
     summaryStats.stats_by_time = summaryStatsByTime
     return summaryStats
   }
@@ -193,12 +201,104 @@ export class PaymentsController {
         break
       }
       default: {
-        currentMinDate.setDate(currentMinDate.getDate() - timeQuantity)
-        prevMinDate.setDate(prevMinDate.getDate() - timeQuantity * 2)
+        // const dd = new Date()
+        // console.log(dd)
+        // const difftz = dd.getTimezoneOffset()
+
+        // dd.setHours(0,0,0,0)
+        // dd.setMinutes(dd.getMinutes() - difftz)
+        // console.log(dd)
+
+        // const ddf = new Date()
+        // ddf.setHours(23,59,59,0)
+        // ddf.setMinutes(ddf.getMinutes() - difftz)
+        // console.log(ddf)
+        currentMinDate.setDate(currentMinDate.getDate() - (timeQuantity - 1))
+        // currentMinDate.setHours(0, 0, 0, 0)
+        prevMinDate.setDate(prevMinDate.getDate() - (timeQuantity * 2 - 1))
+        // prevMinDate.setHours(0, 0, 0, 0)
         break
       }
     }
     return { currentMinDate: currentMinDate, prevMinDate: prevMinDate }
+  }
+
+  private async getSummaryStatsGroupByPeriod(
+    groupType: string,
+    initDate: Date,
+    finishDate?: Date,
+  ): Promise<IStatsByTime[]> {
+    switch (groupType.toLowerCase()) {
+      case TimeRange.MONTH: {
+        // return await this.paymentService.getSummaryStatsByMonth(initDate, finishDate)
+      }
+      case TimeRange.WEEK: {
+        return await this.paymentService.getSummaryStatsByWeek(initDate, finishDate)
+      }
+      case TimeRange.DAY: {
+        const statsByDay = await this.paymentService.getSummaryStatsByDay(initDate, finishDate)
+        return this.fillMissedLogsByDay(statsByDay, initDate, finishDate)
+      }
+      case TimeRange.HOUR: {
+        const statsByHour = await this.paymentService.getSummaryStatsByHour(initDate, finishDate)
+        return this.fillMissedLogsByHour(statsByHour)
+      }
+    }
+  }
+
+  private fillMissedLogsByDay(
+    statsByDay: IStatsByTime[],
+    initDate: Date,
+    finishDate: Date,
+  ): IStatsByTime[] {
+    console.log(typeof initDate)
+    initDate.setDate(initDate.getDate() + 1)
+    const filledStatsByDay = []
+    const mappedLogs = new Map<string, IStatsByTime>()
+    statsByDay.map((el) => {
+      mappedLogs.set(new Date(el.time).toISOString().split('T')[0], el)
+      // mappedLogs.set(el.time, el)
+    })
+    mappedLogs.forEach((el) => console.log(el))
+    for (let day = initDate; day <= finishDate; day.setDate(day.getDate() + 1)) {
+      const dayFormatted = day.toISOString().split('T')[0]
+      if (mappedLogs.get(dayFormatted)) {
+        filledStatsByDay.push(mappedLogs.get(dayFormatted))
+      } else {
+        const emptyHour: IStatsByTime = {
+          time: day.toISOString(),
+          sell_quantity: 0,
+          sells: 0,
+          ticket_avg: 0,
+        }
+        filledStatsByDay.push(emptyHour)
+      }
+    }
+    return filledStatsByDay
+  }
+
+  private fillMissedLogsByHour(statsByDay: IStatsByTime[]): IStatsByTime[] {
+    const filledStatsByHour: IStatsByTime[] = []
+    const mappedLogs = new Map<string, IStatsByTime>()
+    statsByDay.map((el) => {
+      const date = new Date(el.time)
+      el.time = date.getHours().toString()
+      mappedLogs.set(el.time, el)
+    })
+    for (let hour = 0; hour < 24; hour++) {
+      if (mappedLogs.get(hour.toString())) {
+        filledStatsByHour.push(mappedLogs.get(hour.toString()))
+      } else {
+        const emptyHour: IStatsByTime = {
+          time: hour.toString(),
+          sell_quantity: 0,
+          sells: 0,
+          ticket_avg: 0,
+        }
+        filledStatsByHour.push(emptyHour)
+      }
+    }
+    return filledStatsByHour
   }
 }
 
