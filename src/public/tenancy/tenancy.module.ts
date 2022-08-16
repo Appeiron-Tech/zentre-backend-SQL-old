@@ -77,6 +77,11 @@ export class TenancyModule {
             next()
           } catch (e) {
             await this.connection.query(`CREATE DATABASE IF NOT EXISTS ${tenancy.name}`)
+            await this.connection
+              .query(`CREATE EVENT IF NOT EXISTS ${tenancy.name}.day_without_payments
+                      ON SCHEDULE EVERY 1 DAY
+                      DO  INSERT INTO pay_mp_payments(date_created, transaction_amount)
+                          VALUES (current_timestamp, 0.00)`)
 
             const createdConnection: Connection = await createConnection({
               name: tenancy.name,

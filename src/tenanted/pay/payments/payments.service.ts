@@ -220,21 +220,20 @@ export class PaymentsService {
       console.log('group by Hour')
       const summaryStatsQuery = this.payMPPaymentsRepository
         .createQueryBuilder()
-        .select("DATE_FORMAT( date_approved, '%Y-%m-%d %H:00:00' )", 'time')
+        .select("DATE_FORMAT( date_created, '%Y-%m-%d %H:00:00' )", 'time')
         .addSelect('count(mp_id)', 'sell_quantity')
         .addSelect('SUM(transaction_amount)', 'sells')
         .addSelect('AVG(transaction_amount)', 'ticket_avg')
         .where('status = :status', { status: 'approved' })
-        .andWhere('date_approved >= DATE(:min_date)', { min_date: min_date })
+        .andWhere('date_created >= DATE(:min_date)', { min_date: min_date })
 
       if (max_date) {
-        summaryStatsQuery.andWhere('date_approved < Date(:max_date)', { max_date: max_date })
+        summaryStatsQuery.andWhere('date_created < Date(:max_date)', { max_date: max_date })
       }
       const summaryStats = await summaryStatsQuery
         .groupBy('time')
         .orderBy('time', 'ASC')
         .getRawMany()
-      // const normalizedSummaryStats = this.normalizeStatsLogs(summaryStats)
       return summaryStats
     } catch (e) {
       throw e
@@ -249,23 +248,22 @@ export class PaymentsService {
       console.log('group by Day')
       const summaryStatsQuery = this.payMPPaymentsRepository
         .createQueryBuilder()
-        .select('DATE(date_approved)', 'time')
+        .select('DATE(date_created)', 'time')
         .addSelect('count(mp_id)', 'sell_quantity')
         .addSelect('SUM(transaction_amount)', 'sells')
         .addSelect('AVG(transaction_amount)', 'ticket_avg')
-        .where('status = :status', { status: 'approved' })
-        .andWhere('date_approved > DATE(:min_date)', { min_date: min_date })
+        .where('(status = :status OR status is null)', { status: 'approved' })
+        .andWhere('date_created > DATE(:min_date)', { min_date: min_date })
 
       if (max_date) {
-        summaryStatsQuery.andWhere('date_approved <= DATE(:max_date)', { max_date: max_date })
+        summaryStatsQuery.andWhere('date_created <= DATE(:max_date)', { max_date: max_date })
       }
       console.log(summaryStatsQuery.getQueryAndParameters())
       const summaryStats = await summaryStatsQuery
         .groupBy('time')
         .orderBy('time', 'ASC')
         .getRawMany()
-      const normalizedSummaryStats = this.normalizeStatsLogs(summaryStats)
-      return normalizedSummaryStats
+      return summaryStats
     } catch (e) {
       throw e
     }
@@ -279,63 +277,68 @@ export class PaymentsService {
       console.log('group by Week')
       const summaryStatsQuery = this.payMPPaymentsRepository
         .createQueryBuilder()
-        .select('WEEK(date_approved)', 'time')
-        // .addSelect(
-        //   "CONCAT(DATE(DATE_ADD(date_approved, INTERVAL(2-DAYOFWEEK(date_approved)) DAY)), ' - ', DATE(DATE_ADD(date_approved, INTERVAL(8-DAYOFWEEK(date_approved)) DAY)))",
-        //   'time',
-        // )
+        .select('WEEK(date_created)', 'week')
+        .addSelect(
+          "CONCAT(DATE(DATE_ADD(date_created, INTERVAL(2-DAYOFWEEK(date_created)) DAY)), ' - ', DATE(DATE_ADD(date_created, INTERVAL(8-DAYOFWEEK(date_created)) DAY)))",
+          'time',
+        )
         .addSelect('count(mp_id)', 'sell_quantity')
         .addSelect('SUM(transaction_amount)', 'sells')
         .addSelect('AVG(transaction_amount)', 'ticket_avg')
-        .where('status = :status', { status: 'approved' })
-        .andWhere('date_approved > DATE(:min_date)', { min_date: min_date })
+        .where('(status = :status OR status is null)', { status: 'approved' })
+        .andWhere('date_created > DATE(:min_date)', { min_date: min_date })
 
       if (max_date) {
-        summaryStatsQuery.andWhere('date_approved <= DATE(:max_date)', { max_date: max_date })
+        summaryStatsQuery.andWhere('date_created <= DATE(:max_date)', { max_date: max_date })
       }
       const summaryStats = await summaryStatsQuery
-        .groupBy('time')
-        .orderBy('time', 'ASC')
+        .groupBy('week')
+        .orderBy('week', 'ASC')
         .getRawMany()
-      const normalizedSummaryStats = this.normalizeStatsLogs(summaryStats)
-      return normalizedSummaryStats
+      return summaryStats
     } catch (e) {
       throw e
     }
   }
 
-  async getPaymentByType(min_date: Date): Promise<IPaymentsByType[]> {
-    const paymentsByType = this.payMPPaymentsRepository
+  async getPaymentByType(min_date: Date, max_date: Date): Promise<IPaymentsByType[]> {
+    const paymentsByTypeQuery = this.payMPPaymentsRepository
       .createQueryBuilder()
       .select('payment_type_id', 'payment_type')
       .addSelect('SUM(transaction_amount)', 'amount')
       .addSelect('COUNT(mp_id)', 'quantity')
       .where('status = :status', { status: 'approved' })
-      .andWhere('date_approved >= DATE(:min_date)', { min_date: min_date })
-      .groupBy('payment_type')
-      .getRawMany()
+      .andWhere('date_created >= DATE(:min_date)', { min_date: min_date })
+
+    if (max_date) {
+      paymentsByTypeQuery.andWhere('date_created <= DATE(:max_date)', { max_date: max_date })
+    }
+    const paymentsByType = await paymentsByTypeQuery.groupBy('payment_type').getRawMany()
 
     return paymentsByType
   }
 
-  async getPaymentByStatus(min_date: Date): Promise<IPaymentsByStatus[]> {
+  async getPaymentByStatus(min_date: Date, max_date: Date): Promise<IPaymentsByStatus[]> {
     try {
-      const paymentsByType = this.payMPPaymentsRepository
+      const paymentsByStatusQuery = this.payMPPaymentsRepository
         .createQueryBuilder()
         .select('status', 'status')
         .addSelect('COUNT(mp_id)', 'quantity')
-        .where('date_created >= DATE(:min_date)', { min_date: min_date })
-        .groupBy('status')
-        .getRawMany()
+        .where('mp_id is not null')
+        .andWhere('date_created >= DATE(:min_date)', { min_date: min_date })
 
-      return paymentsByType
+      if (max_date) {
+        paymentsByStatusQuery.andWhere('date_created <= DATE(:max_date)', { max_date: max_date })
+      }
+      const paymentsByStatus = await paymentsByStatusQuery.groupBy('status').getRawMany()
+      return paymentsByStatus
     } catch (err) {
       throw err
     }
   }
 
-  async getPaymentList(min_date: Date): Promise<IPayMPPayment[]> {
-    const paymentList = await this.payMPPaymentsRepository
+  async getPaymentList(min_date: Date, max_date: Date): Promise<IPayMPPayment[]> {
+    const paymentListQuery = await this.payMPPaymentsRepository
       .createQueryBuilder()
       .select('mp_id')
       .addSelect('operation_type')
@@ -357,9 +360,14 @@ export class PaymentsService {
       .addSelect('transaction_amount')
       .addSelect('trans_details_net_received_amount')
       .addSelect('trans_details_total_paid_amount')
-      .where('date_approved >= DATE(:date_approved)', { date_approved: min_date })
-      .orderBy('date_created', 'DESC')
-      .getRawMany()
+      .where('date_created >= DATE(:min_date)', { min_date: min_date })
+      .andWhere('mp_id is not null')
+
+    if (max_date) {
+      paymentListQuery.andWhere('date_created <= DATE(:max_date)', { max_date: max_date })
+    }
+
+    const paymentList = await paymentListQuery.orderBy('date_created', 'DESC').getRawMany()
     return <IPayMPPayment[]>paymentList
   }
 
@@ -410,20 +418,5 @@ export class PaymentsService {
         : null,
     }
     return mpPreference
-  }
-
-  private normalizeStatsLogs(stats_logs: IStatsByTime[]): IStatsByTime[] {
-    if (!stats_logs) return []
-    const averages: IStatsByTime[] = []
-    const daysByGroup = Math.ceil(stats_logs.length / Dashboard.STATS.GRAPH_POINTS)
-    if (daysByGroup > 1) {
-      for (let i = 0; i < Dashboard.STATS.GRAPH_POINTS && stats_logs.length > 0; i++) {
-        const logs = stats_logs.splice(0, daysByGroup)
-        const middleLog = logs[Math.floor(logs.length / 2)]
-        averages.push(middleLog)
-      }
-      return averages
-    }
-    return stats_logs
   }
 }

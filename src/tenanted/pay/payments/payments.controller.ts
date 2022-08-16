@@ -116,45 +116,42 @@ export class PaymentsController {
     return summaryStats
   }
 
-  @Get('dashboard/paymentlist/:time_ago')
-  async getPaymentList(@Param('time_ago') timeAgo: string): Promise<readPaymentDto[]> {
+  @Get('dashboard/paymentlist')
+  async getPaymentList(
+    @Query('init_date') rawInitDate: string,
+    @Query('finish_date') rawFinishDate?: string,
+  ): Promise<readPaymentDto[]> {
     const paymentList: readPaymentDto[] = []
-    if (timeAgo.indexOf('-')) {
-      const timeQuantity = Number(timeAgo.split('-')[0])
-      const timeType = timeAgo.split('-')[1].toLowerCase()
-      const initDate = this.getCurrentAndPrevMinDates(timeType, timeQuantity).currentMinDate
-      const rawPaymentList = await this.paymentService.getPaymentList(initDate)
-      rawPaymentList.forEach((payment) => {
-        const readPayment = new readPaymentDto(payment)
-        paymentList.push(readPayment)
-      })
-      return paymentList
-    }
-    console.log('not correct day/month/year format')
+    const initDate = new Date(rawInitDate)
+    const finishDate = rawFinishDate ? new Date(rawFinishDate) : null
+    const rawPaymentList = await this.paymentService.getPaymentList(initDate, finishDate)
+    rawPaymentList.forEach((payment) => {
+      const readPayment = new readPaymentDto(payment)
+      paymentList.push(readPayment)
+    })
+    return paymentList
   }
 
-  @Get('dashboard/by_type/:time_ago')
-  async paymentsByMethod(@Param('time_ago') timeAgo: string): Promise<IPaymentsByType[]> {
-    if (timeAgo.indexOf('-')) {
-      const timeQuantity = Number(timeAgo.split('-')[0])
-      const timeType = timeAgo.split('-')[1].toLowerCase()
-      const initDate = this.getCurrentAndPrevMinDates(timeType, timeQuantity).currentMinDate
-      const paymentList = await this.paymentService.getPaymentByType(initDate)
-      return paymentList
-    }
-    console.log('not correct day/month/year format')
+  @Get('dashboard/by_type')
+  async paymentsByMethod(
+    @Query('init_date') rawInitDate: string,
+    @Query('finish_date') rawFinishDate?: string,
+  ): Promise<IPaymentsByType[]> {
+    const initDate = new Date(rawInitDate)
+    const finishDate = rawFinishDate ? new Date(rawFinishDate) : null
+    const paymentList = await this.paymentService.getPaymentByType(initDate, finishDate)
+    return paymentList
   }
 
-  @Get('dashboard/by_status/:time_ago')
-  async paymentsByStatus(@Param('time_ago') timeAgo: string): Promise<IPaymentsByStatus[]> {
-    if (timeAgo.indexOf('-')) {
-      const timeQuantity = Number(timeAgo.split('-')[0])
-      const timeType = timeAgo.split('-')[1].toLowerCase()
-      const initDate = this.getCurrentAndPrevMinDates(timeType, timeQuantity).currentMinDate
-      const paymentList = await this.paymentService.getPaymentByStatus(initDate)
-      return paymentList
-    }
-    console.log('not correct day/month/year format')
+  @Get('dashboard/by_status')
+  async paymentsByStatus(
+    @Query('init_date') rawInitDate: string,
+    @Query('finish_date') rawFinishDate?: string,
+  ): Promise<IPaymentsByStatus[]> {
+    const initDate = new Date(rawInitDate)
+    const finishDate = rawFinishDate ? new Date(rawFinishDate) : null
+    const paymentList = await this.paymentService.getPaymentByStatus(initDate, finishDate)
+    return paymentList
   }
 
   // -------------------------- FORM -------------------------- //
@@ -186,43 +183,6 @@ export class PaymentsController {
     return summaryStats
   }
 
-  private getCurrentAndPrevMinDates(timeType: string, timeQuantity: number): IMinDates {
-    const currentMinDate = new Date()
-    const prevMinDate = new Date()
-    switch (timeType) {
-      case 'm': {
-        currentMinDate.setMonth(currentMinDate.getMonth() - timeQuantity)
-        prevMinDate.setMonth(prevMinDate.getMonth() - timeQuantity * 2)
-        break
-      }
-      case 'y': {
-        currentMinDate.setFullYear(currentMinDate.getFullYear() - timeQuantity)
-        prevMinDate.setFullYear(prevMinDate.getFullYear() - timeQuantity * 2)
-        break
-      }
-      default: {
-        // const dd = new Date()
-        // console.log(dd)
-        // const difftz = dd.getTimezoneOffset()
-
-        // dd.setHours(0,0,0,0)
-        // dd.setMinutes(dd.getMinutes() - difftz)
-        // console.log(dd)
-
-        // const ddf = new Date()
-        // ddf.setHours(23,59,59,0)
-        // ddf.setMinutes(ddf.getMinutes() - difftz)
-        // console.log(ddf)
-        currentMinDate.setDate(currentMinDate.getDate() - (timeQuantity - 1))
-        // currentMinDate.setHours(0, 0, 0, 0)
-        prevMinDate.setDate(prevMinDate.getDate() - (timeQuantity * 2 - 1))
-        // prevMinDate.setHours(0, 0, 0, 0)
-        break
-      }
-    }
-    return { currentMinDate: currentMinDate, prevMinDate: prevMinDate }
-  }
-
   private async getSummaryStatsGroupByPeriod(
     groupType: string,
     initDate: Date,
@@ -236,45 +196,13 @@ export class PaymentsController {
         return await this.paymentService.getSummaryStatsByWeek(initDate, finishDate)
       }
       case TimeRange.DAY: {
-        const statsByDay = await this.paymentService.getSummaryStatsByDay(initDate, finishDate)
-        return this.fillMissedLogsByDay(statsByDay, initDate, finishDate)
+        return await this.paymentService.getSummaryStatsByDay(initDate, finishDate)
       }
       case TimeRange.HOUR: {
         const statsByHour = await this.paymentService.getSummaryStatsByHour(initDate, finishDate)
         return this.fillMissedLogsByHour(statsByHour)
       }
     }
-  }
-
-  private fillMissedLogsByDay(
-    statsByDay: IStatsByTime[],
-    initDate: Date,
-    finishDate: Date,
-  ): IStatsByTime[] {
-    console.log(typeof initDate)
-    initDate.setDate(initDate.getDate() + 1)
-    const filledStatsByDay = []
-    const mappedLogs = new Map<string, IStatsByTime>()
-    statsByDay.map((el) => {
-      mappedLogs.set(new Date(el.time).toISOString().split('T')[0], el)
-      // mappedLogs.set(el.time, el)
-    })
-    mappedLogs.forEach((el) => console.log(el))
-    for (let day = initDate; day <= finishDate; day.setDate(day.getDate() + 1)) {
-      const dayFormatted = day.toISOString().split('T')[0]
-      if (mappedLogs.get(dayFormatted)) {
-        filledStatsByDay.push(mappedLogs.get(dayFormatted))
-      } else {
-        const emptyHour: IStatsByTime = {
-          time: day.toISOString(),
-          sell_quantity: 0,
-          sells: 0,
-          ticket_avg: 0,
-        }
-        filledStatsByDay.push(emptyHour)
-      }
-    }
-    return filledStatsByDay
   }
 
   private fillMissedLogsByHour(statsByDay: IStatsByTime[]): IStatsByTime[] {
@@ -300,9 +228,4 @@ export class PaymentsController {
     }
     return filledStatsByHour
   }
-}
-
-interface IMinDates {
-  currentMinDate: Date
-  prevMinDate: Date
 }

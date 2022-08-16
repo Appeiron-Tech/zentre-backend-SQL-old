@@ -7,7 +7,7 @@ export class PayMPPayment implements IPayMPPayment {
   id: number
 
   @Index('mp_payments_u_idx', { unique: true })
-  @Column({ type: 'bigint', nullable: false })
+  @Column({ type: 'bigint', nullable: true })
   mp_id: string
 
   @Column({ nullable: true })
