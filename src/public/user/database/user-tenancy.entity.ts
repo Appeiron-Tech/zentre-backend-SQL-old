@@ -11,7 +11,7 @@ export class UserTenancy {
   userId: number
 
   @ManyToOne(() => User, (user) => user.userTenancies)
-  user: number
+  user: User
 
   @Column('int', { nullable: false })
   tenancyId: number

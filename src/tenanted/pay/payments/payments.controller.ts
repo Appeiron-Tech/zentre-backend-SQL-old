@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Param, Post, Query, UseInterceptors } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common'
 import { plainToClass } from 'class-transformer'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { AppLoggerService } from 'src/common/modules/app-logger/app-logger.service'
+import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
 import { TimeRange } from '../constants'
 import { IPaymentsByStatus } from './dashboard/payments-by-status.interface'
 import { IPaymentsByType } from './dashboard/payments-by-type.interface'
@@ -97,6 +107,7 @@ export class PaymentsController {
   }
 
   // -------------------------- DASHBOARD -------------------------- //
+  @UseGuards(JwtAuthGuard)
   @Get('dashboard/payments')
   async getSummaryStats(
     @Query('group_type') groupType: string,
@@ -116,6 +127,7 @@ export class PaymentsController {
     return summaryStats
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('dashboard/paymentlist')
   async getPaymentList(
     @Query('init_date') rawInitDate: string,
@@ -132,6 +144,7 @@ export class PaymentsController {
     return paymentList
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('dashboard/by_type')
   async paymentsByMethod(
     @Query('init_date') rawInitDate: string,
@@ -143,6 +156,7 @@ export class PaymentsController {
     return paymentList
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('dashboard/by_status')
   async paymentsByStatus(
     @Query('init_date') rawInitDate: string,
@@ -155,6 +169,7 @@ export class PaymentsController {
   }
 
   // -------------------------- FORM -------------------------- //
+  @UseGuards(JwtAuthGuard)
   @Post('form')
   async updateForm(@Body() form: PayFormReq): Promise<void> {
     if (form) {

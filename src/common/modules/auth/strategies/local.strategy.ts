@@ -15,8 +15,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException()
     }
-    console.log('user found in local strategy')
-    console.log(user)
     return user
   }
 }
