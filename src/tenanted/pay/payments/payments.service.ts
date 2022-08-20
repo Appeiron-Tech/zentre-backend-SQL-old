@@ -13,9 +13,7 @@ import { IMPPreference } from './dto/interfaces/mp-preference.interface'
 import { IPayMPPayment, toMPPayment } from './dto/pay-mp-payment.dto'
 import { SubmittedFormDto } from './dto/submittedForm.dto'
 import { MPCreateLinkDto } from './dto/mp-create-link.dto'
-import { IDBStats, IStatsByTime, ISummaryStats } from './dashboard/summary-stats.interface'
-import { Dashboard } from '../constants'
-import { ReqBasicSearchDTO } from './dashboard/req-basic-search.dto'
+import { IDBStats, IStatsByTime } from './dashboard/summary-stats.interface'
 import { PayFormReq } from './dto/pay-form-req.dto'
 import { IPaymentsByType } from './dashboard/payments-by-type.interface'
 import { IPaymentsByStatus } from './dashboard/payments-by-status.interface'
@@ -214,10 +212,10 @@ export class PaymentsService {
 
   async getSummaryStatsByHour(min_date: Date, max_date?: Date): Promise<IStatsByTime[]> {
     try {
-      console.log('*** summary Stats by hour: ')
-      console.log(' -- min date: ' + min_date)
-      console.log(' -- max date: ' + max_date)
-      console.log('group by Hour')
+      // console.log('*** summary Stats by hour: ')
+      // console.log(' -- min date: ' + min_date)
+      // console.log(' -- max date: ' + max_date)
+      // console.log('group by Hour')
       const summaryStatsQuery = this.payMPPaymentsRepository
         .createQueryBuilder()
         .select("DATE_FORMAT( date_created, '%Y-%m-%d %H:00:00' )", 'time')
@@ -242,10 +240,10 @@ export class PaymentsService {
 
   async getSummaryStatsByDay(min_date: Date, max_date?: Date): Promise<IStatsByTime[]> {
     try {
-      console.log('*** summary Stats by day: ')
-      console.log(' -- min date: ' + min_date)
-      console.log(' -- max date: ' + max_date)
-      console.log('group by Day')
+      // console.log('*** summary Stats by day: ')
+      // console.log(' -- min date: ' + min_date)
+      // console.log(' -- max date: ' + max_date)
+      // console.log('group by Day')
       const summaryStatsQuery = this.payMPPaymentsRepository
         .createQueryBuilder()
         .select('DATE(date_created)', 'time')
@@ -258,7 +256,7 @@ export class PaymentsService {
       if (max_date) {
         summaryStatsQuery.andWhere('date_created <= DATE(:max_date)', { max_date: max_date })
       }
-      console.log(summaryStatsQuery.getQueryAndParameters())
+      // console.log(summaryStatsQuery.getQueryAndParameters())
       const summaryStats = await summaryStatsQuery
         .groupBy('time')
         .orderBy('time', 'ASC')

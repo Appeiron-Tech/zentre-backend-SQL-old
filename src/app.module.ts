@@ -11,7 +11,7 @@ import { ThemesModule } from './public/theme/theme.module'
 import { AppModule as MyAppModule } from './public/app/app.module'
 import { UserModule } from './public/user/user.module'
 import { OrderModule as POrderModule } from './public/order/order.module'
-import { AnnouncementModule } from './tenanted/appeiron-app/announcement/announcement.module'
+import { AnnouncementModule } from './tenanted/hub/announcement/announcement.module'
 import { ClientModule } from './tenanted/client/client.module'
 import { StoreModule } from './tenanted/e-commerce/store/store.module'
 import { ProductModule } from './tenanted/e-commerce/product/product.module'
@@ -22,6 +22,7 @@ import { CartModule } from './tenanted/e-commerce/cart/cart.module'
 import { GoogleAnalyticsModule } from './third-party-apis/Google/google-analytics/google-analytics.module'
 import { AnalyticsModule as WebAnalyticsModule } from './tenanted/web/analytics/analytics.module'
 import { PaymentsModule } from './tenanted/pay/payments/payments.module'
+import { HubModule } from './tenanted/hub/hub/hub.module'
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { PaymentsModule } from './tenanted/pay/payments/payments.module'
     OrderModule,
     CartModule,
     WebAnalyticsModule,
+    HubModule,
 
     //THIRD PARTY APIS
     CloudStorageModule,

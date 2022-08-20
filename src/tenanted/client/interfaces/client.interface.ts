@@ -1,4 +1,6 @@
+import { IClientApp } from './client-app.interface'
 import { IClientPhone } from './client-phone.interface'
+import { IClientSN } from './client-sn.interface'
 
 export interface IClient {
   id: number
@@ -12,8 +14,6 @@ export interface IClient {
   currencyName: string
   currencySymbol: string
   businessType: string
-  urlIG: string
-  urlFB: string
   brightness: string
   primary: string
   onPrimary: string
@@ -26,5 +26,7 @@ export interface IClient {
   surface: string
   onSurface: string
   phones: IClientPhone[]
+  apps: IClientApp[]
+  sns: IClientSN[]
   createdAt: number
 }

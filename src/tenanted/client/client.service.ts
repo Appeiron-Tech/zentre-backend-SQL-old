@@ -11,12 +11,17 @@ import { UpsertPhoneDto } from './database/dto/upsert-phone.dto'
 import { ClientPhone } from './database/entities/client-phone.entity'
 import { ConfigService } from '@nestjs/config'
 import { CloudStorageService } from 'src/third-party-apis/Google/cloud-storage/cloud-storage.service'
+import { UpsertClientAppDto } from './database/dto/upsert-client-app.dto'
+import { ClientApp } from './database/entities/client-app.entity'
+import { ClientSN } from './database/entities/client-sn.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ClientService {
   private readonly clientRepository: Repository<Client>
   private readonly answerRepository: Repository<ClientAnswer>
   private readonly phoneRepository: Repository<ClientPhone>
+  private readonly clientAppRepository: Repository<ClientApp>
+  private readonly clientSNRepository: Repository<ClientSN>
 
   constructor(
     private configService: ConfigService,
@@ -26,6 +31,8 @@ export class ClientService {
     this.clientRepository = connection.getRepository(Client)
     this.answerRepository = connection.getRepository(ClientAnswer)
     this.phoneRepository = connection.getRepository(ClientPhone)
+    this.clientAppRepository = connection.getRepository(ClientApp)
+    this.clientSNRepository = connection.getRepository(ClientSN)
   }
 
   async findAll(): Promise<Client[]> {
@@ -40,8 +47,11 @@ export class ClientService {
     return await this.clientRepository.findOne({ tenancyName: tenancyName })
   }
 
-  async findClient(id: number): Promise<Client> {
-    return await this.clientRepository.findOne({ id: id })
+  async findClient(id?: number): Promise<Client> {
+    if (id) {
+      return await this.clientRepository.findOne({ id: id })
+    }
+    return await this.clientRepository.findOne()
   }
 
   async create(client: CreateClientDto): Promise<Client> {
@@ -90,5 +100,10 @@ export class ClientService {
   async upsertPhone(client: Client, phone: UpsertPhoneDto): Promise<void> {
     phone.client = client
     await this.phoneRepository.save(phone)
+  }
+
+  async upsertApp(client: Client, app: UpsertClientAppDto): Promise<void> {
+    app.client = client
+    await this.clientAppRepository.save(app)
   }
 }

@@ -2,6 +2,8 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ClientPhone } from './client-phone.entity'
 import { IClient } from '../../interfaces/client.interface'
 import { ClientAnswer } from './client-answer.entity'
+import { ClientApp } from './client-app.entity'
+import { ClientSN } from './client-sn.entity'
 
 @Entity({})
 export class Client implements IClient {
@@ -37,12 +39,6 @@ export class Client implements IClient {
 
   @Column({ length: 3, nullable: true })
   currencySymbol: string
-
-  @Column({ length: 512, nullable: true })
-  urlIG: string
-
-  @Column({ length: 512, nullable: true })
-  urlFB: string
 
   @Column()
   email_analytics: string
@@ -94,6 +90,12 @@ export class Client implements IClient {
 
   @OneToMany(() => ClientPhone, (phone) => phone.client, { eager: true })
   phones: ClientPhone[]
+
+  @OneToMany(() => ClientApp, (app) => app.client, { eager: true })
+  apps: ClientApp[]
+
+  @OneToMany(() => ClientSN, (sn) => sn.client, { eager: true })
+  sns: ClientSN[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number

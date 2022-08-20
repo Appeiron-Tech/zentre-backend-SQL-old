@@ -10,7 +10,7 @@ import { StorePhone } from 'src/tenanted/e-commerce/store/database/store-phone.e
 import { Store } from 'src/tenanted/e-commerce/store/database/store.entity'
 import { StoreWorker } from 'src/tenanted/e-commerce/store/database/store-worker.entity'
 import { StoreOpeningHour } from 'src/tenanted/e-commerce/store/database/store-opening-hour.entity'
-import { Announcement } from 'src/tenanted/appeiron-app/announcement/database/announcement.entity'
+import { Announcement } from 'src/tenanted/hub/announcement/database/announcement.entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Tenancy } from './database/tenancy.entity'
 import { TenancyService } from './tenancy.service'
@@ -36,6 +36,10 @@ import { PayMPPreference } from 'src/tenanted/pay/payments/database/pay-mp-prefe
 import { PayMPItem } from 'src/tenanted/pay/payments/database/pay-mp-item.entity'
 import { PayMPCallLogs } from 'src/tenanted/pay/payments/database/pay-mp-call-logs.entity'
 import { PayMPPayment } from 'src/tenanted/pay/payments/database/pay-mp-payment.entity'
+import { HubSn } from 'src/tenanted/hub/hub/database/entities/hub-sn.entity'
+import { HubApp } from 'src/tenanted/hub/hub/database/entities/hub-app.entity'
+import { ClientApp } from 'src/tenanted/client/database/entities/client-app.entity'
+import { ClientSN } from 'src/tenanted/client/database/entities/client-sn.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -95,6 +99,8 @@ export class TenancyModule {
                 Client,
                 ClientAnswer,
                 ClientPhone,
+                ClientApp,
+                ClientSN,
                 Store,
                 StorePhone,
                 StoreWorker,
@@ -122,6 +128,9 @@ export class TenancyModule {
                 PayMPItem,
                 PayMPCallLogs,
                 PayMPPayment,
+                // HUB
+                HubSn,
+                HubApp,
               ],
               // entities: [__dirname + '/**/*.entity{.ts,.js}'],
               synchronize: true,
