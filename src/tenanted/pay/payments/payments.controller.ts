@@ -181,6 +181,18 @@ export class PaymentsController {
     }
   }
 
+  // @UseGuards(JwtAuthGuard)
+  @Get('form')
+  async getForm(): Promise<PayConfigurationReadDto> {
+    try {
+      const rawPayForm = await this.paymentService.getPayConfiguration()
+      const payForm = plainToClass(PayConfigurationReadDto, rawPayForm)
+      return payForm
+    } catch (err) {
+      throw err
+    }
+  }
+
   // ******************************* PRIVATE FUNCTIONS ********************************
   private async getPeriodSummaryStats(
     groupType: string,
