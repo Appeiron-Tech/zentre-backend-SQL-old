@@ -21,11 +21,22 @@ export class AuthController {
     const resLogin = await this.authService.login(request.user as ValidateUserDTO)
 
     res.cookie('accessToken', resLogin.access_token, {
-      expires: new Date(new Date().getTime() + 20 * 1000),
+      expires: new Date(new Date().getTime() + 3600 * 1000),
       // sameSite: 'strict',
       httpOnly: true,
     })
     return res.send(resLogin)
+  }
+
+  @SkipAuth()
+  @Post('logout')
+  async logout(@Response() res): Promise<void> {
+    res.cookie('accessToken', "xxx", {
+      expires: new Date(new Date().getTime() + 10 ),
+      // sameSite: 'strict',
+      httpOnly: true,
+    })
+    return res.send()
   }
 
   @UseGuards(JwtAuthGuard)
