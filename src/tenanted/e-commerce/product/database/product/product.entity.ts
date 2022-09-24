@@ -211,8 +211,8 @@ export class Product {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Timestamp
 
-  @OneToMany(() => Variation, (variation) => variation.product)
-  variations?: Variation[]
+  @OneToMany(() => Variation, (variation) => variation.product, {eager: true})
+  rawVariations?: Variation[]
 
   @OneToMany(() => ProductCategory, (productCategory) => productCategory.product, { eager: true })
   productCategories?: ProductCategory[]
@@ -225,6 +225,6 @@ export class Product {
   @OneToMany(() => CrossProduct, (crossProduct) => crossProduct.product, { eager: true })
   rawCrossProducts?: CrossProduct[]
 
-  @OneToMany(() => ProductImage, (productImage) => productImage.product)
+  @OneToMany(() => ProductImage, (productImage) => productImage.product, { eager: true })
   images?: ProductImage[]
 }

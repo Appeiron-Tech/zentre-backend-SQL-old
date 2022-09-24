@@ -10,8 +10,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
-import { CreateVariationDto } from './database/variation/dto/create-variation.entity'
-import { UpdateVariationDto } from './database/variation/dto/update-variation.entity'
+import { CreateVariationDto } from './database/variation/dto/create-variation.dto'
+import { UpdateVariationDto } from './database/variation/dto/update-variation.dto'
 import { Variation } from './database/variation/variation.entity'
 import { ProductService } from './product.service'
 

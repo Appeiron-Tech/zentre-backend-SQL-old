@@ -181,7 +181,7 @@ export class PaymentsController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('form')
   async getForm(): Promise<PayConfigurationReadDto> {
     try {

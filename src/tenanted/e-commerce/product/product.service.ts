@@ -22,7 +22,7 @@ import { AttributeOption } from './database/attribute/attribute-option.entity'
 import { CreateAttributeOptionDto } from './database/attribute/dto/create-attribute-option.dto'
 import { ProductAttrOption } from './database/attribute/product-attr-option.entity'
 import { CreateProductAttrOptionDto } from './database/attribute/dto/create-product-attr-option.dto'
-import { CreateVariationDto } from './database/variation/dto/create-variation.entity'
+import { CreateVariationDto } from './database/variation/dto/create-variation.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProductService {

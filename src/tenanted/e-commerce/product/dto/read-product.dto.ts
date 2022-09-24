@@ -1,6 +1,9 @@
 import { Exclude } from 'class-transformer'
 import { Category } from '../database/category/category.entity'
 import { CrossProduct } from '../database/crossProduct/cross-product.entity'
+import { IVariationOptions } from '../database/variation/dto/app-read-variation.dto'
+import { IReadVariation } from '../database/variation/dto/read-variation.dto'
+import { Variation } from '../database/variation/variation.entity'
 
 export class ReadProductDto {
   // @Expose()
@@ -35,10 +38,15 @@ export class ReadProductDto {
   parent_id?: number
   menu_order?: number
   categories?: Category[]
+  variation_options?: IVariationOptions[]
+  variations?: IReadVariation[]
   crossProducts?: ReadProductDto[] | number[]
-
+  
   @Exclude()
   productCategories?: any[]
+
+  @Exclude()
+  rawVariations?: Variation[]
 
   @Exclude()
   rawCrossProducts: CrossProduct[]

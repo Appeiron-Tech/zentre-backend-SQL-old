@@ -2,25 +2,28 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Timestamp,
   UpdateDateColumn,
 } from 'typeorm'
 import { Product } from '../product/product.entity'
+import { VariationImage } from './variation-image.entity'
+import { VariationOptionRelations } from './variation-option-relation.entity'
 
 @Entity({ name: 'variations' })
 export class Variation {
   @PrimaryGeneratedColumn('increment')
   id: number
 
+  @OneToMany(() => VariationOptionRelations, (variationOptionRel) => variationOptionRel.variation, {eager: true})
+  variationOptions?: VariationOptionRelations[]
+
   @Column('int', { nullable: false })
   productId: number
 
   @ManyToOne(() => Product)
   product: Product
-
-  // @ManyToOne(() => Product, (product) => product.variations)
-  // product: number
 
   @Column({
     type: 'decimal',
@@ -150,6 +153,9 @@ export class Variation {
 
   @Column({ nullable: true, default: null })
   menu_order: number
+
+  @OneToMany(() => VariationImage, (variationImage) => variationImage.variation, { eager: true })
+  images?: VariationImage[]
 
   @UpdateDateColumn({
     type: 'timestamp',

@@ -9,7 +9,7 @@ export class ProductImage {
   @Column({ length: 256, nullable: false })
   src: string
 
-  @Column({ length: 128, nullable: false })
+  @Column({ length: 128, nullable: true, default: true })
   name: string
 
   @Column({ length: 512, nullable: true })

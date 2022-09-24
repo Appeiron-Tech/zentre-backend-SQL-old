@@ -40,6 +40,9 @@ import { HubSn } from 'src/tenanted/hub/hub/database/entities/hub-sn.entity'
 import { HubApp } from 'src/tenanted/hub/hub/database/entities/hub-app.entity'
 import { ClientApp } from 'src/tenanted/client/database/entities/client-app.entity'
 import { ClientSN } from 'src/tenanted/client/database/entities/client-sn.entity'
+import { VariationOptionRelations } from 'src/tenanted/e-commerce/product/database/variation/variation-option-relation.entity'
+import { VariationOption } from 'src/tenanted/e-commerce/product/database/variation/variation-option.entity'
+import { VariationImage } from 'src/tenanted/e-commerce/product/database/variation/variation-image.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -121,6 +124,9 @@ export class TenancyModule {
                 ProductAttrOption,
                 PTag,
                 Variation,
+                VariationImage,
+                VariationOption,
+                VariationOptionRelations,
                 // PAY
                 PayConfiguration,
                 PayFormShort,
