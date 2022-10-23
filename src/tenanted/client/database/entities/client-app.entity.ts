@@ -12,6 +12,9 @@ export class ClientApp {
   @Column({ nullable: false, default: false })
   enable: boolean
 
-  @ManyToOne(() => Client, (client) => client.phones)
+  @Column({ nullable: false, default: false })
+  show: boolean
+
+  @ManyToOne(() => Client, (client) => client.apps)
   client: Client
 }

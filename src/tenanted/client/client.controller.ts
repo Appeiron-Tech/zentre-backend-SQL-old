@@ -10,6 +10,8 @@ import { UpsertAnswerDto } from './dto/upsert-answer.dto'
 import { UpsertPhoneDto } from './dto/upsert-phone.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
+import { UpsertSNDto } from './dto/upsert-sns.dto'
+import { UpsertAppDto } from './dto/upsert-app.dto'
 @UseInterceptors(LoggingInterceptor)
 @Controller('api/client')
 export class ClientController {
@@ -36,6 +38,26 @@ export class ClientController {
     }
     const clientToUpdate = plainToClass(DBUpdateClientDto, updateClient)
     await this.clientService.update(id, clientToUpdate)
+  }
+
+  @Patch('sns/:id')
+  async updateSNS(@Param('id') id: number, @Body() updateSNS: UpsertSNDto[]): Promise<void> {
+    const client = await this.clientService.findClient(id)
+    if (updateSNS.length >= 0) {
+      await asyncForEach(updateSNS, async (sn: UpsertSNDto) => {
+        await this.clientService.upsertSN(client, sn)
+      })
+    }
+  }
+
+  @Patch('app/:id')
+  async updateApp(@Param('id') id: number, @Body() updateApp: UpsertAppDto): Promise<void> {
+    const client = await this.clientService.findClient(id)
+    if (updateApp) {
+      await asyncForEach(updateApp, async (app: UpsertAppDto) => {
+        await this.clientService.upsertApp(client, app)
+      })
+    }
   }
 
   @Patch('logo/:id')

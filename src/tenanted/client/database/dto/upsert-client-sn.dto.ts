@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { Client } from '../entities/client.entity'
 
 export class UpsertClientSNDto {
@@ -9,6 +9,10 @@ export class UpsertClientSNDto {
   code: string
 
   @IsOptional()
-  @IsNumber()
-  url: number
+  @IsString()
+  url: string
+
+  @IsOptional()
+  @IsBoolean()
+  show: boolean
 }

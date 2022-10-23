@@ -18,5 +18,9 @@ export class UpsertClientAppDto {
 
   @IsNotEmpty()
   @IsBoolean()
-  is_enable: boolean
+  enable: boolean
+
+  @IsNotEmpty()
+  @IsBoolean()
+  show: boolean
 }

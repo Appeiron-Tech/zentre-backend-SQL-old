@@ -10,6 +10,9 @@ export class ClientSN implements IClientSN {
   @Column({ length: 512, nullable: true })
   url: string
 
-  @ManyToOne(() => Client, (client) => client.phones)
+  @Column({ nullable: false, default: false })
+  show: boolean
+
+  @ManyToOne(() => Client, (client) => client.sns)
   client: Client
 }

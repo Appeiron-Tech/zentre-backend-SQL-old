@@ -14,6 +14,7 @@ import { CloudStorageService } from 'src/third-party-apis/Google/cloud-storage/c
 import { UpsertClientAppDto } from './database/dto/upsert-client-app.dto'
 import { ClientApp } from './database/entities/client-app.entity'
 import { ClientSN } from './database/entities/client-sn.entity'
+import { UpsertClientSNDto } from './database/dto/upsert-client-sn.dto'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ClientService {
@@ -100,6 +101,11 @@ export class ClientService {
   async upsertPhone(client: Client, phone: UpsertPhoneDto): Promise<void> {
     phone.client = client
     await this.phoneRepository.save(phone)
+  }
+
+  async upsertSN(client: Client, sn: UpsertClientSNDto): Promise<void> {
+    sn.client = client
+    await this.clientSNRepository.save(sn)
   }
 
   async upsertApp(client: Client, app: UpsertClientAppDto): Promise<void> {

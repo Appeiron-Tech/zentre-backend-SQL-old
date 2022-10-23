@@ -211,7 +211,7 @@ export class Product {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Timestamp
 
-  @OneToMany(() => Variation, (variation) => variation.product, {eager: true})
+  @OneToMany(() => Variation, (variation) => variation.product, { eager: true })
   rawVariations?: Variation[]
 
   @OneToMany(() => ProductCategory, (productCategory) => productCategory.product, { eager: true })

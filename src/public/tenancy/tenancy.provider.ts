@@ -18,7 +18,7 @@ export const TenancyProvider: Provider = {
         const tenant: Tenancy = await connection.getRepository(Tenancy).findOne({ where: { name } })
         return getConnection(tenant.name)
       } else {
-        throw new Error('not tenant name provided for tenanted request')
+        throw new Error('not tenancy name provided for tenanted request')
       }
     } catch (err) {
       console.log(err)
