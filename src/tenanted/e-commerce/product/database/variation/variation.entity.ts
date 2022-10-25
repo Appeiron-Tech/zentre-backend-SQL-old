@@ -16,7 +16,9 @@ export class Variation {
   @PrimaryGeneratedColumn('increment')
   id: number
 
-  @OneToMany(() => VariationOptionRelations, (variationOptionRel) => variationOptionRel.variation, {eager: true})
+  @OneToMany(() => VariationOptionRelations, (variationOptionRel) => variationOptionRel.variation, {
+    eager: true,
+  })
   variationOptions?: VariationOptionRelations[]
 
   @Column('int', { nullable: false })
@@ -29,8 +31,7 @@ export class Variation {
     type: 'decimal',
     precision: 10,
     scale: 5,
-    nullable: false,
-    default: 0,
+    nullable: true,
   })
   price: number
 
@@ -38,8 +39,7 @@ export class Variation {
     type: 'decimal',
     precision: 10,
     scale: 5,
-    nullable: false,
-    default: 0,
+    nullable: true,
   })
   regular_price: number
 

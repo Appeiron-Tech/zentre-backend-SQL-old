@@ -23,16 +23,20 @@ import { asyncForEach } from 'src/utils/utils'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
 import { CreateProductAttrOptionDto } from './dto/create-product-attr-option.dto'
 import { Variation } from './database/variation/variation.entity'
-import { IAppReadVariation, IVariationOption, IVariationOptions } from './database/variation/dto/app-read-variation.dto'
+import {
+  IAppReadVariation,
+  IVariationOption,
+  IVariationOptions,
+} from './database/variation/dto/app-read-variation.dto'
 import { AppReadProductDto } from './dto/app-read-product.dto'
 
 @UseInterceptors(LoggingInterceptor)
-@UsePipes(new ValidationPipe({always: true}))
-@Controller('tenant/product')
+@UsePipes(new ValidationPipe({ always: true }))
+@Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get()
+  @Get('admin')
   async findAll(): Promise<ReadProductDto[]> {
     const readProducts: ReadProductDto[] = []
     // const products = await this.productService.findAll()
@@ -55,10 +59,10 @@ export class ProductController {
     await asyncForEach(products, async (product: Product) => {
       const readProduct = plainToClass(AppReadProductDto, product)
       readProduct.categories = this.getCategories(product)
-      if(product.rawVariations){
+      if (product.rawVariations) {
         const appVariations = this.getAppReadVariations(product.rawVariations)
         readProduct.variations = appVariations.variations
-        readProduct.variation_options= appVariations.variationOptions
+        readProduct.variation_options = appVariations.variationOptions
       }
       readProducts.push(readProduct)
     })
@@ -189,20 +193,20 @@ export class ProductController {
     }
   }
 
-  private getAppReadVariations(rawVariations: Variation[]): { 
-      variations: IAppReadVariation[], 
-      variationOptions: IVariationOptions[]
-    } {
+  private getAppReadVariations(rawVariations: Variation[]): {
+    variations: IAppReadVariation[]
+    variationOptions: IVariationOptions[]
+  } {
     const appReadVariations = []
     const allVariationOptions = []
-    rawVariations.forEach(rawVariation => {
+    rawVariations.forEach((rawVariation) => {
       const readVariation = plainToClass(IAppReadVariation, rawVariation)
-      if(rawVariation.variationOptions){
+      if (rawVariation.variationOptions) {
         const variationTuples = []
-        rawVariation.variationOptions.forEach(variation => {
+        rawVariation.variationOptions.forEach((variation) => {
           const variationTuple = {
             variation: variation.variationOption.variation,
-            option: variation.variationOption.variationOption
+            option: variation.variationOption.variationOption,
           }
           variationTuples.push(variationTuple)
           allVariationOptions.push(variationTuple)
@@ -214,26 +218,28 @@ export class ProductController {
     const variationOptions = this.getUniqueVariationOptions(allVariationOptions)
     return {
       variations: appReadVariations,
-      variationOptions: variationOptions
+      variationOptions: variationOptions,
     }
   }
 
   private getUniqueVariationOptions(variations: IVariationOption[]): IVariationOptions[] {
     const uniqueVariationOptions: IVariationOptions[] = []
-    variations.forEach((variationOption => {
-      const existingVariation = uniqueVariationOptions.find(e => e.variation === variationOption.variation)
-      if(existingVariation){
-        if(!existingVariation.options.includes(variationOption.option)){
+    variations.forEach((variationOption) => {
+      const existingVariation = uniqueVariationOptions.find(
+        (e) => e.variation === variationOption.variation,
+      )
+      if (existingVariation) {
+        if (!existingVariation.options.includes(variationOption.option)) {
           existingVariation.options.push(variationOption.option)
         }
-      }else{
+      } else {
         const newVariation: IVariationOptions = {
           variation: variationOption.variation,
-          options: [variationOption.option]
+          options: [variationOption.option],
         }
         uniqueVariationOptions.push(newVariation)
       }
-    }))
+    })
     return uniqueVariationOptions
   }
 }
