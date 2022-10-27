@@ -12,15 +12,30 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { UpsertSNDto } from './dto/upsert-sns.dto'
 import { UpsertAppDto } from './dto/upsert-app.dto'
+import { ReadClientDto } from './dto/read-client.dto'
+import { AppReadClientPhone } from './dto/app-read-client-phone.dto'
 @UseInterceptors(LoggingInterceptor)
-@Controller('api/client')
+@Controller('client')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
-  @Get()
+  @Get('app')
+  async appFindAll(): Promise<ReadClientDto> {
+    const client = await this.clientService.findOne()
+    if (client.phones) {
+      const readClientPhones = []
+      client.phones.forEach((clientPhone) => {
+        readClientPhones.push(plainToClass(AppReadClientPhone, clientPhone))
+      })
+      client.phones = readClientPhones
+    }
+    return plainToClass(ReadClientDto, client)
+  }
+
+  @Get('admin')
   async findAll(): Promise<Client> {
-    const clients = await this.clientService.findAll()
-    return clients[0]
+    const clients = await this.clientService.findOne()
+    return clients
   }
 
   @Patch(':id')

@@ -8,6 +8,7 @@ export interface IClient {
   tenancyName: string
   name: string
   description: string
+  address: string
   logo: string
   cover: string
   favicon: string

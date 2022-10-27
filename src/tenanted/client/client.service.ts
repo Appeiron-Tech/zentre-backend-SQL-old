@@ -44,8 +44,12 @@ export class ClientService {
     }
   }
 
-  async findOne(tenancyName: string): Promise<Client> {
-    return await this.clientRepository.findOne({ tenancyName: tenancyName })
+  async findOne(tenancyName?: string): Promise<Client> {
+    if (tenancyName) {
+      return await this.clientRepository.findOne({ tenancyName: tenancyName })
+    } else {
+      return await this.clientRepository.findOne()
+    }
   }
 
   async findClient(id?: number): Promise<Client> {

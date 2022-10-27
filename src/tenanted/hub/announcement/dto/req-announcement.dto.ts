@@ -3,7 +3,7 @@ import { IsBoolean, IsOptional } from 'class-validator'
 
 export class ReqAnnouncementDto {
   screenCode?: string
-  screenType?: string
+  appCode?: string
 
   @IsOptional()
   @IsBoolean()

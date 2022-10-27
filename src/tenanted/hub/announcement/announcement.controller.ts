@@ -10,10 +10,12 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
+import { plainToClass } from 'class-transformer'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { isEmpty } from 'src/utils/utils'
 import { AnnouncementService } from './announcement.service'
 import { Announcement } from './database/announcement.entity'
+import { AppReadAnnouncement } from './dto/app-read-announcement.dto'
 import { CreateAnnouncementDto } from './dto/create-announcement.dto'
 import { ReqAnnouncementDto } from './dto/req-announcement.dto'
 import { UpdAnnouncementDto } from './dto/upd-announcement.dto'
@@ -24,16 +26,25 @@ import { UpdAnnouncementDto } from './dto/upd-announcement.dto'
     always: true,
   }),
 )
-@Controller('api/announcement')
+@Controller('announcement')
 export class AnnouncementController {
   constructor(private announcementService: AnnouncementService) {}
 
-  @Get()
-  async findAll(@Query() reqAnnouncementDto?: ReqAnnouncementDto): Promise<Announcement[]> {
+  @Get('app')
+  async appFindAll(
+    @Query() reqAnnouncementDto?: ReqAnnouncementDto,
+  ): Promise<AppReadAnnouncement[]> {
+    const readAnnouncements = []
+    let announcements = []
     if (isEmpty(reqAnnouncementDto)) {
-      return await this.announcementService.findAll()
+      announcements = await this.announcementService.findAll()
+    } else {
+      announcements = await this.announcementService.findBy(reqAnnouncementDto)
     }
-    return await this.announcementService.findBy(reqAnnouncementDto)
+    announcements.forEach((announcement) => {
+      readAnnouncements.push(plainToClass(AppReadAnnouncement, announcement))
+    })
+    return readAnnouncements
   }
 
   @Post()

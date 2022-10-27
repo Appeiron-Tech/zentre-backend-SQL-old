@@ -19,6 +19,11 @@ export class UpdateClientDto {
   currencySymbol?: string
 
   @IsOptional()
+  @IsString()
+  @MaxLength(1028)
+  address?: string
+
+  @IsOptional()
   @MaxLength(10)
   businessType?: string
 

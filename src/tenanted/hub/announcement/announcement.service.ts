@@ -24,8 +24,8 @@ export class AnnouncementService {
     if (reqAnnouncementDto.screenCode) {
       announcements.where('screenCode = :screenCode')
     }
-    if (reqAnnouncementDto.screenType) {
-      announcements.andWhere('screenType = :screenType')
+    if (reqAnnouncementDto.appCode) {
+      announcements.andWhere('appCode = :appCode')
     }
     if (reqAnnouncementDto.isActive !== undefined && reqAnnouncementDto.isActive !== null) {
       announcements.andWhere('isActive is :isActive')
@@ -35,7 +35,7 @@ export class AnnouncementService {
     }
     announcements.setParameters({
       screenCode: reqAnnouncementDto.screenCode,
-      screenType: reqAnnouncementDto.screenType,
+      screenType: reqAnnouncementDto.appCode,
       isActive: reqAnnouncementDto.isActive,
     })
 

@@ -22,6 +22,9 @@ export class Client implements IClient {
   @Column({ length: 1028, nullable: true })
   description: string
 
+  @Column({ length: 1028, nullable: true })
+  address: string
+
   @Column({ length: 16, nullable: false })
   businessType: string
 

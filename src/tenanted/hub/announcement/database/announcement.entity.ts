@@ -8,9 +8,6 @@ export class Announcement {
   @Column({ length: 7, nullable: true, default: null })
   screenCode?: string
 
-  @Column({ length: 4, nullable: true, default: null })
-  screenType?: string
-
   @Column({ length: 4, nullable: false })
   appCode?: string
 
@@ -22,6 +19,9 @@ export class Announcement {
 
   @Column({ length: 128, nullable: true, default: null })
   url?: string
+
+  @Column({ length: 6, nullable: true, default: null })
+  color?: string
 
   @Column({ length: 128, nullable: true, default: null })
   image?: string
