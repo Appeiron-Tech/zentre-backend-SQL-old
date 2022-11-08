@@ -9,6 +9,9 @@ export class ClientApp {
   @Column({ nullable: true, default: null })
   plan: number
 
+  @Column({ length: 16, nullable: false })
+  name: string
+
   @Column({ nullable: false, default: false })
   enable: boolean
 

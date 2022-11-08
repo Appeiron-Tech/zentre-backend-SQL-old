@@ -43,6 +43,7 @@ import { ClientSN } from 'src/tenanted/client/database/entities/client-sn.entity
 import { VariationOptionRelations } from 'src/tenanted/e-commerce/product/database/variation/variation-option-relation.entity'
 import { VariationOption } from 'src/tenanted/e-commerce/product/database/variation/variation-option.entity'
 import { VariationImage } from 'src/tenanted/e-commerce/product/database/variation/variation-image.entity'
+import { ClientOpeningHour } from 'src/tenanted/client/database/entities/client-opening-hour.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -104,6 +105,7 @@ export class TenancyModule {
                 ClientPhone,
                 ClientApp,
                 ClientSN,
+                ClientOpeningHour,
                 Store,
                 StorePhone,
                 StoreWorker,

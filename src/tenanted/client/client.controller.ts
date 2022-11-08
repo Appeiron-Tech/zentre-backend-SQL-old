@@ -12,8 +12,15 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { UpsertSNDto } from './dto/upsert-sns.dto'
 import { UpsertAppDto } from './dto/upsert-app.dto'
-import { ReadClientDto } from './dto/read-client.dto'
-import { AppReadClientPhone } from './dto/app-read-client-phone.dto'
+import {
+  parseAppReadOpeningHours,
+  parseAppReadPhones,
+  parseAppReadSns,
+  ReadClientDto,
+} from './dto/app-client.dto'
+import { AppClientPhone } from './dto/app-read-phone.dto'
+import { AppClientSN } from './dto/app-read-sns.dto'
+import { AppClientOpeningHour } from './dto/app-read-opening-hour.dto'
 @UseInterceptors(LoggingInterceptor)
 @Controller('client')
 export class ClientController {
@@ -21,15 +28,25 @@ export class ClientController {
 
   @Get('app')
   async appFindAll(): Promise<ReadClientDto> {
+    let phones: AppClientPhone[] = []
+    let sns: AppClientSN[] = []
+    let openingHours: AppClientOpeningHour[] = []
     const client = await this.clientService.findOne()
+    const appClient = plainToClass(ReadClientDto, client)
+
     if (client.phones) {
-      const readClientPhones = []
-      client.phones.forEach((clientPhone) => {
-        readClientPhones.push(plainToClass(AppReadClientPhone, clientPhone))
-      })
-      client.phones = readClientPhones
+      phones = parseAppReadPhones(client.phones)
     }
-    return plainToClass(ReadClientDto, client)
+    if (client.sns) {
+      sns = parseAppReadSns(client.sns)
+    }
+    if (client.openingHours) {
+      openingHours = parseAppReadOpeningHours(client.openingHours)
+    }
+    appClient.phones = phones
+    appClient.sns = sns
+    appClient.openingHours = openingHours
+    return appClient
   }
 
   @Get('admin')
@@ -106,4 +123,21 @@ export class ClientController {
     const client = await this.clientService.findClient(id)
     await this.clientService.updateCover(file, client.id)
   }
+
+  // **************************** PRIVATE FUNCTIONS ***************************** //
+  // private parseAppReadPhones(phones: any[]): AppClientPhone[] {
+  //   const readClientPhones = []
+  //   phones.forEach((clientPhone) => {
+  //     readClientPhones.push(plainToClass(AppClientPhone, clientPhone))
+  //   })
+  //   return readClientPhones
+  // }
+
+  // private parseAppReadSns(sns: any[]): AppClientSN[] {
+  //   const readClientSns = []
+  //   sns.forEach((clientSn) => {
+  //     readClientSns.push(plainToClass(AppClientSN, clientSn))
+  //   })
+  //   return readClientSns
+  // }
 }

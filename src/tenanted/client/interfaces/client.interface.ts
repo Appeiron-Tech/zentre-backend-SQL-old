@@ -1,4 +1,5 @@
 import { IClientApp } from './client-app.interface'
+import { IClientOpeningHour } from './client-opening-hour.interface'
 import { IClientPhone } from './client-phone.interface'
 import { IClientSN } from './client-sn.interface'
 
@@ -29,5 +30,6 @@ export interface IClient {
   phones: IClientPhone[]
   apps: IClientApp[]
   sns: IClientSN[]
+  openingHours: IClientOpeningHour[]
   createdAt: number
 }

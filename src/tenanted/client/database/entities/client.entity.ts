@@ -4,6 +4,7 @@ import { IClient } from '../../interfaces/client.interface'
 import { ClientAnswer } from './client-answer.entity'
 import { ClientApp } from './client-app.entity'
 import { ClientSN } from './client-sn.entity'
+import { ClientOpeningHour } from './client-opening-hour.entity'
 
 @Entity({})
 export class Client implements IClient {
@@ -99,6 +100,9 @@ export class Client implements IClient {
 
   @OneToMany(() => ClientSN, (sn) => sn.client, { eager: true })
   sns: ClientSN[]
+
+  @OneToMany(() => ClientOpeningHour, (clientOH) => clientOH.client, { eager: true })
+  openingHours: ClientOpeningHour[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number

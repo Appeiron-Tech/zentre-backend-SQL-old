@@ -17,7 +17,7 @@ export class Store {
   @Column({ nullable: false })
   address: string
 
-  @Column({ nullable: true, default: false })
+  @Column({ type: 'boolean', nullable: false, default: false })
   isMain?: boolean
 
   @Column({
@@ -41,7 +41,7 @@ export class Store {
   @Column({ nullable: true })
   cityId?: number
 
-  @Column()
+  @Column({ type: 'boolean', nullable: false, default: false })
   isOpenAlways: boolean
 
   @OneToMany(() => StorePhone, (phone) => phone.store, { eager: true })

@@ -11,19 +11,19 @@ export class Announcement {
   @Column({ length: 4, nullable: false })
   appCode?: string
 
-  @Column({ nullable: false })
+  @Column({ length: 64, nullable: true })
   title?: string
 
-  @Column()
+  @Column({ length: 128, nullable: true })
   description?: string
 
-  @Column({ length: 128, nullable: true, default: null })
+  @Column({ length: 256, nullable: true, default: null })
   url?: string
 
   @Column({ length: 6, nullable: true, default: null })
   color?: string
 
-  @Column({ length: 128, nullable: true, default: null })
+  @Column({ length: 256, nullable: true, default: null })
   image?: string
 
   @Column({ type: 'timestamp', nullable: true, default: () => 'CURRENT_TIMESTAMP' })

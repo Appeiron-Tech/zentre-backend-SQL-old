@@ -1,7 +1,7 @@
 import { Exclude, Expose } from 'class-transformer'
 
 @Exclude()
-export class AppReadClientPhone {
+export class AppClientPhone {
   @Expose()
   phone: number
 
