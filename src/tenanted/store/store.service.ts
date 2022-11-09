@@ -1,7 +1,7 @@
 import { Inject, Injectable, Scope } from '@nestjs/common'
 import { asyncForEach } from 'src/utils/utils'
 import { Connection, Repository } from 'typeorm'
-import { TENANCY_CONNECTION } from '../../../public/tenancy/tenancy.provider'
+import { TENANCY_CONNECTION } from '../../public/tenancy/tenancy.provider'
 import { StoreOpeningHour } from './database/store-opening-hour.entity'
 import { StorePhone } from './database/store-phone.entity'
 import { StoreWorker } from './database/store-worker.entity'
@@ -31,10 +31,18 @@ export class StoreService {
     return stores
   }
 
-  async create(store: CreateStoreDto): Promise<Store> {
-    const createdStore = await this.storeRepository.save(store)
-    return createdStore
+  async findOne(storeId?: number): Promise<Store> {
+    if (storeId) {
+      return await this.storeRepository.findOne({ id: storeId })
+    } else {
+      return await this.storeRepository.findOne()
+    }
   }
+
+  // async create(store: CreateStoreDto): Promise<Store> {
+  //   const createdStore = await this.storeRepository.save(store)
+  //   return createdStore
+  // }
 
   async update(storeId: number, store: UpdateStoreDto): Promise<any> {
     const updatedStore = await this.storeRepository.update({ id: storeId }, { ...store })
@@ -43,7 +51,7 @@ export class StoreService {
 
   async createPhones(storeId: number, phones: CreateStorePhoneDto[]): Promise<void> {
     await asyncForEach(phones, async (phone: StorePhone) => {
-      phone.store = storeId
+      phone.storeId = storeId
       if (!phone.isWspMain) phone.isWspMain = false
       await this.storePhoneRepository.save(phone)
     })
@@ -51,7 +59,7 @@ export class StoreService {
 
   async dropStorePhones(storeId: number): Promise<void> {
     console.log('dropping store phones')
-    await this.storePhoneRepository.delete({ store: storeId })
+    await this.storePhoneRepository.delete({ storeId: storeId })
   }
 
   async dropStore(storeId: number): Promise<void> {
@@ -61,7 +69,7 @@ export class StoreService {
 
   // ********************** Store Worker ********************** //
   async createWorker(storeId: number, worker: CreateStoreWorkerDto): Promise<StoreWorker> {
-    worker.store = storeId
+    worker.storeId = storeId
     const createdWorker = await this.storeWorkerRepository.save(worker)
     return createdWorker
   }

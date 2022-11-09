@@ -45,13 +45,13 @@ export class Client implements IClient {
   currencySymbol: string
 
   @Column()
-  email_analytics: string
+  ga_email_analytics: string
 
   @Column()
-  view_id: string
+  ga_view_id: string
 
   @Column({ type: 'text', nullable: true })
-  api_key: string
+  ga_api_key: string
 
   @Column({ length: 6, nullable: true })
   brightness: string

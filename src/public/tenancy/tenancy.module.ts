@@ -6,10 +6,10 @@ import { ClientPhone } from 'src/tenanted/client/database/entities/client-phone.
 import { Connection, createConnection, getConnection } from 'typeorm'
 import { TenancyController } from './tenancy.controller'
 import { TenancyProvider } from './tenancy.provider'
-import { StorePhone } from 'src/tenanted/e-commerce/store/database/store-phone.entity'
-import { Store } from 'src/tenanted/e-commerce/store/database/store.entity'
-import { StoreWorker } from 'src/tenanted/e-commerce/store/database/store-worker.entity'
-import { StoreOpeningHour } from 'src/tenanted/e-commerce/store/database/store-opening-hour.entity'
+import { StorePhone } from 'src/tenanted/store/database/store-phone.entity'
+import { Store } from 'src/tenanted/store/database/store.entity'
+import { StoreWorker } from 'src/tenanted/store/database/store-worker.entity'
+import { StoreOpeningHour } from 'src/tenanted/store/database/store-opening-hour.entity'
 import { Announcement } from 'src/tenanted/hub/announcement/database/announcement.entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Tenancy } from './database/tenancy.entity'
@@ -44,6 +44,7 @@ import { VariationOptionRelations } from 'src/tenanted/e-commerce/product/databa
 import { VariationOption } from 'src/tenanted/e-commerce/product/database/variation/variation-option.entity'
 import { VariationImage } from 'src/tenanted/e-commerce/product/database/variation/variation-image.entity'
 import { ClientOpeningHour } from 'src/tenanted/client/database/entities/client-opening-hour.entity'
+import { StoreSN } from 'src/tenanted/store/database/store-sn.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -109,6 +110,7 @@ export class TenancyModule {
                 Store,
                 StorePhone,
                 StoreWorker,
+                StoreSN,
                 StoreOpeningHour,
                 Announcement,
                 Order,

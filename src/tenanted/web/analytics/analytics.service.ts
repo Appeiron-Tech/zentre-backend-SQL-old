@@ -71,12 +71,12 @@ export class AnalyticsService {
   private async getAnalyticsKeys(): Promise<IAnalyticsKeys> {
     const client = await this.findClient()
     const analyticsAPIKey = await this.googleAnalytics.getAnalyticsKey(
-      client.api_key,
-      client.email_analytics,
+      client.ga_api_key,
+      client.ga_email_analytics,
     )
     return {
       APIKey: analyticsAPIKey,
-      viewId: client.view_id,
+      viewId: client.ga_view_id,
     }
   }
 }

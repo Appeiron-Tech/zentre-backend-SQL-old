@@ -1,8 +1,9 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { IStoreWorker } from '../interfaces/store-worker.interface'
 import { Store } from './store.entity'
 
-@Entity({ name: 'storeworkers' })
-export class StoreWorker {
+@Entity({ name: 'store_workers' })
+export class StoreWorker implements IStoreWorker {
   @PrimaryGeneratedColumn('increment')
   id: number
 
@@ -10,24 +11,24 @@ export class StoreWorker {
   storeId: number
 
   @ManyToOne(() => Store, (store) => store.workers)
-  store: number
+  store: Store
 
-  @Column({ nullable: false })
+  @Column({ length: 128, nullable: false })
   name: string
 
-  @Column({ nullable: true })
+  @Column({ length: 128, nullable: true })
   email: string
 
-  @Column()
+  @Column({ length: 32, nullable: true })
   jobTitle?: string
 
-  @Column()
+  @Column({ nullable: false })
   phone?: number
 
-  @Column()
+  @Column({ nullable: true })
   countryCode?: number
 
-  @Column()
+  @Column({ nullable: false, length: 4 })
   phoneType?: string
 
   @Column({ nullable: false, default: true })

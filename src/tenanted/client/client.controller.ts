@@ -18,9 +18,9 @@ import {
   parseAppReadSns,
   ReadClientDto,
 } from './dto/app-client.dto'
-import { AppClientPhone } from './dto/app-read-phone.dto'
-import { AppClientSN } from './dto/app-read-sns.dto'
-import { AppClientOpeningHour } from './dto/app-read-opening-hour.dto'
+import { AppClientPhone } from './dto/app-client-phone.dto'
+import { AppClientSN } from './dto/app-client-sns.dto'
+import { AppClientOpeningHour } from './dto/app-client-opening-hour.dto'
 @UseInterceptors(LoggingInterceptor)
 @Controller('client')
 export class ClientController {

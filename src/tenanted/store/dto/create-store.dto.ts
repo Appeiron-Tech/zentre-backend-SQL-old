@@ -9,7 +9,8 @@ import {
 import { CreateStorePhoneDto } from './create-store-phone.dto'
 
 export class CreateStoreDto {
-  store: string
+  name: string
+  storeId: number
   description?: string
   address: string
 

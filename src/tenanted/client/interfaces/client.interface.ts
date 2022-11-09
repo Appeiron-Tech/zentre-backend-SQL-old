@@ -16,6 +16,9 @@ export interface IClient {
   currencyName: string
   currencySymbol: string
   businessType: string
+  ga_email_analytics: string
+  ga_view_id: string
+  ga_api_key: string
   brightness: string
   primary: string
   onPrimary: string
@@ -27,9 +30,9 @@ export interface IClient {
   onBackground: string
   surface: string
   onSurface: string
-  phones: IClientPhone[]
-  apps: IClientApp[]
-  sns: IClientSN[]
-  openingHours: IClientOpeningHour[]
+  // phones: IClientPhone[]
+  // apps: IClientApp[]
+  // sns: IClientSN[]
+  // openingHours: IClientOpeningHour[]
   createdAt: number
 }

@@ -1,5 +1,5 @@
 export interface CreateStoreWorkerDto {
-  store?: number
+  storeId?: number
   name: string
   email?: string
   jobTitle?: string

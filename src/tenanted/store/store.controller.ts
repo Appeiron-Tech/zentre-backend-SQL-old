@@ -18,12 +18,20 @@ import { StoreWorker } from './database/store-worker.entity'
 import { Store } from './database/store.entity'
 import { CreateStoreOpeningHourDto } from './dto/create-store-opening-hour.dto'
 import { CreateStoreWorkerDto } from './dto/worker/create-store-worker.dto'
-import { CreateStoreDto } from './dto/create-store.dto'
 import { UpdStoreWorkerDto } from './dto/worker/upd-store-worker.dto'
 import { StoreService } from './store.service'
 import { plainToClass } from 'class-transformer'
 import { ReqUpdateStoreDto } from './dto/req-upd-store.dto'
 import { UpdateStoreDto } from './dto/upd-store.dto'
+import {
+  parseAppReadOpeningHours,
+  parseAppReadPhones,
+  parseAppReadSns,
+  ReadStoreDto,
+} from './dto/app/app-store.dto'
+import { AppStorePhone } from './dto/app/app-store-phone.dto'
+import { AppStoreSN } from './dto/app/app-store-sn.dto'
+import { AppStoreOpeningHour } from './dto/app/app-store-opening-hour.dto'
 // import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
 
 @UseInterceptors(LoggingInterceptor)
@@ -36,20 +44,43 @@ import { UpdateStoreDto } from './dto/upd-store.dto'
 export class StoreController {
   constructor(private storeService: StoreService) {}
 
+  @Get('app')
+  async appFindAll(): Promise<ReadStoreDto> {
+    let phones: AppStorePhone[] = []
+    let sns: AppStoreSN[] = []
+    let openingHours: AppStoreOpeningHour[] = []
+    const store = await this.storeService.findOne()
+    const appStore = plainToClass(ReadStoreDto, store)
+
+    if (store.phones) {
+      phones = parseAppReadPhones(store.phones)
+    }
+    if (store.sns) {
+      sns = parseAppReadSns(store.sns)
+    }
+    if (store.openingHours) {
+      openingHours = parseAppReadOpeningHours(store.openingHours)
+    }
+    appStore.phones = phones
+    appStore.sns = sns
+    appStore.openingHours = openingHours
+    return appStore
+  }
+
   @Get()
   async findAll(): Promise<Store[]> {
     const stores = await this.storeService.findAll()
     return stores
   }
 
-  @Post()
-  async create(@Body(new ValidationPipe()) store: CreateStoreDto): Promise<Store> {
-    const createdStore = await this.storeService.create(store)
-    if (store.phones) {
-      await this.storeService.createPhones(createdStore.id, store.phones)
-    }
-    return createdStore
-  }
+  // @Post()
+  // async create(@Body(new ValidationPipe()) store: CreateStoreDto): Promise<Store> {
+  //   const createdStore = await this.storeService.create(store)
+  //   if (store.phones) {
+  //     await this.storeService.createPhones(createdStore.id, store.phones)
+  //   }
+  //   return createdStore
+  // }
 
   @Patch('/:id')
   async update(
@@ -128,8 +159,8 @@ export class StoreController {
       const createOpeningHour = {
         storeId: storeId,
         weekDay: openingHour.weekDay,
-        from: range.from,
-        to: range.to,
+        fromHour: range.fromHour,
+        toHour: range.toHour,
       }
       await this.storeService.createOpeningHour(storeId, createOpeningHour)
     })

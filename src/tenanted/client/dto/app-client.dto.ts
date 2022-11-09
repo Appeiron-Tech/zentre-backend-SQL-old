@@ -1,9 +1,9 @@
 import { Exclude, Expose, plainToClass } from 'class-transformer'
 import { ClientAnswer } from '../database/entities/client-answer.entity'
 import { IClientApp } from '../interfaces/client-app.interface'
-import { AppClientOpeningHour } from './app-read-opening-hour.dto'
-import { AppClientPhone } from './app-read-phone.dto'
-import { AppClientSN } from './app-read-sns.dto'
+import { AppClientOpeningHour } from './app-client-opening-hour.dto'
+import { AppClientPhone } from './app-client-phone.dto'
+import { AppClientSN } from './app-client-sns.dto'
 
 @Exclude()
 export class ReadClientDto {
@@ -36,12 +36,6 @@ export class ReadClientDto {
 
   @Expose()
   businessType?: string
-
-  @Expose()
-  urlIG?: string
-
-  @Expose()
-  urlFB?: string
 
   @Expose()
   brightness?: string
