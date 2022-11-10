@@ -36,8 +36,6 @@ import { PayMPPreference } from 'src/tenanted/pay/payments/database/pay-mp-prefe
 import { PayMPItem } from 'src/tenanted/pay/payments/database/pay-mp-item.entity'
 import { PayMPCallLogs } from 'src/tenanted/pay/payments/database/pay-mp-call-logs.entity'
 import { PayMPPayment } from 'src/tenanted/pay/payments/database/pay-mp-payment.entity'
-import { HubSn } from 'src/tenanted/hub/hub/database/entities/hub-sn.entity'
-import { HubApp } from 'src/tenanted/hub/hub/database/entities/hub-app.entity'
 import { ClientApp } from 'src/tenanted/client/database/entities/client-app.entity'
 import { ClientSN } from 'src/tenanted/client/database/entities/client-sn.entity'
 import { VariationOptionRelations } from 'src/tenanted/e-commerce/product/database/variation/variation-option-relation.entity'
@@ -45,6 +43,8 @@ import { VariationOption } from 'src/tenanted/e-commerce/product/database/variat
 import { VariationImage } from 'src/tenanted/e-commerce/product/database/variation/variation-image.entity'
 import { ClientOpeningHour } from 'src/tenanted/client/database/entities/client-opening-hour.entity'
 import { StoreSN } from 'src/tenanted/store/database/store-sn.entity'
+import { HubSurvey } from 'src/tenanted/hub/contact/database/entities/survey.entity'
+import { HubContact } from 'src/tenanted/hub/contact/database/entities/contact.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -138,9 +138,9 @@ export class TenancyModule {
                 PayMPItem,
                 PayMPCallLogs,
                 PayMPPayment,
-                // HUB
-                HubSn,
-                HubApp,
+                // CONTACT
+                HubSurvey,
+                HubContact,
               ],
               // entities: [__dirname + '/**/*.entity{.ts,.js}'],
               synchronize: true,

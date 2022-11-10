@@ -22,7 +22,7 @@ import { CartModule } from './tenanted/e-commerce/cart/cart.module'
 import { GoogleAnalyticsModule } from './third-party-apis/Google/google-analytics/google-analytics.module'
 import { AnalyticsModule as WebAnalyticsModule } from './tenanted/web/analytics/analytics.module'
 import { PaymentsModule } from './tenanted/pay/payments/payments.module'
-import { HubModule } from './tenanted/hub/hub/hub.module'
+import { ContactModule } from './tenanted/hub/contact/contact.module'
 
 @Module({
   imports: [
@@ -61,7 +61,7 @@ import { HubModule } from './tenanted/hub/hub/hub.module'
     OrderModule,
     CartModule,
     WebAnalyticsModule,
-    HubModule,
+    ContactModule,
 
     //THIRD PARTY APIS
     CloudStorageModule,

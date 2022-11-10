@@ -8,7 +8,6 @@ import { StoreWorker } from './database/store-worker.entity'
 import { Store } from './database/store.entity'
 import { CreateStorePhoneDto } from './dto/create-store-phone.dto'
 import { CreateStoreWorkerDto } from './dto/worker/create-store-worker.dto'
-import { CreateStoreDto } from './dto/create-store.dto'
 import { UpdStoreWorkerDto } from './dto/worker/upd-store-worker.dto'
 import { UpdateStoreDto } from './dto/upd-store.dto'
 
