@@ -30,11 +30,11 @@ export class StoreService {
     return stores
   }
 
-  async findOne(storeId?: number): Promise<Store> {
+  async find(storeId?: number): Promise<Store[]> {
     if (storeId) {
-      return await this.storeRepository.findOne({ id: storeId })
+      return await this.storeRepository.find({ id: storeId })
     } else {
-      return await this.storeRepository.findOne()
+      return await this.storeRepository.find()
     }
   }
 

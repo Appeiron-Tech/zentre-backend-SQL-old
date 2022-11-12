@@ -1,8 +1,6 @@
 import { Exclude, Expose, plainToClass } from 'class-transformer'
 import { ClientAnswer } from '../database/entities/client-answer.entity'
 import { IClientApp } from '../interfaces/client-app.interface'
-import { AppClientOpeningHour } from './app-client-opening-hour.dto'
-import { AppClientPhone } from './app-client-phone.dto'
 import { AppClientSN } from './app-client-sns.dto'
 
 @Exclude()
@@ -15,9 +13,6 @@ export class ReadClientDto {
 
   @Expose()
   description?: string
-
-  @Expose()
-  address?: string
 
   @Expose()
   logo: string
@@ -70,11 +65,14 @@ export class ReadClientDto {
   @Expose()
   onSurface?: string
 
-  @Expose()
-  phones?: AppClientPhone[]
+  // @Expose()
+  // openingHours?: AppClientOpeningHour[]
 
-  @Expose()
-  openingHours?: AppClientOpeningHour[]
+  // @Expose()
+  // phones?: AppClientPhone[]
+
+  // @Expose()
+  // address?: string
 
   @Expose()
   answers?: ClientAnswer[]
@@ -86,26 +84,10 @@ export class ReadClientDto {
   sns: AppClientSN[]
 }
 
-export function parseAppReadPhones(phones: any[]): AppClientPhone[] {
-  const readClientPhones = []
-  phones.forEach((clientPhone) => {
-    readClientPhones.push(plainToClass(AppClientPhone, clientPhone))
-  })
-  return readClientPhones
-}
-
 export function parseAppReadSns(sns: any[]): AppClientSN[] {
   const readClientSns = []
   sns.forEach((clientSn) => {
     readClientSns.push(plainToClass(AppClientSN, clientSn))
   })
   return readClientSns
-}
-
-export function parseAppReadOpeningHours(openingHours: any[]): AppClientOpeningHour[] {
-  const readOpeningHours = []
-  openingHours.forEach((openingHour) => {
-    readOpeningHours.push(plainToClass(AppClientOpeningHour, openingHour))
-  })
-  return readOpeningHours
 }

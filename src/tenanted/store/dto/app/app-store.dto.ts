@@ -1,11 +1,13 @@
 import { Exclude, Expose, plainToClass } from 'class-transformer'
 import { AppStoreOpeningHour } from './app-store-opening-hour.dto'
 import { AppStorePhone } from './app-store-phone.dto'
-import { AppStoreSN } from './app-store-sn.dto'
 import { AppStoreWorker } from './app-store-worker.dto'
 
 @Exclude()
 export class ReadStoreDto {
+  @Expose()
+  id: number
+
   @Expose()
   name: string
 
@@ -39,8 +41,8 @@ export class ReadStoreDto {
   @Expose()
   phones?: AppStorePhone[]
 
-  @Expose()
-  sns: AppStoreSN[]
+  // @Expose()
+  // sns: AppStoreSN[]
 
   @Expose()
   workers?: AppStoreWorker[]
@@ -57,13 +59,13 @@ export function parseAppReadPhones(phones: any[]): AppStorePhone[] {
   return readStorePhones
 }
 
-export function parseAppReadSns(sns: any[]): AppStoreSN[] {
-  const readStoreSns = []
-  sns.forEach((storeSn) => {
-    readStoreSns.push(plainToClass(AppStoreSN, storeSn))
-  })
-  return readStoreSns
-}
+// export function parseAppReadSns(sns: any[]): AppStoreSN[] {
+//   const readStoreSns = []
+//   sns.forEach((storeSn) => {
+//     readStoreSns.push(plainToClass(AppStoreSN, storeSn))
+//   })
+//   return readStoreSns
+// }
 
 export function parseAppReadOpeningHours(openingHours: any[]): AppStoreOpeningHour[] {
   const readOpeningHours = []

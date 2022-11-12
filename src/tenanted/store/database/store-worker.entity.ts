@@ -7,7 +7,7 @@ export class StoreWorker implements IStoreWorker {
   @PrimaryGeneratedColumn('increment')
   id: number
 
-  @Column('int', { nullable: true })
+  @Column('int', { nullable: false })
   storeId: number
 
   @ManyToOne(() => Store, (store) => store.workers)
@@ -22,13 +22,13 @@ export class StoreWorker implements IStoreWorker {
   @Column({ length: 32, nullable: true })
   jobTitle?: string
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   phone?: number
 
   @Column({ nullable: true })
   countryCode?: number
 
-  @Column({ nullable: false, length: 4 })
+  @Column({ nullable: false, length: 3 })
   phoneType?: string
 
   @Column({ nullable: false, default: true })

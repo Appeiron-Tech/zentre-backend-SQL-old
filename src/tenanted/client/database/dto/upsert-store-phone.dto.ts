@@ -1,8 +1,8 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator'
-import { Client } from '../entities/client.entity'
+import { Store } from 'src/tenanted/store/database/store.entity'
 
-export class UpsertPhoneDto {
-  client?: Client
+export class UpsertStorePhoneDto {
+  store?: Store
 
   @IsNotEmpty()
   @IsNumber()

@@ -2,7 +2,6 @@ import { BadRequestException, MiddlewareConsumer, Module, RequestMethod } from '
 import { ConfigService } from '@nestjs/config'
 import { NextFunction, Request } from 'express'
 import { Client } from 'src/tenanted/client/database/entities/client.entity'
-import { ClientPhone } from 'src/tenanted/client/database/entities/client-phone.entity'
 import { Connection, createConnection, getConnection } from 'typeorm'
 import { TenancyController } from './tenancy.controller'
 import { TenancyProvider } from './tenancy.provider'
@@ -41,8 +40,6 @@ import { ClientSN } from 'src/tenanted/client/database/entities/client-sn.entity
 import { VariationOptionRelations } from 'src/tenanted/e-commerce/product/database/variation/variation-option-relation.entity'
 import { VariationOption } from 'src/tenanted/e-commerce/product/database/variation/variation-option.entity'
 import { VariationImage } from 'src/tenanted/e-commerce/product/database/variation/variation-image.entity'
-import { ClientOpeningHour } from 'src/tenanted/client/database/entities/client-opening-hour.entity'
-import { StoreSN } from 'src/tenanted/store/database/store-sn.entity'
 import { HubSurvey } from 'src/tenanted/hub/contact/database/entities/survey.entity'
 import { HubContact } from 'src/tenanted/hub/contact/database/entities/contact.entity'
 
@@ -103,14 +100,11 @@ export class TenancyModule {
               entities: [
                 Client,
                 ClientAnswer,
-                ClientPhone,
                 ClientApp,
                 ClientSN,
-                ClientOpeningHour,
                 Store,
                 StorePhone,
                 StoreWorker,
-                StoreSN,
                 StoreOpeningHour,
                 Announcement,
                 Order,

@@ -1,10 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { ClientPhone } from './client-phone.entity'
 import { IClient } from '../../interfaces/client.interface'
 import { ClientAnswer } from './client-answer.entity'
 import { ClientApp } from './client-app.entity'
 import { ClientSN } from './client-sn.entity'
-import { ClientOpeningHour } from './client-opening-hour.entity'
 
 @Entity({})
 export class Client implements IClient {
@@ -22,9 +20,6 @@ export class Client implements IClient {
 
   @Column({ length: 1028, nullable: true })
   description: string
-
-  @Column({ length: 1028, nullable: true })
-  address: string
 
   @Column({ length: 16, nullable: false })
   businessType: string
@@ -92,17 +87,11 @@ export class Client implements IClient {
   })
   answers: ClientAnswer[]
 
-  @OneToMany(() => ClientPhone, (phone) => phone.client, { eager: true })
-  phones: ClientPhone[]
-
   @OneToMany(() => ClientApp, (app) => app.client, { eager: true })
   apps: ClientApp[]
 
   @OneToMany(() => ClientSN, (sn) => sn.client, { eager: true })
   sns: ClientSN[]
-
-  @OneToMany(() => ClientOpeningHour, (clientOH) => clientOH.client, { eager: true })
-  openingHours: ClientOpeningHour[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number

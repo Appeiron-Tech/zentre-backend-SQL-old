@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { StoreOpeningHour } from './store-opening-hour.entity'
 import { StorePhone } from './store-phone.entity'
-import { StoreSN } from './store-sn.entity'
+// import { StoreSN } from './store-sn.entity'
 import { StoreWorker } from './store-worker.entity'
 
 @Entity({ name: 'stores' })
@@ -25,7 +25,7 @@ export class Store {
   cover: string
 
   @Column({ type: 'boolean', nullable: false, default: false })
-  isMain?: boolean
+  isMain: boolean
 
   @Column({
     type: 'decimal',
@@ -54,16 +54,19 @@ export class Store {
   @OneToMany(() => StorePhone, (phone) => phone.store, { eager: true })
   phones?: StorePhone[]
 
-  @OneToMany(() => StoreSN, (sn) => sn.store, { eager: true })
-  sns: StoreSN[]
+  // @OneToMany(() => StoreSN, (sn) => sn.store, { eager: true })
+  // sns: StoreSN[]
 
-  @OneToMany(() => StoreWorker, (worker) => worker.store, { eager: true })
+  @OneToMany(() => StoreWorker, (worker) => worker.store)
   workers?: StoreWorker[]
 
   @OneToMany(() => StoreOpeningHour, (openingHour) => openingHour.store, {
     eager: true,
   })
   openingHours?: StoreOpeningHour[]
+
+  @Column({ nullable: false, default: true })
+  isActive: boolean
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number

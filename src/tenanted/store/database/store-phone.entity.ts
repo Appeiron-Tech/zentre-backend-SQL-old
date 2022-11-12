@@ -10,16 +10,16 @@ export class StorePhone implements IStorePhone {
   @Column({ nullable: false })
   phone: number
 
-  @Column()
+  @Column({ nullable: true, default: null })
   countryCode: number
 
-  @Column()
+  @Column({ length: 3, nullable: false })
   type: string
 
   @ManyToOne(() => Store, (store) => store.phones)
   store: Store
 
-  @Column('int', { nullable: true })
+  @Column('int', { nullable: false })
   storeId: number
 
   @Column()

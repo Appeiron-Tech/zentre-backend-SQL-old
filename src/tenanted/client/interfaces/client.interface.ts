@@ -1,6 +1,4 @@
 import { IClientApp } from './client-app.interface'
-import { IClientOpeningHour } from './client-opening-hour.interface'
-import { IClientPhone } from './client-phone.interface'
 import { IClientSN } from './client-sn.interface'
 
 export interface IClient {
@@ -9,7 +7,6 @@ export interface IClient {
   tenancyName: string
   name: string
   description: string
-  address: string
   logo: string
   cover: string
   favicon: string
@@ -30,9 +27,7 @@ export interface IClient {
   onBackground: string
   surface: string
   onSurface: string
-  // phones: IClientPhone[]
-  // apps: IClientApp[]
-  // sns: IClientSN[]
-  // openingHours: IClientOpeningHour[]
+  apps: IClientApp[]
+  sns: IClientSN[]
   createdAt: number
 }

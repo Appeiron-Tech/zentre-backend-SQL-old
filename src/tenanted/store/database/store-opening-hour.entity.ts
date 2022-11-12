@@ -10,16 +10,16 @@ export class StoreOpeningHour implements IStoreOpeningHour {
   @ManyToOne(() => Store, (store) => store.openingHours)
   store: Store
 
-  @Column('int', { nullable: true })
+  @Column('int', { nullable: false })
   storeId: number
 
   @Column('int', { nullable: false })
   weekDay: number
 
-  @Column({ length: 5, nullable: false })
+  @Column({ length: 5, nullable: true })
   fromHour: string
 
-  @Column({ length: 5, nullable: false })
+  @Column({ length: 5, nullable: true })
   toHour: string
 }
 

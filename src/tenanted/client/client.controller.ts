@@ -4,48 +4,26 @@ import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { asyncForEach, editFileName } from 'src/utils/utils'
 import { ClientService } from './client.service'
 import { Client } from './database/entities/client.entity'
-import { UpdateClientDto } from './dto/update-client.dto'
-import { UpdateClientDto as DBUpdateClientDto } from './database/dto/update-client.dto'
-import { UpsertAnswerDto } from './dto/upsert-answer.dto'
-import { UpsertPhoneDto } from './dto/upsert-phone.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { UpsertSNDto } from './dto/upsert-sns.dto'
 import { UpsertAppDto } from './dto/upsert-app.dto'
-import {
-  parseAppReadOpeningHours,
-  parseAppReadPhones,
-  parseAppReadSns,
-  ReadClientDto,
-} from './dto/app-client.dto'
-import { AppClientPhone } from './dto/app-client-phone.dto'
+import { parseAppReadSns, ReadClientDto } from './dto/app-client.dto'
 import { AppClientSN } from './dto/app-client-sns.dto'
-import { AppClientOpeningHour } from './dto/app-client-opening-hour.dto'
 @UseInterceptors(LoggingInterceptor)
 @Controller('client')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Get('app')
-  async appFindAll(): Promise<ReadClientDto> {
-    let phones: AppClientPhone[] = []
+  async appFindClient(): Promise<ReadClientDto> {
     let sns: AppClientSN[] = []
-    let openingHours: AppClientOpeningHour[] = []
     const client = await this.clientService.findOne()
     const appClient = plainToClass(ReadClientDto, client)
-
-    if (client.phones) {
-      phones = parseAppReadPhones(client.phones)
-    }
     if (client.sns) {
       sns = parseAppReadSns(client.sns)
     }
-    if (client.openingHours) {
-      openingHours = parseAppReadOpeningHours(client.openingHours)
-    }
-    appClient.phones = phones
     appClient.sns = sns
-    appClient.openingHours = openingHours
     return appClient
   }
 
@@ -55,22 +33,22 @@ export class ClientController {
     return clients
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateClient: UpdateClientDto): Promise<void> {
-    const client = await this.clientService.findClient(id)
-    if (updateClient.answers?.length >= 0) {
-      await asyncForEach(updateClient.answers, async (answer: UpsertAnswerDto) => {
-        await this.clientService.upsertAnswer(client, answer)
-      })
-    }
-    if (updateClient.phones?.length >= 0) {
-      await asyncForEach(updateClient.phones, async (phone: UpsertPhoneDto) => {
-        await this.clientService.upsertPhone(client, phone)
-      })
-    }
-    const clientToUpdate = plainToClass(DBUpdateClientDto, updateClient)
-    await this.clientService.update(id, clientToUpdate)
-  }
+  // @Patch(':id')
+  // async update(@Param('id') id: number, @Body() updateClient: UpdateClientDto): Promise<void> {
+  //   const client = await this.clientService.findClient(id)
+  //   if (updateClient.answers?.length >= 0) {
+  //     await asyncForEach(updateClient.answers, async (answer: UpsertAnswerDto) => {
+  //       await this.clientService.upsertAnswer(client, answer)
+  //     })
+  //   }
+  //   if (updateClient.phones?.length >= 0) {
+  //     await asyncForEach(updateClient.phones, async (phone: UpsertPhoneDto) => {
+  //       await this.clientService.upsertPhone(client, phone)
+  //     })
+  //   }
+  //   const clientToUpdate = plainToClass(DBUpdateClientDto, updateClient)
+  //   await this.clientService.update(id, clientToUpdate)
+  // }
 
   @Patch('sns/:id')
   async updateSNS(@Param('id') id: number, @Body() updateSNS: UpsertSNDto[]): Promise<void> {

@@ -23,14 +23,8 @@ import { StoreService } from './store.service'
 import { plainToClass } from 'class-transformer'
 import { ReqUpdateStoreDto } from './dto/req-upd-store.dto'
 import { UpdateStoreDto } from './dto/upd-store.dto'
-import {
-  parseAppReadOpeningHours,
-  parseAppReadPhones,
-  parseAppReadSns,
-  ReadStoreDto,
-} from './dto/app/app-store.dto'
+import { parseAppReadOpeningHours, parseAppReadPhones, ReadStoreDto } from './dto/app/app-store.dto'
 import { AppStorePhone } from './dto/app/app-store-phone.dto'
-import { AppStoreSN } from './dto/app/app-store-sn.dto'
 import { AppStoreOpeningHour } from './dto/app/app-store-opening-hour.dto'
 // import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
 
@@ -45,32 +39,17 @@ export class StoreController {
   constructor(private storeService: StoreService) {}
 
   @Get('app')
-  async appFindAll(): Promise<ReadStoreDto> {
-    let phones: AppStorePhone[] = []
-    let sns: AppStoreSN[] = []
-    let openingHours: AppStoreOpeningHour[] = []
-    const store = await this.storeService.findOne()
-    const appStore = plainToClass(ReadStoreDto, store)
-
-    if (store.phones) {
-      phones = parseAppReadPhones(store.phones)
-    }
-    if (store.sns) {
-      sns = parseAppReadSns(store.sns)
-    }
-    if (store.openingHours) {
-      openingHours = parseAppReadOpeningHours(store.openingHours)
-    }
-    appStore.phones = phones
-    appStore.sns = sns
-    appStore.openingHours = openingHours
-    return appStore
+  async appFindStore(): Promise<ReadStoreDto[]> {
+    const stores = await this.storeService.find()
+    const readStores = this.parseReadStores(stores)
+    return readStores
   }
 
-  @Get()
-  async findAll(): Promise<Store[]> {
-    const stores = await this.storeService.findAll()
-    return stores
+  @Get('app/:storeId')
+  async appFindStores(@Param('storeId') storeId?: number): Promise<ReadStoreDto[]> {
+    const stores = await this.storeService.find(storeId)
+    const readStores = this.parseReadStores(stores)
+    return readStores
   }
 
   // @Post()
@@ -184,4 +163,20 @@ export class StoreController {
   //     await this.storeService.createOpeningHour(storeId, createOpeningHour)
   //   })
   // }
+
+  // ************************* PRIVATE METHODS ************************* //
+  private parseReadStores(stores: ReadStoreDto[]) {
+    const readStores: ReadStoreDto[] = []
+    stores.forEach((store) => {
+      const readStore = plainToClass(ReadStoreDto, store)
+      if (store.phones) {
+        readStore.phones = parseAppReadPhones(store.phones)
+      }
+      if (store.openingHours) {
+        readStore.openingHours = parseAppReadOpeningHours(store.openingHours)
+      }
+      readStores.push(readStore)
+    })
+    return readStores
+  }
 }
