@@ -18,11 +18,11 @@ import { plainToClass } from 'class-transformer'
 import { UpdateProductDto } from './database/product/dto/update-product.dto'
 import { Category } from './database/category/category.entity'
 import { ReadProductDto } from './dto/read-product.dto'
-import { asyncForEach } from 'src/utils/utils'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
-import { CreateProductAttrOptionDto } from './dto/create-product-attr-option.dto'
 import { AppReadProductDto } from './dto/app-read-product.dto'
 import { getAppReadVariations } from './database/variation/dto/read-variation.dto'
+import { AppCategoryDto } from './database/category/dto/read-category.dto'
+import { parseReadProductImages } from './database/image/dto/read-product-image.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(new ValidationPipe({ always: true }))
@@ -49,39 +49,37 @@ export class ProductController {
   @Get('app')
   async appFindAll(@Query('storeId') storeId?: number): Promise<AppReadProductDto[]> {
     const readProducts: AppReadProductDto[] = []
-    let products
+    let products = []
     if (storeId) {
       products = await this.productService.findByStore(storeId)
     } else {
       products = await this.productService.findAll()
     }
-    await asyncForEach(products, async (product: Product) => {
+    products.forEach((product: Product) => {
       const readProduct = plainToClass(AppReadProductDto, product)
       readProduct.categories = this.getCategories(product)
-      if (product.rawVariations) {
-        const appVariations = getAppReadVariations(product.rawVariations)
-        readProduct.variations = appVariations.variations
-        readProduct.variation_options = appVariations.variationOptions
-      }
+      const appVariations = getAppReadVariations(product.rawVariations)
+      readProduct.variations = appVariations.variations
+      readProduct.variation_options = appVariations.variationOptions
+      readProduct.images = parseReadProductImages(product.rawImages)
       readProducts.push(readProduct)
     })
     return readProducts
   }
 
   @Get('app/:id')
-  async find(@Param('id') id: number): Promise<ReadProductDto> {
+  async find(@Param('id') id: number): Promise<AppReadProductDto> {
     const product = await this.productService.findOne(id)
-    const readProduct = plainToClass(ReadProductDto, product)
+    const readProduct = plainToClass(AppReadProductDto, product)
     readProduct.categories = this.getCategories(product)
     readProduct.crossProducts = await this.getCrossProducts({
       product: product,
       loadCrossProducts: true,
     })
-    if (product.rawVariations) {
-      const appVariations = getAppReadVariations(product.rawVariations)
-      readProduct.variations = appVariations.variations
-      readProduct.variation_options = appVariations.variationOptions
-    }
+    const appVariations = getAppReadVariations(product.rawVariations)
+    readProduct.variations = appVariations.variations
+    readProduct.variation_options = appVariations.variationOptions
+    readProduct.images = parseReadProductImages(product.rawImages)
     return readProduct
   }
 
@@ -126,22 +124,22 @@ export class ProductController {
   }
 
   /*************************** ATTRIBUTES ************************ */
-  @Post(':id/attr_option')
-  async createProductAttrOption(
-    @Param('id') productId: number,
-    @Body() attrOption: CreateProductAttrOptionDto,
-  ): Promise<void> {
-    console.log('attr_option', attrOption)
-    await this.productService.createProductAttrOption(productId, attrOption.attrOptionId)
-  }
+  // @Post(':id/attr_option')
+  // async createProductAttrOption(
+  //   @Param('id') productId: number,
+  //   @Body() attrOption: CreateProductAttrOptionDto,
+  // ): Promise<void> {
+  //   console.log('attr_option', attrOption)
+  //   await this.productService.createProductAttrOption(productId, attrOption.attrOptionId)
+  // }
 
-  @Delete(':id/attr_option/:attrOptionId')
-  async deleteProductAttrOption(
-    @Param('id') productId: number,
-    @Param('attrOptionId') attrOptionId: number,
-  ): Promise<void> {
-    await this.productService.dropProductAttrOption(attrOptionId)
-  }
+  // @Delete(':id/attr_option/:attrOptionId')
+  // async deleteProductAttrOption(
+  //   @Param('id') productId: number,
+  //   @Param('attrOptionId') attrOptionId: number,
+  // ): Promise<void> {
+  //   await this.productService.dropProductAttrOption(attrOptionId)
+  // }
 
   /*************************** IMAGES ************************ */
   @Post(':id/image')
@@ -155,9 +153,11 @@ export class ProductController {
 
   /* =================================================================================== */
   /******************************* PRIVATE FUNCTIONS *********************************** */
-  private getCategories(product: Product): Category[] {
+  private getCategories(product: Product): AppCategoryDto[] {
     if (product.productCategories) {
-      return product.productCategories.map((productCategory) => productCategory.category)
+      return product.productCategories.map((productCategory) =>
+        plainToClass(AppCategoryDto, productCategory.category),
+      )
     }
     return []
   }
@@ -165,7 +165,7 @@ export class ProductController {
   private async getCrossProducts(params: {
     product: Product
     loadCrossProducts?: boolean
-  }): Promise<ReadProductDto[] | number[]> {
+  }): Promise<AppReadProductDto[] | number[]> {
     const { product, loadCrossProducts } = params
     if (product.rawCrossProducts?.length > 0) {
       const crossProductsIds = product.rawCrossProducts.map(
@@ -173,7 +173,7 @@ export class ProductController {
       )
       if (loadCrossProducts) {
         const crossProducts = await this.productService.findByIds(crossProductsIds)
-        return crossProducts.map((crossProduct) => plainToClass(ReadProductDto, crossProduct))
+        return crossProducts.map((crossProduct) => plainToClass(AppReadProductDto, crossProduct))
       }
       return crossProductsIds
     }

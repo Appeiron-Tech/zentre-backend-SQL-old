@@ -41,7 +41,7 @@ export class ReadProductDto {
   variation_options?: IVariationOptions[]
   variations?: IReadVariation[]
   crossProducts?: ReadProductDto[] | number[]
-  
+
   @Exclude()
   productCategories?: any[]
 

@@ -48,22 +48,24 @@ export function getAppReadVariations(rawVariations: Variation[]): {
 } {
   const appReadVariations = []
   const allVariationOptions = []
-  rawVariations.forEach((rawVariation) => {
-    const readVariation = plainToClass(IAppReadVariation, rawVariation)
-    if (rawVariation.variationOptions) {
-      const variationTuples = []
-      rawVariation.variationOptions.forEach((variation) => {
-        const variationTuple = {
-          variation: variation.variationOption.variation,
-          option: variation.variationOption.variationOption,
-        }
-        variationTuples.push(variationTuple)
-        allVariationOptions.push(variationTuple)
-      })
-      readVariation.variation_tuples = variationTuples
-    }
-    appReadVariations.push(readVariation)
-  })
+  if (rawVariations) {
+    rawVariations.forEach((rawVariation) => {
+      const readVariation = plainToClass(IAppReadVariation, rawVariation)
+      if (rawVariation.variationOptions) {
+        const variationTuples = []
+        rawVariation.variationOptions.forEach((variation) => {
+          const variationTuple = {
+            variation: variation.variationOption.variation,
+            option: variation.variationOption.variationOption,
+          }
+          variationTuples.push(variationTuple)
+          allVariationOptions.push(variationTuple)
+        })
+        readVariation.variation_tuples = variationTuples
+      }
+      appReadVariations.push(readVariation)
+    })
+  }
   const variationOptions = getUniqueVariationOptions(allVariationOptions)
   return {
     variations: appReadVariations,
@@ -73,21 +75,23 @@ export function getAppReadVariations(rawVariations: Variation[]): {
 
 export function getUniqueVariationOptions(variations: IVariationOption[]): IVariationOptions[] {
   const uniqueVariationOptions: IVariationOptions[] = []
-  variations.forEach((variationOption) => {
-    const existingVariation = uniqueVariationOptions.find(
-      (e) => e.variation === variationOption.variation,
-    )
-    if (existingVariation) {
-      if (!existingVariation.options.includes(variationOption.option)) {
-        existingVariation.options.push(variationOption.option)
+  if (variations) {
+    variations.forEach((variationOption) => {
+      const existingVariation = uniqueVariationOptions.find(
+        (e) => e.variation === variationOption.variation,
+      )
+      if (existingVariation) {
+        if (!existingVariation.options.includes(variationOption.option)) {
+          existingVariation.options.push(variationOption.option)
+        }
+      } else {
+        const newVariation: IVariationOptions = {
+          variation: variationOption.variation,
+          options: [variationOption.option],
+        }
+        uniqueVariationOptions.push(newVariation)
       }
-    } else {
-      const newVariation: IVariationOptions = {
-        variation: variationOption.variation,
-        options: [variationOption.option],
-      }
-      uniqueVariationOptions.push(newVariation)
-    }
-  })
+    })
+  }
   return uniqueVariationOptions
 }

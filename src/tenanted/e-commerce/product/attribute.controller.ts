@@ -9,9 +9,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
-import { AttributeOption } from './database/attribute/attribute-option.entity'
 import { Attribute } from './database/attribute/attribute.entity'
-import { CreateAttributeOptionDto } from './database/attribute/dto/create-attribute-option.dto'
 import { CreateAttributeDto } from './database/attribute/dto/create-attribute.dto'
 import { ProductService } from './product.service'
 
@@ -38,12 +36,12 @@ export class AttributeController {
     return createdAttribute
   }
 
-  @Post(':id/option')
-  async createOption(
-    @Param('id') id: number,
-    @Body() option: CreateAttributeOptionDto,
-  ): Promise<AttributeOption> {
-    const createdOption = await this.productService.createAttributeOption(id, option)
-    return createdOption
-  }
+  // @Post(':id/option')
+  // async createOption(
+  //   @Param('id') id: number,
+  //   @Body() option: CreateAttributeOptionDto,
+  // ): Promise<AttributeOption> {
+  //   const createdOption = await this.productService.createAttributeOption(id, option)
+  //   return createdOption
+  // }
 }

@@ -18,10 +18,7 @@ import { CreateCrossProductDto } from './database/crossProduct/dto/create-cross-
 import { ProductImage } from './database/image/product-image.entity'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
 import { CreateAttributeDto } from './database/attribute/dto/create-attribute.dto'
-import { AttributeOption } from './database/attribute/attribute-option.entity'
-import { CreateAttributeOptionDto } from './database/attribute/dto/create-attribute-option.dto'
 import { ProductAttrOption } from './database/attribute/product-attr-option.entity'
-import { CreateProductAttrOptionDto } from './database/attribute/dto/create-product-attr-option.dto'
 import { CreateVariationDto } from './database/variation/dto/create-variation.dto'
 
 @Injectable({ scope: Scope.REQUEST })
@@ -33,7 +30,6 @@ export class ProductService {
   private readonly crossProductRepository: Repository<CrossProduct>
   private readonly categoryRepository: Repository<Category>
   private readonly attributeRepository: Repository<Attribute>
-  private readonly attributeOptionRepository: Repository<AttributeOption>
   private readonly tagRepository: Repository<PTag>
   private readonly variationRepository: Repository<Variation>
 
@@ -45,7 +41,6 @@ export class ProductService {
     this.productAttrOptionRepository = connection.getRepository(ProductAttrOption)
     this.categoryRepository = connection.getRepository(Category)
     this.attributeRepository = connection.getRepository(Attribute)
-    this.attributeOptionRepository = connection.getRepository(AttributeOption)
     this.tagRepository = connection.getRepository(PTag)
     this.variationRepository = connection.getRepository(Variation)
   }
@@ -65,10 +60,13 @@ export class ProductService {
       .createQueryBuilder('product')
       .innerJoinAndSelect('product.productCategories', 'productCategories')
       .innerJoinAndSelect('productCategories.category', 'category')
-      .leftJoinAndSelect('product.rawVariations', 'variations')
-      .leftJoinAndSelect('product.attributeOptions', 'attributeOptions')
+      // .leftJoinAndSelect('product.attributeOptions', 'attributeOptions')
       .leftJoinAndSelect('product.rawCrossProducts', 'crossProducts')
-      .leftJoinAndSelect('product.images', 'images')
+      .leftJoinAndSelect('product.rawImages', 'images')
+      .leftJoinAndSelect('product.rawVariations', 'variations')
+      .leftJoinAndSelect('variations.images', 'variationImages')
+      .leftJoinAndSelect('variations.variationOptions', 'variationOptionsRel')
+      .leftJoinAndSelect('variationOptionsRel.variationOption', 'variationOption')
       .innerJoinAndSelect(
         'product.storeProducts',
         'storeProduct',
@@ -164,32 +162,32 @@ export class ProductService {
     return createdAttribute
   }
 
-  async createAttributeOption(
-    attributeId: number,
-    option: CreateAttributeOptionDto,
-  ): Promise<AttributeOption> {
-    const attribute = await this.attributeRepository.findOne(attributeId)
-    option.attribute = attribute
-    const createdOption = await this.attributeOptionRepository.save(option)
-    return createdOption
-  }
+  // async createAttributeOption(
+  //   attributeId: number,
+  //   option: CreateAttributeOptionDto,
+  // ): Promise<AttributeOption> {
+  //   const attribute = await this.attributeRepository.findOne(attributeId)
+  //   option.attribute = attribute
+  //   const createdOption = await this.attributeOptionRepository.save(option)
+  //   return createdOption
+  // }
 
-  async findAttributeOption(id: number): Promise<AttributeOption> {
-    return await this.attributeOptionRepository.findOne({ id: id })
-  }
+  // async findAttributeOption(id: number): Promise<AttributeOption> {
+  //   return await this.attributeOptionRepository.findOne({ id: id })
+  // }
 
-  async dropProductAttrOption(productAttrOptionId: number): Promise<void> {
-    await this.productAttrOptionRepository.delete({ id: productAttrOptionId })
-  }
+  // async dropProductAttrOption(productAttrOptionId: number): Promise<void> {
+  //   await this.productAttrOptionRepository.delete({ id: productAttrOptionId })
+  // }
 
-  async createProductAttrOption(productId: number, attrOptionId: number): Promise<void> {
-    const createProductAttrOption: CreateProductAttrOptionDto = {
-      productId: productId,
-      attributeOptionId: attrOptionId,
-    }
-    console.log(createProductAttrOption)
-    await this.productAttrOptionRepository.save(createProductAttrOption)
-  }
+  // async createProductAttrOption(productId: number, attrOptionId: number): Promise<void> {
+  //   const createProductAttrOption: CreateProductAttrOptionDto = {
+  //     productId: productId,
+  //     attributeOptionId: attrOptionId,
+  //   }
+  //   console.log(createProductAttrOption)
+  //   await this.productAttrOptionRepository.save(createProductAttrOption)
+  // }
 
   /* *********************** VARIATION ********************* */
   async findVariationByProduct(productId: number): Promise<Variation[]> {

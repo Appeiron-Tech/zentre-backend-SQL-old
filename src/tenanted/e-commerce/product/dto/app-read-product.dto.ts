@@ -1,7 +1,9 @@
 import { Exclude } from 'class-transformer'
 import { Timestamp } from 'typeorm'
-import { Category } from '../database/category/category.entity'
+import { AppCategoryDto } from '../database/category/dto/read-category.dto'
 import { CrossProduct } from '../database/crossProduct/cross-product.entity'
+import { AppProductImage } from '../database/image/dto/read-product-image.dto'
+import { ProductImage } from '../database/image/product-image.entity'
 import { StoreProduct } from '../database/storeProduct/store-product.entity'
 import {
   IAppReadVariation,
@@ -26,7 +28,8 @@ export class AppReadProductDto {
   length?: number
   width?: number
   height?: number
-  categories?: Category[]
+  categories?: AppCategoryDto[]
+  images: AppProductImage[]
   variation_options?: IVariationOptions[]
   variations?: IAppReadVariation[]
   crossProducts?: AppReadProductDto[] | number[]
@@ -123,6 +126,9 @@ export class AppReadProductDto {
 
   @Exclude()
   productCategories?: any[]
+
+  @Exclude()
+  rawImages: ProductImage[]
 
   @Exclude()
   rawVariations?: Variation[]

@@ -218,17 +218,17 @@ export class Product {
   @OneToMany(() => ProductCategory, (productCategory) => productCategory.product, { eager: true })
   productCategories?: ProductCategory[]
 
-  @OneToMany(() => ProductAttrOption, (productAttrOption) => productAttrOption.product, {
-    eager: true,
-  })
-  attributeOptions?: ProductAttrOption[]
+  // @OneToMany(() => ProductAttrOption, (productAttrOption) => productAttrOption.product, {
+  //   eager: true,
+  // })
+  // attributeOptions?: ProductAttrOption[]
 
   @OneToMany(() => CrossProduct, (crossProduct) => crossProduct.product, { eager: true })
   rawCrossProducts?: CrossProduct[]
 
-  @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.product, { eager: true })
+  @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.product)
   storeProducts?: StoreProduct[]
 
   @OneToMany(() => ProductImage, (productImage) => productImage.product, { eager: true })
-  images?: ProductImage[]
+  rawImages?: ProductImage[]
 }
