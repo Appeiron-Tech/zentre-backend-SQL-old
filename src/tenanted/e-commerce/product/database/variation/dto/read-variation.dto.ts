@@ -1,14 +1,15 @@
-import { Exclude } from "class-transformer"
-import { Timestamp } from "typeorm"
-import { IVariationOption } from "./app-read-variation.dto"
+import { Exclude, plainToClass } from 'class-transformer'
+import { Timestamp } from 'typeorm'
+import { Variation } from '../variation.entity'
+import { IAppReadVariation, IVariationOption, IVariationOptions } from './app-read-variation.dto'
 
 export interface IRawVariationOptions {
-  id: number,
-  variationId: number,
-  variationOptionId: number,
-  variationOption:{
-    id: number,
-    variation: string,
+  id: number
+  variationId: number
+  variationOptionId: number
+  variationOption: {
+    id: number
+    variation: string
     variationOption: string
   }
 }
@@ -39,4 +40,54 @@ export class IReadVariation {
   menu_order: number
   updatedAt: Timestamp
   createdAt: Timestamp
+}
+
+export function getAppReadVariations(rawVariations: Variation[]): {
+  variations: IAppReadVariation[]
+  variationOptions: IVariationOptions[]
+} {
+  const appReadVariations = []
+  const allVariationOptions = []
+  rawVariations.forEach((rawVariation) => {
+    const readVariation = plainToClass(IAppReadVariation, rawVariation)
+    if (rawVariation.variationOptions) {
+      const variationTuples = []
+      rawVariation.variationOptions.forEach((variation) => {
+        const variationTuple = {
+          variation: variation.variationOption.variation,
+          option: variation.variationOption.variationOption,
+        }
+        variationTuples.push(variationTuple)
+        allVariationOptions.push(variationTuple)
+      })
+      readVariation.variation_tuples = variationTuples
+    }
+    appReadVariations.push(readVariation)
+  })
+  const variationOptions = getUniqueVariationOptions(allVariationOptions)
+  return {
+    variations: appReadVariations,
+    variationOptions: variationOptions,
+  }
+}
+
+export function getUniqueVariationOptions(variations: IVariationOption[]): IVariationOptions[] {
+  const uniqueVariationOptions: IVariationOptions[] = []
+  variations.forEach((variationOption) => {
+    const existingVariation = uniqueVariationOptions.find(
+      (e) => e.variation === variationOption.variation,
+    )
+    if (existingVariation) {
+      if (!existingVariation.options.includes(variationOption.option)) {
+        existingVariation.options.push(variationOption.option)
+      }
+    } else {
+      const newVariation: IVariationOptions = {
+        variation: variationOption.variation,
+        options: [variationOption.option],
+      }
+      uniqueVariationOptions.push(newVariation)
+    }
+  })
+  return uniqueVariationOptions
 }

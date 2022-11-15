@@ -2,7 +2,11 @@ import { Exclude } from 'class-transformer'
 import { Timestamp } from 'typeorm'
 import { Category } from '../database/category/category.entity'
 import { CrossProduct } from '../database/crossProduct/cross-product.entity'
-import { IAppReadVariation, IVariationOptions } from '../database/variation/dto/app-read-variation.dto'
+import { StoreProduct } from '../database/storeProduct/store-product.entity'
+import {
+  IAppReadVariation,
+  IVariationOptions,
+} from '../database/variation/dto/app-read-variation.dto'
 import { Variation } from '../database/variation/variation.entity'
 
 export class AppReadProductDto {
@@ -116,12 +120,15 @@ export class AppReadProductDto {
 
   @Exclude()
   menu_order?: number
-  
+
   @Exclude()
   productCategories?: any[]
 
   @Exclude()
   rawVariations?: Variation[]
+
+  @Exclude()
+  storeProducts?: StoreProduct[]
 
   @Exclude()
   rawCrossProducts: CrossProduct[]

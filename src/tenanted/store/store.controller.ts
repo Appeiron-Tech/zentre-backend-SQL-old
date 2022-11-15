@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   // UseGuards,
   UseInterceptors,
   UsePipes,
@@ -15,7 +16,6 @@ import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { asyncForEach } from 'src/utils/utils'
 import { StoreOpeningHour } from './database/store-opening-hour.entity'
 import { StoreWorker } from './database/store-worker.entity'
-import { Store } from './database/store.entity'
 import { CreateStoreOpeningHourDto } from './dto/create-store-opening-hour.dto'
 import { CreateStoreWorkerDto } from './dto/worker/create-store-worker.dto'
 import { UpdStoreWorkerDto } from './dto/worker/upd-store-worker.dto'
@@ -24,8 +24,6 @@ import { plainToClass } from 'class-transformer'
 import { ReqUpdateStoreDto } from './dto/req-upd-store.dto'
 import { UpdateStoreDto } from './dto/upd-store.dto'
 import { parseAppReadOpeningHours, parseAppReadPhones, ReadStoreDto } from './dto/app/app-store.dto'
-import { AppStorePhone } from './dto/app/app-store-phone.dto'
-import { AppStoreOpeningHour } from './dto/app/app-store-opening-hour.dto'
 // import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
 
 @UseInterceptors(LoggingInterceptor)
@@ -168,6 +166,7 @@ export class StoreController {
   private parseReadStores(stores: ReadStoreDto[]) {
     const readStores: ReadStoreDto[] = []
     stores.forEach((store) => {
+      console.info(store)
       const readStore = plainToClass(ReadStoreDto, store)
       if (store.phones) {
         readStore.phones = parseAppReadPhones(store.phones)

@@ -42,6 +42,7 @@ import { VariationOption } from 'src/tenanted/e-commerce/product/database/variat
 import { VariationImage } from 'src/tenanted/e-commerce/product/database/variation/variation-image.entity'
 import { HubSurvey } from 'src/tenanted/hub/contact/database/entities/survey.entity'
 import { HubContact } from 'src/tenanted/hub/contact/database/entities/contact.entity'
+import { StoreProduct } from 'src/tenanted/e-commerce/product/database/storeProduct/store-product.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenancy])],
@@ -117,6 +118,7 @@ export class TenancyModule {
                 AttributeOption,
                 CrossProduct,
                 ProductImage,
+                StoreProduct,
                 Category,
                 ProductCategory,
                 ProductAttrOption,

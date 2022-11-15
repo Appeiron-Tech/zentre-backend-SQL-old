@@ -6,14 +6,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { Product } from './database/product/product.entity'
-import { CreateProductDto } from './dto/create-product.dto'
-import { CreateProductDto as DBCreateProductDto } from './database/product/dto/create-product.dto'
 import { ProductService } from './product.service'
 import { plainToClass } from 'class-transformer'
 import { UpdateProductDto } from './database/product/dto/update-product.dto'
@@ -22,13 +21,8 @@ import { ReadProductDto } from './dto/read-product.dto'
 import { asyncForEach } from 'src/utils/utils'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
 import { CreateProductAttrOptionDto } from './dto/create-product-attr-option.dto'
-import { Variation } from './database/variation/variation.entity'
-import {
-  IAppReadVariation,
-  IVariationOption,
-  IVariationOptions,
-} from './database/variation/dto/app-read-variation.dto'
 import { AppReadProductDto } from './dto/app-read-product.dto'
+import { getAppReadVariations } from './database/variation/dto/read-variation.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(new ValidationPipe({ always: true }))
@@ -53,14 +47,19 @@ export class ProductController {
   }
 
   @Get('app')
-  async appFindAll(): Promise<AppReadProductDto[]> {
+  async appFindAll(@Query('storeId') storeId?: number): Promise<AppReadProductDto[]> {
     const readProducts: AppReadProductDto[] = []
-    const products = await this.productService.findAll()
+    let products
+    if (storeId) {
+      products = await this.productService.findByStore(storeId)
+    } else {
+      products = await this.productService.findAll()
+    }
     await asyncForEach(products, async (product: Product) => {
       const readProduct = plainToClass(AppReadProductDto, product)
       readProduct.categories = this.getCategories(product)
       if (product.rawVariations) {
-        const appVariations = this.getAppReadVariations(product.rawVariations)
+        const appVariations = getAppReadVariations(product.rawVariations)
         readProduct.variations = appVariations.variations
         readProduct.variation_options = appVariations.variationOptions
       }
@@ -69,25 +68,30 @@ export class ProductController {
     return readProducts
   }
 
-  @Get(':id')
+  @Get('app/:id')
   async find(@Param('id') id: number): Promise<ReadProductDto> {
-    const product = await this.productService.find(id)
+    const product = await this.productService.findOne(id)
     const readProduct = plainToClass(ReadProductDto, product)
     readProduct.categories = this.getCategories(product)
     readProduct.crossProducts = await this.getCrossProducts({
       product: product,
       loadCrossProducts: true,
     })
+    if (product.rawVariations) {
+      const appVariations = getAppReadVariations(product.rawVariations)
+      readProduct.variations = appVariations.variations
+      readProduct.variation_options = appVariations.variationOptions
+    }
     return readProduct
   }
 
-  @Post()
-  async create(@Body() product: CreateProductDto): Promise<Product> {
-    const toCreateProduct: DBCreateProductDto = plainToClass(DBCreateProductDto, product)
-    const createdProduct = await this.productService.upsert(toCreateProduct)
-    await this.createCrossProducts(createdProduct.id, product.crossProductIds)
-    return createdProduct
-  }
+  // @Post()
+  // async create(@Body() product: CreateProductDto): Promise<Product> {
+  //   const toCreateProduct: DBCreateProductDto = plainToClass(DBCreateProductDto, product)
+  //   const createdProduct = await this.productService.upsert(toCreateProduct)
+  //   await this.createCrossProducts(createdProduct.id, product.crossProductIds)
+  //   return createdProduct
+  // }
 
   @Patch()
   async update(@Body() product: UpdateProductDto): Promise<Product> {
@@ -96,17 +100,17 @@ export class ProductController {
   }
 
   /*************************** CROSS PRODUCTS ************************ */
-  @Post(':id/crossproducts')
-  async upsertCrossProducts(
-    @Param('id') productId: number,
-    @Body() crossProductIds: number[],
-  ): Promise<void> {
-    if (crossProductIds?.length > 0) {
-      const validProducts: Product[] = await this.productService.findAll(crossProductIds)
-      await this.productService.dropCrossProducts(productId)
-      await this.productService.createCrossProducts(productId, validProducts)
-    }
-  }
+  // @Post(':id/crossproducts')
+  // async upsertCrossProducts(
+  //   @Param('id') productId: number,
+  //   @Body() crossProductIds: number[],
+  // ): Promise<void> {
+  //   if (crossProductIds?.length > 0) {
+  //     const validProducts: Product[] = await this.productService.findAll(crossProductIds)
+  //     await this.productService.dropCrossProducts(productId)
+  //     await this.productService.createCrossProducts(productId, validProducts)
+  //   }
+  // }
 
   /*************************** CATEGORIES ************************ */
   @Post(':id/category')
@@ -152,8 +156,10 @@ export class ProductController {
   /* =================================================================================== */
   /******************************* PRIVATE FUNCTIONS *********************************** */
   private getCategories(product: Product): Category[] {
-    const categories = product.productCategories.map((productCategory) => productCategory.category)
-    return categories
+    if (product.productCategories) {
+      return product.productCategories.map((productCategory) => productCategory.category)
+    }
+    return []
   }
 
   private async getCrossProducts(params: {
@@ -161,85 +167,23 @@ export class ProductController {
     loadCrossProducts?: boolean
   }): Promise<ReadProductDto[] | number[]> {
     const { product, loadCrossProducts } = params
-    const crossProductsIds = product.rawCrossProducts.map(
-      (crossProduct) => crossProduct.crossProductId,
-    )
-    if (loadCrossProducts) {
-      const crossProducts = await this.productService.findAll(crossProductsIds)
-      return crossProducts.map((crossProduct) => plainToClass(ReadProductDto, crossProduct))
-    }
-    return crossProductsIds
-  }
-
-  private async getAppCrossProducts(params: {
-    product: Product
-    loadCrossProducts?: boolean
-  }): Promise<AppReadProductDto[] | number[]> {
-    const { product, loadCrossProducts } = params
-    const crossProductsIds = product.rawCrossProducts.map(
-      (crossProduct) => crossProduct.crossProductId,
-    )
-    if (loadCrossProducts) {
-      const crossProducts = await this.productService.findAll(crossProductsIds)
-      return crossProducts.map((crossProduct) => plainToClass(AppReadProductDto, crossProduct))
-    }
-    return crossProductsIds
-  }
-
-  private async createCrossProducts(productId: number, crossProductIds: number[]): Promise<void> {
-    if (crossProductIds?.length > 0) {
-      const crossProducts = await this.productService.findAll(crossProductIds)
-      await this.productService.createCrossProducts(productId, crossProducts)
-    }
-  }
-
-  private getAppReadVariations(rawVariations: Variation[]): {
-    variations: IAppReadVariation[]
-    variationOptions: IVariationOptions[]
-  } {
-    const appReadVariations = []
-    const allVariationOptions = []
-    rawVariations.forEach((rawVariation) => {
-      const readVariation = plainToClass(IAppReadVariation, rawVariation)
-      if (rawVariation.variationOptions) {
-        const variationTuples = []
-        rawVariation.variationOptions.forEach((variation) => {
-          const variationTuple = {
-            variation: variation.variationOption.variation,
-            option: variation.variationOption.variationOption,
-          }
-          variationTuples.push(variationTuple)
-          allVariationOptions.push(variationTuple)
-        })
-        readVariation.variation_tuples = variationTuples
-      }
-      appReadVariations.push(readVariation)
-    })
-    const variationOptions = this.getUniqueVariationOptions(allVariationOptions)
-    return {
-      variations: appReadVariations,
-      variationOptions: variationOptions,
-    }
-  }
-
-  private getUniqueVariationOptions(variations: IVariationOption[]): IVariationOptions[] {
-    const uniqueVariationOptions: IVariationOptions[] = []
-    variations.forEach((variationOption) => {
-      const existingVariation = uniqueVariationOptions.find(
-        (e) => e.variation === variationOption.variation,
+    if (product.rawCrossProducts?.length > 0) {
+      const crossProductsIds = product.rawCrossProducts.map(
+        (crossProduct) => crossProduct.crossProductId,
       )
-      if (existingVariation) {
-        if (!existingVariation.options.includes(variationOption.option)) {
-          existingVariation.options.push(variationOption.option)
-        }
-      } else {
-        const newVariation: IVariationOptions = {
-          variation: variationOption.variation,
-          options: [variationOption.option],
-        }
-        uniqueVariationOptions.push(newVariation)
+      if (loadCrossProducts) {
+        const crossProducts = await this.productService.findByIds(crossProductsIds)
+        return crossProducts.map((crossProduct) => plainToClass(ReadProductDto, crossProduct))
       }
-    })
-    return uniqueVariationOptions
+      return crossProductsIds
+    }
+    return []
   }
+
+  // private async createCrossProducts(productId: number, crossProductIds: number[]): Promise<void> {
+  //   if (crossProductIds?.length > 0) {
+  //     const crossProducts = await this.productService.findAll(crossProductIds)
+  //     await this.productService.createCrossProducts(productId, crossProducts)
+  //   }
+  // }
 }

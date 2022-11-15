@@ -42,7 +42,7 @@ export class ReadStoreDto {
   phones?: AppStorePhone[]
 
   // @Expose()
-  // sns: AppStoreSN[]
+  // storeProducts?: StoreProduct[]
 
   @Expose()
   workers?: AppStoreWorker[]

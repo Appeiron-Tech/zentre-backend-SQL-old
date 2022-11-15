@@ -11,7 +11,7 @@ export class ProductCategory {
   productId: number
 
   @ManyToOne(() => Product, (product) => product.productCategories)
-  product: number
+  product: Product
 
   @Column('int', { nullable: false })
   categoryId: number

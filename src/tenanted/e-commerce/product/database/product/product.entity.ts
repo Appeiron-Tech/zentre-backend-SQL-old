@@ -12,6 +12,7 @@ import { ProductCategory } from '../category/product-category.entity'
 import { Variation } from '../variation/variation.entity'
 import { ProductImage } from '../image/product-image.entity'
 import { ProductAttrOption } from '../attribute/product-attr-option.entity'
+import { StoreProduct } from '../storeProduct/store-product.entity'
 
 @Entity({ name: 'products' })
 export class Product {
@@ -224,6 +225,9 @@ export class Product {
 
   @OneToMany(() => CrossProduct, (crossProduct) => crossProduct.product, { eager: true })
   rawCrossProducts?: CrossProduct[]
+
+  @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.product, { eager: true })
+  storeProducts?: StoreProduct[]
 
   @OneToMany(() => ProductImage, (productImage) => productImage.product, { eager: true })
   images?: ProductImage[]

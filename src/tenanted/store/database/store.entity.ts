@@ -1,7 +1,7 @@
+import { StoreProduct } from 'src/tenanted/e-commerce/product/database/storeProduct/store-product.entity'
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { StoreOpeningHour } from './store-opening-hour.entity'
 import { StorePhone } from './store-phone.entity'
-// import { StoreSN } from './store-sn.entity'
 import { StoreWorker } from './store-worker.entity'
 
 @Entity({ name: 'stores' })
@@ -54,9 +54,6 @@ export class Store {
   @OneToMany(() => StorePhone, (phone) => phone.store, { eager: true })
   phones?: StorePhone[]
 
-  // @OneToMany(() => StoreSN, (sn) => sn.store, { eager: true })
-  // sns: StoreSN[]
-
   @OneToMany(() => StoreWorker, (worker) => worker.store)
   workers?: StoreWorker[]
 
@@ -64,6 +61,9 @@ export class Store {
     eager: true,
   })
   openingHours?: StoreOpeningHour[]
+
+  @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.product)
+  storeProducts?: StoreProduct[]
 
   @Column({ nullable: false, default: true })
   isActive: boolean

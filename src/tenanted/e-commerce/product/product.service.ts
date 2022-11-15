@@ -50,21 +50,42 @@ export class ProductService {
     this.variationRepository = connection.getRepository(Variation)
   }
 
-  async findAll(ids?: number[]): Promise<Product[]> {
+  async findByIds(ids: number[]): Promise<Product[]> {
     if (ids && ids?.length > 0) {
       console.log('ids ' + ids)
       return await this.productRepository.find({
         where: { id: In(ids) },
       })
-    } else {
-      return await this.productRepository.find()
-      // const products = await this.productRepository.find()
-      // return products.map((product) => plainToClass(ReadProductDto, product))
     }
+    return []
   }
 
-  async find(id: number): Promise<Product> {
+  async findByStore(storeId: number): Promise<Product[]> {
+    return await this.productRepository
+      .createQueryBuilder('product')
+      .innerJoinAndSelect('product.productCategories', 'productCategories')
+      .innerJoinAndSelect('productCategories.category', 'category')
+      .leftJoinAndSelect('product.rawVariations', 'variations')
+      .leftJoinAndSelect('product.attributeOptions', 'attributeOptions')
+      .leftJoinAndSelect('product.rawCrossProducts', 'crossProducts')
+      .leftJoinAndSelect('product.images', 'images')
+      .innerJoinAndSelect(
+        'product.storeProducts',
+        'storeProduct',
+        'storeProduct.storeId = :storeId',
+        {
+          storeId: storeId,
+        },
+      )
+      .getMany()
+  }
+
+  async findOne(id: number): Promise<Product> {
     return await this.productRepository.findOne(id)
+  }
+
+  async findAll(): Promise<Product[]> {
+    return await this.productRepository.find()
   }
 
   async upsert(product: CreateProductDto | UpdateProductDto): Promise<Product> {
