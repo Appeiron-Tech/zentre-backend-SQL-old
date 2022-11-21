@@ -61,7 +61,7 @@ export class ProductService {
       .innerJoinAndSelect('product.productCategories', 'productCategories')
       .innerJoinAndSelect('productCategories.category', 'category')
       // .leftJoinAndSelect('product.attributeOptions', 'attributeOptions')
-      .leftJoinAndSelect('product.rawCrossProducts', 'crossProducts')
+      // .leftJoinAndSelect('product.rawCrossProducts', 'crossProducts')
       .leftJoinAndSelect('product.rawImages', 'images')
       .leftJoinAndSelect('product.rawVariations', 'variations')
       .leftJoinAndSelect('variations.images', 'variationImages')
@@ -75,6 +75,8 @@ export class ProductService {
           storeId: storeId,
         },
       )
+      .orderBy('product.id', 'ASC')
+      .addOrderBy('variations.id', 'ASC')
       .getMany()
   }
 

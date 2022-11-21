@@ -1,5 +1,6 @@
 import { Exclude, plainToClass } from 'class-transformer'
 import { Timestamp } from 'typeorm'
+import { IVariationImage } from '../variation-image.entity'
 import { Variation } from '../variation.entity'
 import { IAppReadVariation, IVariationOption, IVariationOptions } from './app-read-variation.dto'
 
@@ -55,6 +56,7 @@ export function getAppReadVariations(rawVariations: Variation[]): {
         const variationTuples = []
         rawVariation.variationOptions.forEach((variation) => {
           const variationTuple = {
+            icon: variation.variationOption.icon,
             variation: variation.variationOption.variation,
             option: variation.variationOption.variationOption,
           }
@@ -73,6 +75,44 @@ export function getAppReadVariations(rawVariations: Variation[]): {
   }
 }
 
+export function getAppSimpleReadVariations(rawVariations: Variation[]): {
+  variationMinPrice: number
+  variationOptions: IVariationOptions[]
+  variationImage: IVariationImage
+} {
+  let minPrice = null
+  let variationImage: IVariationImage = null
+  const allVariationOptions = []
+  if (rawVariations) {
+    rawVariations.forEach((rawVariation) => {
+      if (rawVariation.variationOptions) {
+        rawVariation.variationOptions.forEach((variation) => {
+          const variationTuple = {
+            icon: variation.variationOption.icon,
+            variation: variation.variationOption.variation,
+            option: variation.variationOption.variationOption,
+          }
+          allVariationOptions.push(variationTuple)
+        })
+      }
+      if (!minPrice) {
+        minPrice = rawVariation.price
+      } else if (rawVariation.price !== null && rawVariation.price < minPrice) {
+        minPrice = rawVariation.price
+      }
+      if (!variationImage) {
+        variationImage = getSimpleReadImage(rawVariation.images)
+      }
+    })
+  }
+  const variationOptions = getUniqueVariationOptions(allVariationOptions)
+  return {
+    variationMinPrice: minPrice,
+    variationOptions: variationOptions,
+    variationImage: variationImage,
+  }
+}
+
 export function getUniqueVariationOptions(variations: IVariationOption[]): IVariationOptions[] {
   const uniqueVariationOptions: IVariationOptions[] = []
   if (variations) {
@@ -86,12 +126,25 @@ export function getUniqueVariationOptions(variations: IVariationOption[]): IVari
         }
       } else {
         const newVariation: IVariationOptions = {
+          icon: variationOption.icon,
           variation: variationOption.variation,
           options: [variationOption.option],
         }
+        console.log('new variation: ')
+        console.info(newVariation)
         uniqueVariationOptions.push(newVariation)
       }
     })
   }
   return uniqueVariationOptions
+}
+
+function getSimpleReadImage(variationImages: IVariationImage[]): IVariationImage {
+  let image: IVariationImage = null
+  if (variationImages?.length > 0) {
+    image = variationImages.find(
+      (variationImage) => variationImage.src !== null && variationImage.src !== '',
+    )
+  }
+  return image
 }

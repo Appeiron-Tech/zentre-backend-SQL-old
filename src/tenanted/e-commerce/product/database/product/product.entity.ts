@@ -11,7 +11,6 @@ import { CrossProduct } from '../crossProduct/cross-product.entity'
 import { ProductCategory } from '../category/product-category.entity'
 import { Variation } from '../variation/variation.entity'
 import { ProductImage } from '../image/product-image.entity'
-import { ProductAttrOption } from '../attribute/product-attr-option.entity'
 import { StoreProduct } from '../storeProduct/store-product.entity'
 
 @Entity({ name: 'products' })

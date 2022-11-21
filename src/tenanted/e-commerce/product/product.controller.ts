@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
@@ -19,10 +18,14 @@ import { UpdateProductDto } from './database/product/dto/update-product.dto'
 import { Category } from './database/category/category.entity'
 import { ReadProductDto } from './dto/read-product.dto'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
-import { AppReadProductDto } from './dto/app-read-product.dto'
-import { getAppReadVariations } from './database/variation/dto/read-variation.dto'
+import { AppReadProductDto, AppSimpleReadProductDto } from './dto/app-read-product.dto'
+import {
+  getAppReadVariations,
+  getAppSimpleReadVariations,
+} from './database/variation/dto/read-variation.dto'
 import { AppCategoryDto } from './database/category/dto/read-category.dto'
 import { parseReadProductImages } from './database/image/dto/read-product-image.dto'
+import { IProductImage, ProductImage } from './database/image/product-image.entity'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(new ValidationPipe({ always: true }))
@@ -47,8 +50,8 @@ export class ProductController {
   }
 
   @Get('app')
-  async appFindAll(@Query('storeId') storeId?: number): Promise<AppReadProductDto[]> {
-    const readProducts: AppReadProductDto[] = []
+  async appFindAll(@Query('storeId') storeId?: number): Promise<AppSimpleReadProductDto[]> {
+    const readProducts: AppSimpleReadProductDto[] = []
     let products = []
     if (storeId) {
       products = await this.productService.findByStore(storeId)
@@ -56,12 +59,13 @@ export class ProductController {
       products = await this.productService.findAll()
     }
     products.forEach((product: Product) => {
-      const readProduct = plainToClass(AppReadProductDto, product)
+      const readProduct = plainToClass(AppSimpleReadProductDto, product)
       readProduct.categories = this.getCategories(product)
-      const appVariations = getAppReadVariations(product.rawVariations)
-      readProduct.variations = appVariations.variations
-      readProduct.variation_options = appVariations.variationOptions
-      readProduct.images = parseReadProductImages(product.rawImages)
+      const appSummaryVariations = getAppSimpleReadVariations(product.rawVariations)
+      readProduct.variation_min_price = appSummaryVariations.variationMinPrice
+      readProduct.variation_options = appSummaryVariations.variationOptions
+      readProduct.image =
+        appSummaryVariations.variationImage ?? this.getSimpleReadProductImage(product.rawImages)
       readProducts.push(readProduct)
     })
     return readProducts
@@ -178,6 +182,16 @@ export class ProductController {
       return crossProductsIds
     }
     return []
+  }
+
+  private getSimpleReadProductImage(productImages: ProductImage[]): IProductImage {
+    let image: IProductImage = null
+    if (productImages?.length > 0) {
+      image = productImages.find(
+        (productImage) => productImage.src !== null && productImage.src !== '',
+      )
+    }
+    return image
   }
 
   // private async createCrossProducts(productId: number, crossProductIds: number[]): Promise<void> {

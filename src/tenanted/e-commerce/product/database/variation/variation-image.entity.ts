@@ -1,9 +1,8 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp } from 'typeorm'
-import { Product } from '../product/product.entity'
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Variation } from './variation.entity'
 
 @Entity({ name: 'variation_images' })
-export class VariationImage {
+export class VariationImage implements IVariationImage {
   @PrimaryGeneratedColumn('increment')
   id: number
 
@@ -20,5 +19,14 @@ export class VariationImage {
   variation: Variation
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: number
+}
+
+export interface IVariationImage {
+  id: number
+  src: string
+  name: string
+  alt?: string
+  variation: Variation
   createdAt: number
 }

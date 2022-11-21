@@ -1,24 +1,27 @@
-import { Exclude } from "class-transformer"
-import { Timestamp } from "typeorm"
+import { Exclude } from 'class-transformer'
+import { Timestamp } from 'typeorm'
+import { IVariationImage } from '../variation-image.entity'
 
 export interface IRawVariationOptions {
-  id: number,
-  variationId: number,
-  variationOptionId: number,
-  variationOption:{
-    id: number,
-    variation: string,
+  id: number
+  variationId: number
+  variationOptionId: number
+  variationOption: {
+    id: number
+    variation: string
     variationOption: string
   }
 }
 
 export interface IVariationOptions {
-  variation: string,
+  icon: string
+  variation: string
   options: string[]
 }
 
 export interface IVariationOption {
-  variation: string,
+  icon: string
+  variation: string
   option: string
 }
 
@@ -38,6 +41,7 @@ export class IAppReadVariation {
   length: number
   width: number
   height: number
+  images: IVariationImage[]
 
   @Exclude()
   date_created: Timestamp
