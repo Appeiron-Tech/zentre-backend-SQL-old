@@ -1,15 +1,16 @@
 import { Exclude } from 'class-transformer'
 import { Timestamp } from 'typeorm'
-import { AppCategoryDto } from '../database/category/dto/read-category.dto'
-import { CrossProduct } from '../database/crossProduct/cross-product.entity'
-import { AppProductImage } from '../database/image/dto/read-product-image.dto'
-import { ProductImage } from '../database/image/product-image.entity'
-import { StoreProduct } from '../database/storeProduct/store-product.entity'
+import { AppCategoryDto } from '../../category/dto/read-category.dto'
+import { CrossProduct } from '../../crossProduct/cross-product.entity'
+import { AppProductImage } from '../../image/dto/read-product-image.dto'
+import { ProductImage } from '../../image/product-image.entity'
+import { StoreProduct } from '../../storeProduct/store-product.entity'
 import {
   IAppReadVariation,
+  IAvailableVariation,
   IVariationOptions,
-} from '../database/variation/dto/app-read-variation.dto'
-import { Variation } from '../database/variation/variation.entity'
+} from '../../variation/dto/app-read-variation.dto'
+import { Variation } from '../../variation/variation.entity'
 
 export class AppReadProductDto {
   id: number
@@ -33,6 +34,7 @@ export class AppReadProductDto {
   variation_options?: IVariationOptions[]
   variations?: IAppReadVariation[]
   crossProducts?: AppReadProductDto[] | number[]
+  availableVariationOptions?: IAvailableVariation[]
 
   @Exclude()
   slug: string

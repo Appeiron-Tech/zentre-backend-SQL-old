@@ -20,7 +20,7 @@ export interface IVariationOptions {
 }
 
 export interface IVariationOption {
-  icon: string
+  icon?: string
   variation: string
   option: string
 }
@@ -102,4 +102,32 @@ export class IAppReadVariation {
 
   @Exclude()
   createdAt: Timestamp
+}
+
+export interface IAvailableOption {
+  label: string
+  value: string
+  disable: boolean
+}
+
+export interface IAvailableRelation {
+  variation: string
+  options: IAvailableOption[]
+}
+
+export interface IAvailableVariation {
+  variation: string
+  option?: string
+  available: IAvailableRelation[]
+}
+
+export interface IVariationTuple {
+  icon: string
+  variation: string
+  option: string
+}
+
+export interface IGroupByVariation {
+  variation: string
+  options: string[]
 }

@@ -18,7 +18,10 @@ import { UpdateProductDto } from './database/product/dto/update-product.dto'
 import { Category } from './database/category/category.entity'
 import { ReadProductDto } from './dto/read-product.dto'
 import { CreateProductImageDto } from './database/image/dto/create-product-image.dto'
-import { AppReadProductDto, AppSimpleReadProductDto } from './dto/app-read-product.dto'
+import {
+  AppReadProductDto,
+  AppSimpleReadProductDto,
+} from './database/product/dto/app-read-product.dto'
 import {
   getAppReadVariations,
   getAppSimpleReadVariations,
@@ -26,6 +29,15 @@ import {
 import { AppCategoryDto } from './database/category/dto/read-category.dto'
 import { parseReadProductImages } from './database/image/dto/read-product-image.dto'
 import { IProductImage, ProductImage } from './database/image/product-image.entity'
+import {
+  IAvailableOption,
+  IAvailableRelation,
+  IAvailableVariation,
+  IGroupByVariation,
+  IVariationOption,
+  IVariationOptions,
+  IVariationTuple,
+} from './database/variation/dto/app-read-variation.dto'
 
 @UseInterceptors(LoggingInterceptor)
 @UsePipes(new ValidationPipe({ always: true }))
@@ -81,8 +93,14 @@ export class ProductController {
       loadCrossProducts: true,
     })
     const appVariations = getAppReadVariations(product.rawVariations)
+    const allVariationOptions = appVariations.variations.map((options) => options.variation_tuples)
     readProduct.variations = appVariations.variations
     readProduct.variation_options = appVariations.variationOptions
+
+    readProduct.availableVariationOptions = this.getAvailableVariationOptions(
+      appVariations.variationOptions,
+      allVariationOptions,
+    )
     readProduct.images = parseReadProductImages(product.rawImages)
     return readProduct
   }
@@ -192,6 +210,117 @@ export class ProductController {
       )
     }
     return image
+  }
+
+  private getOthersVariations(
+    variation: string,
+    option: string,
+    tuple: IVariationOption[],
+  ): IVariationOption[] {
+    const otherVariations: IVariationOption[] = tuple.map((variationOption) => {
+      if (variationOption.variation !== variation && variationOption.option !== option) {
+        return {
+          variation: variationOption.variation,
+          option: variationOption.option,
+        }
+      } else {
+        return {} as IVariationOption
+      }
+    })
+    return otherVariations?.filter((variation) => variation.variation !== undefined) || []
+  }
+
+  private findRelation(
+    allVariationOptions: IVariationOption[][],
+    variation: string,
+    option: string,
+  ): IVariationOption[] {
+    const foundTuples = allVariationOptions.map((tuple) => {
+      const containsVariation = tuple.some(
+        (vOption) => vOption.variation == variation && vOption.option == option,
+      )
+      if (containsVariation) {
+        return this.getOthersVariations(variation, option, tuple)
+      } else {
+        return []
+      }
+    })
+    const variationRelations: IVariationOption[] = []
+    if (foundTuples.length) {
+      foundTuples.forEach((foundTuple) => {
+        if (foundTuple.length) {
+          variationRelations.push(...foundTuple)
+        }
+      })
+    }
+    return variationRelations
+  }
+
+  private groupRelationsByVariation(relations: IVariationOption[]): IGroupByVariation[] {
+    const groupByVariation: IGroupByVariation[] = []
+    relations.forEach((relation) => {
+      const existsVariation = groupByVariation.find((e) => e.variation === relation.variation)
+      if (existsVariation) {
+        if (!existsVariation.options.includes(relation.option)) {
+          existsVariation.options.push(relation.option)
+        }
+      } else {
+        const newVariation: IGroupByVariation = {
+          variation: relation.variation,
+          options: [relation.option],
+        }
+        groupByVariation.push(newVariation)
+      }
+    })
+    return groupByVariation
+  }
+
+  private parseAvailableOptions(
+    allOptions: string[],
+    relationOptions: string[],
+  ): IAvailableOption[] {
+    const availableOptions: IAvailableOption[] = []
+    allOptions.forEach((allOption) => {
+      const availableOption: IAvailableOption = {
+        label: allOption,
+        value: allOption,
+        disable: !relationOptions.includes(allOption),
+      }
+      availableOptions.push(availableOption)
+    })
+    return availableOptions
+  }
+
+  private getAvailableVariationOptions(
+    variationOptions: IVariationOptions[],
+    allVariationOptions: IVariationOption[][],
+  ): IAvailableVariation[] {
+    const availableVariationOptions: IAvailableVariation[] = []
+    variationOptions.forEach((variationOption) => {
+      variationOption.options.forEach((option) => {
+        const availableRelations: IAvailableRelation[] = []
+        const relations = this.findRelation(allVariationOptions, variationOption.variation, option)
+        const variationRelations = this.groupRelationsByVariation(relations)
+        variationRelations.forEach((variationRelation) => {
+          const allOptions =
+            variationOptions.find((variation) => variation.variation == variationRelation.variation)
+              ?.options || []
+          const availableOptions = this.parseAvailableOptions(allOptions, variationRelation.options)
+          const availableRelation: IAvailableRelation = {
+            variation: variationRelation.variation,
+            options: availableOptions,
+          }
+          availableRelations.push(availableRelation)
+        })
+        const availableVariationOption: IAvailableVariation = {
+          variation: variationOption.variation,
+          option: option,
+          available: availableRelations,
+        }
+        availableVariationOptions.push(availableVariationOption)
+      })
+    })
+    return availableVariationOptions
   }
 
   // private async createCrossProducts(productId: number, crossProductIds: number[]): Promise<void> {

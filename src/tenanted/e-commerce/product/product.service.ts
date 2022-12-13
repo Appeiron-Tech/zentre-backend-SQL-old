@@ -106,10 +106,10 @@ export class ProductService {
   async findCategories(ids?: number[]): Promise<Category[]> {
     if (ids && ids?.length > 0) {
       return await this.categoryRepository.find({
-        where: { id: In(ids) },
+        where: { id: In(ids), isActive: true },
       })
     } else {
-      return await this.categoryRepository.find()
+      return await this.categoryRepository.find({ isActive: true })
     }
   }
 

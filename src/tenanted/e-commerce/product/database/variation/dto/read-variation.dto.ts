@@ -130,8 +130,6 @@ export function getUniqueVariationOptions(variations: IVariationOption[]): IVari
           variation: variationOption.variation,
           options: [variationOption.option],
         }
-        console.log('new variation: ')
-        console.info(newVariation)
         uniqueVariationOptions.push(newVariation)
       }
     })

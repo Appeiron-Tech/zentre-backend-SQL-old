@@ -9,9 +9,11 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
+import { plainToClass } from 'class-transformer'
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { Category } from './database/category/category.entity'
 import { CreateCategoryDto } from './database/category/dto/create-category.dto'
+import { AppCategoryDto } from './database/category/dto/read-category.dto'
 import { ProductService } from './product.service'
 
 @UseInterceptors(LoggingInterceptor)
@@ -20,14 +22,19 @@ import { ProductService } from './product.service'
     always: true,
   }),
 )
-@Controller('api/category')
+@Controller('category')
 export class CategoryController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get()
-  async findCategories(): Promise<Category[]> {
+  @Get('app')
+  async findCategories(): Promise<AppCategoryDto[]> {
+    const readCategories: AppCategoryDto[] = []
     const categories = await this.productService.findCategories()
-    return categories
+    categories.forEach((category) => {
+      const readCategory = plainToClass(AppCategoryDto, category)
+      readCategories.push(readCategory)
+    })
+    return readCategories
   }
 
   @Post()
