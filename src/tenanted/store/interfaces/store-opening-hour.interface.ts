@@ -1,6 +1,7 @@
 export interface IStoreOpeningHour {
   id?: number
-  store: any
+  store?: any
+  storeId: number
   weekDay: number
   fromHour: string
   toHour: string

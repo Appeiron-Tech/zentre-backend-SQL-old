@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConnectionOptions } from 'typeorm'
+import { MongooseModule } from '@nestjs/mongoose'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './common/modules/auth/auth.module'
@@ -27,21 +28,28 @@ import { ContactModule } from './tenanted/hub/contact/contact.module'
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRootAsync({
+    // TypeOrmModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   async useFactory(configService: ConfigService) {
+    //     return {
+    //       type: 'mysql',
+    //       host: configService.get('DB_HOST'),
+    //       port: +configService.get<number>('DB_PORT'),
+    //       username: configService.get('DB_USER'),
+    //       password: configService.get('DB_PASSWORD'),
+    //       database: configService.get('DB_DATABASE'),
+    //       entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    //       synchronize: false,
+    //     } as ConnectionOptions
+    //   },
+    // }),
+    MongooseModule.forRootAsync({
       imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_DB'),
+      }),
       inject: [ConfigService],
-      async useFactory(configService: ConfigService) {
-        return {
-          type: 'mysql',
-          host: configService.get('DB_HOST'),
-          port: +configService.get<number>('DB_PORT'),
-          username: configService.get('DB_USER'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_DATABASE'),
-          entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: false,
-        } as ConnectionOptions
-      },
     }),
     AuthModule,
     //PUBLIC

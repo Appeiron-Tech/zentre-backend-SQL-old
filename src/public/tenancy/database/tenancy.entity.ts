@@ -1,32 +1,33 @@
-import { UserTenancy } from 'src/public/user/database/user-tenancy.entity'
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Document, Schema as MongooseSchema } from 'mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+// import { UserTenancy } from 'src/public/user/database/user-tenancy.entity'
+// import { Column, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity({ name: 'tenancies' })
+export type TenancyDocument = Tenancy & Document
+@Schema({ timestamps: true })
 export class Tenancy {
-  @PrimaryGeneratedColumn('increment')
-  id: number
+  _id: MongooseSchema.Types.ObjectId
 
-  @Column({ unique: true })
+  @Prop({ unique: true })
   name: string
 
-  @Column({ length: 256 })
+  @Prop({ length: 256 })
   description?: string
 
-  @Column({ length: 256 })
+  @Prop({ length: 256 })
   logo?: string
 
-  @Column({ default: true })
+  @Prop({ type: Boolean, default: true })
   isActive: boolean
 
-  @Column({ nullable: true })
+  @Prop({ nullable: true })
   planACOM: number
 
-  @Column({ nullable: true })
+  @Prop({ nullable: true })
   planWCOM: number
 
-  @OneToMany(() => UserTenancy, (userTenancy) => userTenancy.user)
-  userTenancies?: UserTenancy[]
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Prop({ type: Date })
   createdAt: number
 }
+
+export const TenancySchema = SchemaFactory.createForClass(Tenancy)

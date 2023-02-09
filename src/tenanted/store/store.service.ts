@@ -1,6 +1,6 @@
 import { Inject, Injectable, Scope } from '@nestjs/common'
 import { asyncForEach } from 'src/utils/utils'
-import { Connection, Repository } from 'typeorm'
+import { Any, Connection, createQueryBuilder, Repository } from 'typeorm'
 import { TENANCY_CONNECTION } from '../../public/tenancy/tenancy.provider'
 import { StoreOpeningHour } from './database/store-opening-hour.entity'
 import { StorePhone } from './database/store-phone.entity'
@@ -99,6 +99,25 @@ export class StoreService {
       openingHours = await this.storeOpeningHourRepository.find({ storeId: storeId })
     } else {
       openingHours = await this.storeOpeningHourRepository.find()
+    }
+    return openingHours
+  }
+
+  async findOpeningHoursGroupByStore(storeId?: number): Promise<StoreOpeningHour[]> {
+    let openingHours = []
+    if (storeId) {
+      openingHours = await this.storeOpeningHourRepository
+        .createQueryBuilder()
+        .where('storeId = :storeId', { storeId: storeId })
+        .orderBy('storeId')
+        .addOrderBy('weekDay')
+        .getMany()
+    } else {
+      openingHours = await this.storeOpeningHourRepository
+        .createQueryBuilder()
+        .orderBy('storeId')
+        .addOrderBy('weekDay')
+        .getMany()
     }
     return openingHours
   }

@@ -24,6 +24,8 @@ import { plainToClass } from 'class-transformer'
 import { ReqUpdateStoreDto } from './dto/req-upd-store.dto'
 import { UpdateStoreDto } from './dto/upd-store.dto'
 import { parseAppReadOpeningHours, parseAppReadPhones, ReadStoreDto } from './dto/app/app-store.dto'
+import { AdmStoreOpeningHour, IHours, IOpeningHour } from './dto/admin/adm-store-opening-hour.dto'
+import { IStoreOpeningHour } from './interfaces/store-opening-hour.interface'
 // import { JwtAuthGuard } from 'src/common/modules/auth/guards/jwt-auth.guard'
 
 @UseInterceptors(LoggingInterceptor)
@@ -48,6 +50,28 @@ export class StoreController {
     const stores = await this.storeService.find(storeId)
     const readStores = this.parseReadStores(stores)
     return readStores
+  }
+
+  // ************************** ADMIN ***************************
+  @Get('admin')
+  async adminFindStore(): Promise<ReadStoreDto[]> {
+    const stores = await this.storeService.find()
+    const readStores = this.parseReadStores(stores)
+    return readStores
+  }
+
+  //************** Opening Hours **************** */
+  @Get('admin/openingHours')
+  async findAllOpeningHours(): Promise<any[]> {
+    const rawOpeningHours = await this.storeService.findOpeningHoursGroupByStore()
+    const openingHours = this.parseOpeningHours(rawOpeningHours)
+    return openingHours
+  }
+
+  @Get('/:id/openingHours')
+  async findOpeningHoursByStore(@Param('id') storeId: number): Promise<StoreOpeningHour[]> {
+    const openingHours = await this.storeService.findOpeningHours(storeId)
+    return openingHours
   }
 
   // @Post()
@@ -108,16 +132,34 @@ export class StoreController {
   }
 
   //************** Opening Hours **************** */
-  @Get('/openingHours')
-  async findAllOpeningHours(): Promise<StoreOpeningHour[]> {
-    const openingHours = await this.storeService.findOpeningHours()
-    return openingHours
-  }
-
-  @Get('/:id/openingHours')
-  async findOpeningHoursByStore(@Param('id') storeId: number): Promise<StoreOpeningHour[]> {
-    const openingHours = await this.storeService.findOpeningHours(storeId)
-    return openingHours
+  private parseOpeningHours(rawOpeningHours: IStoreOpeningHour[]): AdmStoreOpeningHour[] {
+    const storeOpeningHours: AdmStoreOpeningHour[] = []
+    const maxStore = Math.max(...rawOpeningHours.map((op) => op.storeId))
+    for (let storeId = 0; storeId <= maxStore; storeId++) {
+      const openingHoursByStore = rawOpeningHours.filter((op) => op.storeId == storeId)
+      const openingHours: IOpeningHour[] = []
+      if (openingHoursByStore.length > 0) {
+        for (let weekDay = 1; weekDay < 8; weekDay++) {
+          const openingHoursByDay: IHours[] = []
+          openingHoursByStore.forEach((op) => {
+            if (op.weekDay == weekDay) {
+              openingHoursByDay.push({ id: op.id, fromHour: op.fromHour, toHour: op.toHour })
+            }
+          })
+          const openingHoursByWeekDay: IOpeningHour = {
+            weekDay: weekDay,
+            hours: openingHoursByDay,
+          }
+          openingHours.push(openingHoursByWeekDay)
+        }
+        const _storeOpeningHour: AdmStoreOpeningHour = {
+          storeId: storeId,
+          openingHours: openingHours,
+        }
+        storeOpeningHours.push(_storeOpeningHour)
+      }
+    }
+    return storeOpeningHours
   }
 
   @Post('/:id/openingHour')

@@ -11,7 +11,7 @@ import { StoreWorker } from 'src/tenanted/store/database/store-worker.entity'
 import { StoreOpeningHour } from 'src/tenanted/store/database/store-opening-hour.entity'
 import { Announcement } from 'src/tenanted/hub/announcement/database/announcement.entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Tenancy } from './database/tenancy.entity'
+import { Tenancy, TenancySchema } from './database/tenancy.entity'
 import { TenancyService } from './tenancy.service'
 import { Product } from 'src/tenanted/e-commerce/product/database/product/product.entity'
 import { Category } from 'src/tenanted/e-commerce/product/database/category/category.entity'
@@ -43,9 +43,18 @@ import { VariationImage } from 'src/tenanted/e-commerce/product/database/variati
 import { HubSurvey } from 'src/tenanted/hub/contact/database/entities/survey.entity'
 import { HubContact } from 'src/tenanted/hub/contact/database/entities/contact.entity'
 import { StoreProduct } from 'src/tenanted/e-commerce/product/database/storeProduct/store-product.entity'
+import { MongooseModule } from '@nestjs/mongoose'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Tenancy])],
+  // imports: [TypeOrmModule.forFeature([Tenancy])],
+  imports: [
+    MongooseModule.forFeature([
+      {
+        name: Tenancy.name,
+        schema: TenancySchema,
+      },
+    ]),
+  ],
   controllers: [TenancyController],
   providers: [TenancyService, TenancyProvider],
   exports: [TenancyProvider],
